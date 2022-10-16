@@ -54,20 +54,25 @@ export default {
 
 <style lang="less" scoped>
 .MainView {
+  height: 100%;
   .Aside {
     width: auto;
     display: block;
     position: relative;
-    border: solid black 2px;
+    box-shadow: 2.4px 1.4px 3.1px -9px rgba(0, 0, 0, 0.029),
+      6.9px 4px 8.5px -9px rgba(0, 0, 0, 0.044),
+      14.4px 8.4px 17.8px -9px rgba(0, 0, 0, 0.051),
+      27.1px 15.8px 35.8px -9px rgba(0, 0, 0, 0.053),
+      55px 32px 80px -9px rgba(0, 0, 0, 0.05);
+
+    border-radius: 5px;
   }
   .Main {
-    border: solid black 2px;
-    background-color: cornflowerblue;
+    background-color: var(--theme--grey);
   }
   .Footer {
     width: 100%;
-    border: solid black 2px;
-    background-color: darkorange;
+    // background-color: darkorange;
   }
 }
 </style>

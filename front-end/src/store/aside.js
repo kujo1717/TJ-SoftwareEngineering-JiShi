@@ -26,9 +26,25 @@ export default {
                     path: '/Calendarview',
                     name: 'CalendarView',
                     label: '总日历',
-                    icon: 's-home',
-                    url: '/Calendarview',
+                    icon: 'icon/calendar.png',
+                    index: '1',
+                    children:[
+                        {
+                            path: '/Calendarview',
+                            name: 'CalendarView',
+                            label: '总日历-1',
+                            icon: 's-home',
+                            index: '1-1',
+                        }
+                    ]
 
+                },
+                {
+                    path: '/Calendarview',
+                    name: 'CalendarView',
+                    label: '视图',
+                    icon: 's-home',
+                    index: '2'
                 },
 
             ]

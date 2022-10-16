@@ -10,18 +10,16 @@ aside组件，页面统一使用的侧边导航栏，可收起
     class="AsideView"
     :unique-opened="true"
     :collapse="isCollapse"
-    background-color="#00a497"
-    text-color="#fff"
-    active-text-color="#000"
-    default-active="1-4-1"
+    default-active="1"
   >
     <!-- 根据menu数据，动态渲染一级的noChildren目录 -->
     <el-menu-item
       @click="clickMenu(item)"
       v-for="item in noChildren"
-      :index="item.path"
+      :index="item.index"
       :key="item.path"
     >
+ 
       <!-- <i :class="'el-icon-' + item.icon" style="color: #ffc107"></i> -->
       <template slot="title">
         <span slot="title">{{ item.label }}</span>
@@ -29,7 +27,11 @@ aside组件，页面统一使用的侧边导航栏，可收起
     </el-menu-item>
 
     <!-- 根据menu数据，动态渲染hasChildren目录 -->
-    <el-submenu v-for="item in hasChildren" :index="item.path" :key="item.name">
+    <el-submenu
+      v-for="item in hasChildren"
+      :index="item.index"
+      :key="item.name"
+    >
       <!-- 1级目录 -->
       <template slot="title">
         <!-- <i :class="'el-icon-' + item.icon" style="color: #ffc107"></i> -->
@@ -38,7 +40,7 @@ aside组件，页面统一使用的侧边导航栏，可收起
 
       <!-- 2级目录 -->
       <el-menu-item-group v-for="subItem in item.children" :key="subItem.path">
-        <el-menu-item :index="subItem.path" @click="clickMenu(subItem)">
+        <el-menu-item :index="subItem.index" @click="clickMenu(subItem)">
           {{ subItem.label }}
         </el-menu-item>
       </el-menu-item-group>
@@ -100,4 +102,23 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.AsideView {
+
+  /deep/ .el-submenu__title:hover {
+    background-color: var(--menu-hover) !important;
+  }
+  /deep/ .el-menu-item:hover {
+    background-color: var(--menu-hover) !important;
+
+  }
+
+  .el-menu-item {
+    color: black;
+  }
+  .el-menu-item.is-active {
+    color: black;
+
+    background-color: var(--menu-chosen);
+  }
+}
 </style>

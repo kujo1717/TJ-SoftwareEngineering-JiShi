@@ -22,4 +22,10 @@ body,
 .el-autocomplete-suggestion {
   width: auto !important;
 }
+
+:root {
+  --menu-hover: #e8fcf9;
+  --menu-chosen: #d3f9f4;
+  --theme--grey: #f5f5f5;
+}
 </style>
