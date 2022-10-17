@@ -1,0 +1,23 @@
+{
+  "id": "3709679",
+  "name": "SE",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "784528",
+      "name": "日历",
+      "font_class": "calendar",
+      "unicode": "e65f",
+      "unicode_decimal": 58975
+    },
+    {
+      "icon_id": "14835757",
+      "name": "列表视图",
+      "font_class": "viewList",
+      "unicode": "e660",
+      "unicode_decimal": 58976
+    }
+  ]
+}

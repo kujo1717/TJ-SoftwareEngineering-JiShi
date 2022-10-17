@@ -32,5 +32,14 @@ module.exports = {
     //       }
     //     }
     //   }
+  },
+
+  css: {
+    loaderOptions: {
+      sass: {
+        additionalData: `@import "@/assets/styles/css/variables.scss";` //引入全局变量   
+      }
+    }
   }
+
 };

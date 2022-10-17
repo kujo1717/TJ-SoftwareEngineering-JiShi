@@ -19,7 +19,7 @@ aside组件，页面统一使用的侧边导航栏，可收起
       :index="item.index"
       :key="item.path"
     >
- 
+      <i :class="'icon iconfont ' + item.icon"></i>
       <!-- <i :class="'el-icon-' + item.icon" style="color: #ffc107"></i> -->
       <template slot="title">
         <span slot="title">{{ item.label }}</span>
@@ -101,20 +101,23 @@ export default {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .AsideView {
+  // background-color: $color-red;
 
+  // hover颜色
   /deep/ .el-submenu__title:hover {
     background-color: var(--menu-hover) !important;
   }
   /deep/ .el-menu-item:hover {
     background-color: var(--menu-hover) !important;
-
   }
 
+  // 通常颜色
   .el-menu-item {
     color: black;
   }
+  // active颜色
   .el-menu-item.is-active {
     color: black;
 

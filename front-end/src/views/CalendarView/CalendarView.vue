@@ -5,7 +5,10 @@
 @lastUpdata 10.15
 */
 <template>
-  <div>CalendarView</div>
+  <div>
+    CalendarView
+    <el-button type='primary'>test primary css</el-button>
+  </div>
 </template>
 
 <script>

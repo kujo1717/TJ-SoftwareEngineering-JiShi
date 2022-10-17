@@ -1,5 +1,7 @@
 // // 引入element样式文件
 import 'element-ui/lib/theme-chalk/index.css'
+import './assets/styles/icon/iconfont.css'
+import './assets/styles/css/element-variables.scss'
 import Vue from 'vue'
 import App from './App.vue'
 import http from 'axios'
