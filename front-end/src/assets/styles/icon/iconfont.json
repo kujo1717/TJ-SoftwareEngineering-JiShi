@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "13638698",
+      "name": "优先级",
+      "font_class": "youxianji",
+      "unicode": "e653",
+      "unicode_decimal": 58963
+    },
+    {
       "icon_id": "784528",
       "name": "日历",
       "font_class": "calendar",

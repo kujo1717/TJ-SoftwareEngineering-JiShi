@@ -31,8 +31,8 @@ export default {
 
                 },
                 {
-                    path: '/Calendarview',
-                    name: 'CalendarView',
+                    path: '/Taskview',
+                    name: 'TaskView',
                     label: '视图',
                     icon: 'icon-viewList',
                     index: '2'

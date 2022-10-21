@@ -79,6 +79,7 @@ Vue.use(CollapseItem);
 Vue.use(Collapse);
 Vue.use(Loading.directive);
 
+
 Vue.prototype.$message = Message;
 Vue.prototype.$confirm = MessageBox.confirm
 Vue.prototype.$alert = MessageBox.alert
