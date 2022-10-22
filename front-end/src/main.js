@@ -79,6 +79,11 @@ Vue.use(CollapseItem);
 Vue.use(Collapse);
 Vue.use(Loading.directive);
 
+
+//引入moment
+import moment from "moment"
+Vue.prototype.$moment = moment;
+
 Vue.prototype.$message = Message;
 Vue.prototype.$confirm = MessageBox.confirm
 Vue.prototype.$alert = MessageBox.alert
