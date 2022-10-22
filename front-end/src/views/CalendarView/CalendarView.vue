@@ -1,24 +1,50 @@
 /**
 全日历页面
 @author yy
-@editor yy
-@lastUpdata 10.15
+@editor yy, hym
+@lastUpdata 10.12
 */
 <template>
   <div>
-    CalendarView
-    <el-button type='primary'>test primary css</el-button>
+    <FullCalendar :options="calendarOptions" />
+    <CreateTaskBox/>
+    
   </div>
 </template>
 
 <script>
+// 引入日历组件
+import '@fullcalendar/core/vdom' // solves problem with Vite
+import FullCalendar from '@fullcalendar/vue'
+import dayGridPlugin from '@fullcalendar/daygrid'
+import interactionPlugin from '@fullcalendar/interaction'
+import CreateTaskBox from '../../components/CreateTaskBox.vue'
+
+
 export default {
-  name: "CalendarView",
-  components: {},
-  data() {
-    return {};
+  name: "CalenderView",
+  components: { FullCalendar, CreateTaskBox },
+  data () {
+    return {
+      calendarOptions: {
+        plugins: [dayGridPlugin, interactionPlugin],
+        initialView: 'dayGridMonth',
+        dateClick: this.handleDateClick,
+        events: [
+          { title: '事项1', date: '2022-10-07' },
+          { title: '事项2', date: '2022-10-07' }
+        ]
+      },
+
+    }
+
   },
-  mounted() {},
+  methods: {
+    handleDateClick: function (arg) {
+      //alert('date click! ' + arg.dateStr)
+      this.dialogVisible = true;
+    }
+  }
 };
 </script>
 
