@@ -14,7 +14,7 @@
     >
       <el-form
         ref="form"
-        :model="form"
+        :model="createForm"
         label-width="80px"
         :rules="createForm_rules"
       >
@@ -40,16 +40,15 @@
             type="textarea"
             placeholder="背景/信息说明"
             v-model="createForm.detail"
+            :autosize="{ minRows: 3, maxRows: 5}"
             maxlength="30"
             show-word-limit
           ></el-input>
         </el-form-item>
 
         <!--分类-->
-        <el-form-item
-          label="分类"
-          prop="classification"
-        >
+        <i class="iconfont icon-fenlei iconPosition" />
+        <el-form-item prop="classification">
           <el-dropdown
             @command="handleClassifyCommand"
             trigger="click"
@@ -60,18 +59,16 @@
               ></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="a">黄金糕</el-dropdown-item>
-              <el-dropdown-item command="b">狮子头</el-dropdown-item>
-              <el-dropdown-item command="c">螺蛳粉</el-dropdown-item>
+              <el-dropdown-item command="a">学习</el-dropdown-item>
+              <el-dropdown-item command="b">工作</el-dropdown-item>
+              <el-dropdown-item command="c">生活</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </el-form-item>
 
         <!--优先级-->
-        <el-form-item
-          label="优先级"
-          prop="classification"
-        >
+        <i class="iconfont icon-louti iconPosition" />
+        <el-form-item prop="classification">
           <el-dropdown
             @command="handlePriorityCommand"
             trigger="click"
@@ -82,18 +79,29 @@
               ></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="a">黄金糕</el-dropdown-item>
-              <el-dropdown-item command="b">狮子头</el-dropdown-item>
-              <el-dropdown-item command="c">螺蛳粉</el-dropdown-item>
+              <el-dropdown-item><i
+                  class="iconfont icon-youxianji"
+                  style="color:#d81e06"
+                ></i>高优先级</el-dropdown-item>
+              <el-dropdown-item><i
+                  class="iconfont icon-youxianji"
+                  style="color:#f4ea2a"
+                ></i>中优先级</el-dropdown-item>
+              <el-dropdown-item><i
+                  class="iconfont icon-youxianji"
+                  style="color:#1afa29"
+                ></i>低优先级</el-dropdown-item>
+              <el-dropdown-item><i
+                  class="iconfont icon-youxianji"
+                  style="color:#bfbfbf"
+                ></i>无优先级</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </el-form-item>
 
         <!--选择时间范围-->
-        <el-form-item
-          label="时间"
-          prop="timeRange"
-        >
+        <i class="el-icon-time iconPosition" />
+        <el-form-item prop="timeRange">
           <el-time-picker
             is-range
             arrow-control
@@ -128,7 +136,7 @@ export default {
   name: "CreateTaskBox",
   data () {
     return {
-      dialogVisible: true,
+      dialogVisible: this.createTaskBoxDialogVisible,
       createForm: {
         title: '',//事项名称
         detail: '',//事项详述
@@ -147,6 +155,7 @@ export default {
       },
     }
   },
+  props: ["createTaskBoxDialogVisible", "date"],
   methods: {
     //处理分类的下拉框
     handleClassifyCommand () {
@@ -161,14 +170,34 @@ export default {
     //按钮的退出方法
     buttonExit () {
       this.dialogVisible = false;
+
+      //这里要写把新事项往后端存的代码
+      //code here......
+
+      this.$message({
+        message: '事项创建成功！',
+        type: 'success'
+      });
     }
   },
   mounted: function () {
-
+    this.dialogVisible = this.createTaskBoxDialogVisible;
   },
   computed: {
 
+  },
+  watch: {
+    createTaskBoxDialogVisible: {
+      handler (newVal) {
+        console.log('检测到父组件参数变化！', newVal)
+        console.log("子组件接收到日期：", this.date)
+        this.dialogVisible = newVal;
+      },
+      deep: true,
+      immediate: true
+    },
   }
+
 }
 </script>
 
@@ -179,5 +208,14 @@ export default {
   display: flex;
   justify-content: flex-end;
   padding-right: 20px;
+}
+
+//icon位置
+.iconPosition {
+  float: left;
+  position: relative;
+  left: 50px;
+  top: 14px;
+  transform: scale(1.2);
 }
 </style>

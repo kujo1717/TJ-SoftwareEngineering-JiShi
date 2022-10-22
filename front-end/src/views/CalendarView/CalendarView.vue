@@ -7,8 +7,7 @@
 <template>
   <div>
     <FullCalendar :options="calendarOptions" />
-    <CreateTaskBox/>
-    
+    <CreateTaskBox :createTaskBoxDialogVisible="createTaskBoxDialogVisible" :date="chosen_date" :key="timer"/>
   </div>
 </template>
 
@@ -26,6 +25,9 @@ export default {
   components: { FullCalendar, CreateTaskBox },
   data () {
     return {
+      timer: '',//用于每次调用子组件都按照当前时间重新生成DOM元素
+      chosen_date:'',//当前选中的日期
+      createTaskBoxDialogVisible: false,
       calendarOptions: {
         plugins: [dayGridPlugin, interactionPlugin],
         initialView: 'dayGridMonth',
@@ -35,15 +37,19 @@ export default {
           { title: '事项2', date: '2022-10-07' }
         ]
       },
-
     }
 
   },
   methods: {
     handleDateClick: function (arg) {
-      //alert('date click! ' + arg.dateStr)
-      this.dialogVisible = true;
+      this.timer = new Date().getTime();
+      this.createTaskBoxDialogVisible = true;
+      this.chosen_date = arg.dateStr;
+      //alert('date click! ' + arg.dateStr)     
     }
+  },
+  watch:{
+    
   }
 };
 </script>
