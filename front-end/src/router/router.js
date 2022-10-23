@@ -7,7 +7,6 @@ Vue.use(VueRouter)
 //路由组件
 import Main from '../views/Main.vue'
 import CalendarView from '../views/CalendarView/CalendarView.vue'
-import TaskView from '../views/TaskView/TaskView.vue'
 import ViewList from '../views/ViewList/viewList.vue'
 //路由配置项
 const routes = [
@@ -44,18 +43,7 @@ const routes = [
 
                 ]
             },
-            {
-                path: 'TaskView',
-                name: 'TaskView',
-                component: TaskView,
-                meta: {
-                    needAuth: true,
-                    title: 'TaskView Page'
-                },
-                children: [
 
-                ]
-            }
         ]
     }
 ]
