@@ -3,6 +3,14 @@
 @author: hym
 @editor: hym
 @lastUpdate hym 10.22
+
+传参说明：
+1.createTaskBoxDialogVisible: bool 控制对话框显示
+2.dateObj: Obj
+{
+  start:Date()
+  end:Date()
+}
 */
 <template>
   <div>
@@ -102,16 +110,14 @@
         <!--选择时间范围-->
         <i class="el-icon-time iconPosition" />
         <el-form-item prop="timeRange">
-          <el-time-picker
-            is-range
-            arrow-control
-            v-model="createForm.timeRange"
+          <el-date-picker
+            v-model="timeRange"
+            type="datetimerange"
             range-separator="至"
-            start-placeholder="开始时间"
-            end-placeholder="结束时间"
-            placeholder="选择时间范围"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
           >
-          </el-time-picker>
+          </el-date-picker>
         </el-form-item>
 
       </el-form>
@@ -142,7 +148,8 @@ export default {
         detail: '',//事项详述
         classification: '默认分类',//事项分类
         priority: '无优先级',//优先级
-        timeRange: [new Date(2016, 9, 10, 8, 40), new Date(2016, 9, 10, 9, 40)],//时间范围
+        start: this.dateObj.start,
+        end: this.dateObj.end,
       },
       createForm_rules: {
         title: [
@@ -155,7 +162,7 @@ export default {
       },
     }
   },
-  props: ["createTaskBoxDialogVisible", "date"],
+  props: ["createTaskBoxDialogVisible", "dateObj"],
   methods: {
     //处理分类的下拉框
     handleClassifyCommand () {
@@ -184,13 +191,13 @@ export default {
     this.dialogVisible = this.createTaskBoxDialogVisible;
   },
   computed: {
-
+    timeRange(){
+      return [this.createForm.start, this.createForm.end];
+    }
   },
   watch: {
     createTaskBoxDialogVisible: {
       handler (newVal) {
-        console.log('检测到父组件参数变化！', newVal)
-        console.log("子组件接收到日期：", this.date)
         this.dialogVisible = newVal;
       },
       deep: true,

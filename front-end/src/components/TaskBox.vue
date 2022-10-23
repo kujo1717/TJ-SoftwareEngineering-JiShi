@@ -3,13 +3,13 @@
 @author: hym
 @editor: hym
 @lastUpdate hym 10.22
+
+传参说明：
+taskBoxDialogVisible: bool 控制对话框显示
+taskid: string 事项id
 */
 <template>
   <div>
-    <!--按钮-->
-    <el-button @click=openDialog()>
-      查看事项详情
-    </el-button>
 
     <!--对话框-->
     <el-dialog
@@ -146,7 +146,7 @@ export default {
   name: "TaskBox",
   data () {
     return {
-      dialogVisible: false,//是否弹出对话框
+      dialogVisible: this.taskBoxDialogVisible,//是否弹出对话框
       isEditting: false,//是否正在编辑，用于动态class
       detailTextArea: "abandon",//详情的文字
 
@@ -185,6 +185,7 @@ export default {
       value3: ''
     }
   },
+  props: ["taskBoxDialogVisible", "taskid"],
   methods: {
     openDialog () {
       this.dialogVisible = true;
@@ -194,11 +195,20 @@ export default {
     }
   },
   mounted: function () {
-
+    this.dialogVisible = this.taskBoxDialogVisible;
   },
   computed: {
 
   },
+  watch: {
+    taskBoxDialogVisible: {
+      handler (newVal) {
+          this.dialogVisible = newVal;
+      },
+      deep: true,
+      immediate: true
+    },
+  }
 }
 </script>
 
