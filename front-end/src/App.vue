@@ -29,6 +29,8 @@ body,
   --theme--grey: #f5f5f5;
   --head--grey: #6a6a6a;
   --color-primary: #009688;
+  --calendar-primary: #82c759;
+  --calendar-hover: #305b13;
 }
 
 .icon,

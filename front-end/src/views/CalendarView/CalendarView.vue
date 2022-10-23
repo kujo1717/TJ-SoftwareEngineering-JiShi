@@ -33,11 +33,14 @@ import interactionPlugin from "@fullcalendar/interaction";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import listPlugin from "@fullcalendar/list";
 import timeGridPlugin from "@fullcalendar/timegrid";
+// import 'bootstrap/dist/css/bootstrap.css';
+// import 'bootstrap-icons/font/bootstrap-icons.css'; // needs additional webpack config!
+// import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 
 export default {
   name: "CalenderView",
   components: { FullCalendar, CreateTaskBox, TaskBox },
-  data() {
+  data () {
     return {
       chosen_dateObj: "", //当前选中的日期
       chosen_taskid: "", //当前选中的任务
@@ -52,6 +55,7 @@ export default {
           resourceTimelinePlugin,
           listPlugin,
           timeGridPlugin,
+          //bootstrap5Plugin,
         ],
         locale: "zh",
         timeZone: "local",
@@ -68,6 +72,7 @@ export default {
           right: "dayGridMonth,timeGridWeek,timeGridDay resourceTimeline",
         },
         initialView: "dayGridMonth",
+        //themeSystem: 'bootstrap5',
         selectable: true,
         editable: true, //拖拽编辑
         nowIndicator: true, //当前时间指示器
@@ -126,7 +131,7 @@ export default {
     };
   },
   methods: {
-    resetDialogVisible() {
+    resetDialogVisible () {
       this.createTaskBoxDialogVisible = false;
       this.taskBoxDialogVisible = false;
     },
@@ -152,4 +157,24 @@ export default {
 </script>
 
 <style lang="less" scoped>
+//改变日历主题色
+/deep/ .fc-button-primary {
+  background-color: var(--calendar-primary) !important;
+  border-color: var(--calendar-primary) !important;
+}
+
+/deep/ .fc-button-primary:hover {
+  background-color: var(--calendar-hover) !important;
+  border-color: var(--calendar-hover) !important;
+}
+
+/deep/ .fc-button-primary:active {
+  background-color: var(--calendar-hover) !important;
+  border-color: var(--calendar-hover) !important;
+}
+
+//隐藏盗版
+/deep/ .fc-license-message {
+  opacity: 0 !important;
+}
 </style>
