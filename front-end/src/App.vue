@@ -27,6 +27,8 @@ body,
   --menu-hover: #e8fcf9;
   --menu-chosen: #d3f9f4;
   --theme--grey: #f5f5f5;
+  --head--grey: #6a6a6a;
+  --color-primary: #009688;
 }
 
 .icon,

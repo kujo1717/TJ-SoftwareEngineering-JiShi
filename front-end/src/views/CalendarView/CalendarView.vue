@@ -12,7 +12,7 @@
     <CreateTaskBox
       :createTaskBoxDialogVisible="createTaskBoxDialogVisible"
       :dateObj="chosen_dateObj"
-      :key="new Date().getTime()+5"
+      :key="new Date().getTime() + 5"
     />
     <TaskBox
       :taskBoxDialogVisible="taskBoxDialogVisible"
@@ -24,48 +24,53 @@
 
 <script>
 // 引入日历组件
-import CreateTaskBox from '../../components/CreateTaskBox.vue'
-import TaskBox from '../../components/TaskBox.vue'
-import '@fullcalendar/core/vdom' // solves problem with Vite
-import FullCalendar from '@fullcalendar/vue'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import interactionPlugin from '@fullcalendar/interaction'
-import resourceTimelinePlugin from '@fullcalendar/resource-timeline'
-import listPlugin from '@fullcalendar/list'
-import timeGridPlugin from '@fullcalendar/timegrid';
-
+import CreateTaskBox from "../../components/CreateTaskBox.vue";
+import TaskBox from "../../components/TaskBox.vue";
+import "@fullcalendar/core/vdom"; // solves problem with Vite
+import FullCalendar from "@fullcalendar/vue";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
+import listPlugin from "@fullcalendar/list";
+import timeGridPlugin from "@fullcalendar/timegrid";
 
 export default {
   name: "CalenderView",
   components: { FullCalendar, CreateTaskBox, TaskBox },
-  data () {
+  data() {
     return {
-      chosen_dateObj: '',//当前选中的日期
-      chosen_taskid: '',//当前选中的任务
+      chosen_dateObj: "", //当前选中的日期
+      chosen_taskid: "", //当前选中的任务
 
       createTaskBoxDialogVisible: false,
       taskBoxDialogVisible: false,
       isDateClicking: false,
       calendarOptions: {
-        plugins: [dayGridPlugin, interactionPlugin, resourceTimelinePlugin, listPlugin, timeGridPlugin],
-        locale: 'zh',
-        timeZone: 'local',
+        plugins: [
+          dayGridPlugin,
+          interactionPlugin,
+          resourceTimelinePlugin,
+          listPlugin,
+          timeGridPlugin,
+        ],
+        locale: "zh",
+        timeZone: "local",
         buttonText: {
-          today: '今天',
-          month: '月',
-          week: '周',
-          day: '日',
-          resourceTimeline: '子任务列表',
+          today: "今天",
+          month: "月",
+          week: "周",
+          day: "日",
+          resourceTimeline: "子任务列表",
         },
         headerToolbar: {
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay resourceTimeline',
+          left: "prev,next today",
+          center: "title",
+          right: "dayGridMonth,timeGridWeek,timeGridDay resourceTimeline",
         },
-        initialView: 'dayGridMonth',
+        initialView: "dayGridMonth",
         selectable: true,
-        editable: true,//拖拽编辑
-        nowIndicator: true,//当前时间指示器
+        editable: true, //拖拽编辑
+        nowIndicator: true, //当前时间指示器
         //点击事件
         select: this.handleDateSelect,
         eventClick: this.handleEventClick,
@@ -74,41 +79,54 @@ export default {
         dayMaxEventRows: true,
         views: {
           timeGrid: {
-            dayMaxEventRows: 6 // adjust to 6 only for timeGridWeek/timeGridDay
+            dayMaxEventRows: 6, // adjust to 6 only for timeGridWeek/timeGridDay
           },
         },
         events: [
-          { id: '001', groupid: '1', title: '事项1', start: '2022-10-23T12:30:00', end: '2022-10-23T15:30:00', color: '#378006', allDay: false, displayEventTime: true, resourceIds: ['a1', 'a2'] },
-          { title: '事项2', date: '2022-10-23', allDay: true, resourceIds: ['a'] },
-          { title: '事项2', date: '2022-10-23', allDay: true },
-          { title: '事项2', date: '2022-10-23', allDay: true },
-          { title: '事项2', date: '2022-10-23', allDay: true },
-          { title: '事项2', date: '2022-10-23', allDay: true },
-          { title: '事项2', date: '2022-10-23', allDay: true },
+          {
+            id: "001",
+            groupid: "1",
+            title: "事项1",
+            start: "2022-10-23T12:30:00",
+            end: "2022-10-23T15:30:00",
+            color: "#378006",
+            allDay: false,
+            displayEventTime: true,
+            resourceIds: ["a1", "a2"],
+          },
+          {
+            title: "事项2",
+            date: "2022-10-23",
+            allDay: true,
+            resourceIds: ["a"],
+          },
+          { title: "事项2", date: "2022-10-23", allDay: true },
+          { title: "事项2", date: "2022-10-23", allDay: true },
+          { title: "事项2", date: "2022-10-23", allDay: true },
+          { title: "事项2", date: "2022-10-23", allDay: true },
+          { title: "事项2", date: "2022-10-23", allDay: true },
         ],
         resources: [
           {
-            id: 'a',
-            title: 'Room A',
+            id: "a",
+            title: "Room A",
             children: [
               {
-                id: 'a1',
-                title: 'Room A1'
+                id: "a1",
+                title: "Room A1",
               },
               {
-                id: 'a2',
-                title: 'Room A2'
-              }
-            ]
-          }
-        ]
-
+                id: "a2",
+                title: "Room A2",
+              },
+            ],
+          },
+        ],
       },
-    }
-
+    };
   },
   methods: {
-    resetDialogVisible () {
+    resetDialogVisible() {
       this.createTaskBoxDialogVisible = false;
       this.taskBoxDialogVisible = false;
     },
@@ -125,15 +143,11 @@ export default {
       this.resetDialogVisible();
       this.taskBoxDialogVisible = true;
 
-      console.log('事项信息：', arg);
-
+      console.log("事项信息：", arg);
     },
   },
 
-
-  watch: {
-
-  }
+  watch: {},
 };
 </script>
 

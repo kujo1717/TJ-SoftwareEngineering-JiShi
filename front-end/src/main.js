@@ -13,12 +13,13 @@ import {
   Form, FormItem, Input, Select, Checkbox, Radio, Switch, DatePicker, TimePicker,
   Tabs, TabPane, Table, TableColumn, Descriptions, DescriptionsItem, Icon, Tooltip, Alert, Tag,
   Option, Avatar, Image, Skeleton, Divider, Calendar, Carousel, CarouselItem, Rate, Autocomplete, Popover, Pagination,
-  Badge, Upload, CollapseItem, Collapse, Loading, RadioGroup, RadioButton, Cascader, CascaderPanel
+  Badge, Upload, CollapseItem, Collapse, Loading, RadioGroup, RadioButton, Cascader, CascaderPanel, Scrollbar
 } from 'element-ui'
 
 import router from './router/router'
 import store from './store/index'
 //注册使用ElementUI
+Vue.use(Scrollbar)
 Vue.use(CascaderPanel)
 Vue.use(Cascader)
 Vue.use(RadioGroup)
@@ -79,10 +80,6 @@ Vue.use(CollapseItem);
 Vue.use(Collapse);
 Vue.use(Loading.directive);
 
-
-//引入moment
-import moment from "moment"
-Vue.prototype.$moment = moment;
 
 Vue.prototype.$message = Message;
 Vue.prototype.$confirm = MessageBox.confirm
