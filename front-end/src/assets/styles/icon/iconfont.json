@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "18164621",
+      "name": "站点地图,分级,组织,层级",
+      "font_class": "org",
+      "unicode": "e864",
+      "unicode_decimal": 59492
+    },
+    {
       "icon_id": "2675010",
       "name": "分类",
       "font_class": "fenlei",

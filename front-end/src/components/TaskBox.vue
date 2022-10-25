@@ -15,116 +15,157 @@ taskid: string 事项id
     <el-dialog
       :visible.sync="dialogVisible"
       width="1000px"
-      append-to-body
+      :append-to-body="true"
     >
-      <el-container style="height: 510px; border: 1px solid #eee">
+      <el-container>
 
         <!--header-->
         <el-header>
-          这里是header
-        </el-header>
-        <!--sider-->
+          <!--勾选框-->
+          <el-radio
+            class="isDone_radio"
+            v-model="taskInfo.isdone"
+            :label="true"
+            @click.native.prevent="onTaskDoneRadioChange()"
+          >
+            <span></span>
+          </el-radio>
 
+          <!--事项与ddl的时间差-->
+          <font :color="timeLengthColor">{{timeLengthBetweenDDL}}</font>
+        </el-header>
         <el-container>
 
-          <el-aside width="450px">
+          <el-aside width="40em">
             <!--事项详情-->
-            <div class="siderPanel">
-              <div class="detailPanel">
-                <h2 class="taskTitle">背单词</h2>
-                <!--点击编辑详情-->
-                <el-button
-                  size="mini"
-                  @click="changeEditState()"
-                  class="editButton"
-                ><i
-                    :class="isEditting ? 'el-icon-document-checked' : 'el-icon-edit'"></i>
-                </el-button>
+            <div class="detailPanel">
+              <h2 class="taskTitle">{{taskInfo.taskTitle}}</h2>
+              <!--点击编辑详情-->
+              <el-button
+                size="mini"
+                @click="changeEditState()"
+                class="editButton"
+              ><i
+                  :class="isEditting ? 'el-icon-document-checked' : 'el-icon-edit'"></i>
+              </el-button>
 
-                <div v-if="!isEditting">
-                  {{detailTextArea}}
-                </div>
-                <el-input
-                  v-else
-                  type="textarea"
-                  :autosize="{ minRows: 2, maxRows: 5}"
-                  placeholder="请输入内容"
-                  v-model="detailTextArea"
-                >
-                </el-input>
+              <div v-if="!isEditting">
+                {{taskInfo.taskDetail}}
               </div>
-
-              <!--事项属性-->
-              <el-form label-width="0px">
-                <!--分类-->
-                <el-form-item class="formItem">
-                  <i class="iconfont icon-fenlei"></i>分类：
-                  <el-dropdown trigger="click">
-                    <span class="el-dropdown-link">
-                      <el-tag
-                        type="success"
-                        class="el-icon-arrow-down el-icon--right"
-                      >{{sideTable.classification}}</el-tag>
-                    </span>
-                    <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item>学习</el-dropdown-item>
-                      <el-dropdown-item>工作</el-dropdown-item>
-                      <el-dropdown-item>生活</el-dropdown-item>
-                    </el-dropdown-menu>
-                  </el-dropdown>
-                </el-form-item>
-
-                <!--优先级-->
-                <el-form-item class="formItem">
-                  <i class="iconfont icon-louti"></i>优先级：
-                  <el-dropdown trigger="click">
-                    <span class="el-dropdown-link">
-                      <el-tag
-                        type="info"
-                        effect="dark"
-                        class="el-icon-arrow-down el-icon--right"
-                      >{{sideTable.priority}}</el-tag>
-                    </span>
-                    <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item><i
-                          class="iconfont icon-youxianji"
-                          style="color:#d81e06"
-                        ></i>高优先级</el-dropdown-item>
-                      <el-dropdown-item><i
-                          class="iconfont icon-youxianji"
-                          style="color:#f4ea2a"
-                        ></i>中优先级</el-dropdown-item>
-                      <el-dropdown-item><i
-                          class="iconfont icon-youxianji"
-                          style="color:#1afa29"
-                        ></i>低优先级</el-dropdown-item>
-                      <el-dropdown-item><i
-                          class="iconfont icon-youxianji"
-                          style="color:#bfbfbf"
-                        ></i>无优先级</el-dropdown-item>
-                    </el-dropdown-menu>
-                  </el-dropdown>
-                </el-form-item>
-
-                <!--终止时间-->
-                <el-form-item class="formItem">
-                  <i class="el-icon-time"></i>时间：
-                  <span class="block">
-                    <el-date-picker
-                      v-model="value2"
-                      type="datetimerange"
-                      :picker-options="pickerOptions"
-                      range-separator="至"
-                      start-placeholder="开始日期"
-                      end-placeholder="结束日期"
-                      align="right"
-                      size="mini"
-                    >
-                    </el-date-picker>
-                  </span>
-                </el-form-item>
-              </el-form>
+              <el-input
+                v-else
+                type="textarea"
+                :autosize="{ minRows: 2, maxRows: 5}"
+                placeholder="请输入内容"
+                v-model="taskInfo.taskDetail"
+              >
+              </el-input>
             </div>
+
+            <!--事项属性-->
+            <el-form label-width="0px">
+              <!--分类-->
+              <el-form-item class="formItem">
+                <i class="iconfont icon-fenlei"></i>分类：
+                <el-select
+                  v-model="taskInfo.classification"
+                  :popper-append-to-body="false"
+                >
+
+                  <el-option
+                    v-for="item in typeList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+
+              <!--优先级-->
+              <el-form-item class="formItem">
+                <i class="iconfont icon-louti"></i>优先级：
+                <el-dropdown
+                  trigger="click"
+                  @command="handlePriorityCommand"
+                >
+                  <span class="el-dropdown-link">
+                    <el-tag
+                      :type="priorityColor"
+                      effect="dark"
+                      class="el-icon-arrow-down el-icon--right"
+                    >{{taskInfo.priority}}</el-tag>
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item command="高优先级"><i
+                        class="iconfont icon-youxianji"
+                        style="color:#d81e06"
+                      ></i>高优先级</el-dropdown-item>
+                    <el-dropdown-item command="中优先级"><i
+                        class="iconfont icon-youxianji"
+                        style="color:#f4ea2a"
+                      ></i>中优先级</el-dropdown-item>
+                    <el-dropdown-item command="低优先级"><i
+                        class="iconfont icon-youxianji"
+                        style="color:#1afa29"
+                      ></i>低优先级</el-dropdown-item>
+                    <el-dropdown-item command="无优先级"><i
+                        class="iconfont icon-youxianji"
+                        style="color:#bfbfbf"
+                      ></i>无优先级</el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+              </el-form-item>
+
+              <!--时间-->
+              <el-form-item class="formItem">
+                <i class="el-icon-time"></i>时间：
+                <span class="block">
+                  <el-date-picker
+                    v-model="taskInfo.timeRange"
+                    type="datetimerange"
+                    :picker-options="pickerOptions"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    align="right"
+                    size="mini"
+                  >
+                  </el-date-picker>
+                </span>
+              </el-form-item>
+
+              <el-form-item class="formItem">
+                <i class="iconfont icon-org"></i>
+                <span v-if="taskInfo.familyPosition=='child'">父事项：</span>
+                <span v-else-if="taskInfo.familyPosition=='parent'">子事项：</span>
+
+                <el-table
+                  ref="multipleTable"
+                  :data="taskInfo.familyMembers"
+                  tooltip-effect="dark"
+                  style="width: 100%"
+                >
+                  <el-table-column
+                    type="selection"
+                    width="55"
+                  >
+                  </el-table-column>
+                  <el-table-column
+                    label="事项名称"
+                    width="120"
+                  >
+                    <template slot-scope="scope">{{ scope.row.date }}</template>
+                  </el-table-column>
+                  <el-table-column
+                    prop="name"
+                    label="状态"
+                    width="120"
+                  >
+                  </el-table-column>
+                </el-table>
+              </el-form-item>
+            </el-form>
 
           </el-aside>
 
@@ -148,14 +189,29 @@ export default {
     return {
       dialogVisible: this.taskBoxDialogVisible,//是否弹出对话框
       isEditting: false,//是否正在编辑，用于动态class
-      detailTextArea: "abandon",//详情的文字
 
-      //卡片的侧边栏数据
-      sideTable: {
+      //事项详细数据
+      taskInfo: {
+        taskTitle: '背单词',
+        taskDetail: "先背两小时单词",//详情的文字
+        isdone: true,
         classification: '学习',
         priority: '无优先级',
-        timeRange: '2022-10-01 00:00:00'
+        timeRange: [new Date(), ''],
+        familyPosition: 'parent',
+        familyMembers: [],
       },
+
+      typeList: [{
+        value: '选项1',
+        label: '学习'
+      }, {
+        value: '选项2',
+        label: '工作'
+      }, {
+        value: '选项3',
+        label: '生活'
+      }],
 
       //日历选择
       pickerOptions: {
@@ -180,33 +236,133 @@ export default {
           }
         }]
       },
-      value1: '',
-      value2: '',
-      value3: ''
+
     }
   },
   props: ["taskBoxDialogVisible", "taskid"],
   methods: {
+    //显示组件
     openDialog () {
       this.dialogVisible = true;
     },
+    //切换"编辑"/"保存"按钮
     changeEditState () {
       this.isEditting = !this.isEditting;
+    },
+    //处理isdone勾选框事件
+    onTaskDoneRadioChange () {
+      this.taskInfo.isdone = !this.taskInfo.isdone;
+    },
+    //处理优先级下拉框的指令
+    handlePriorityCommand (command) {
+      this.taskInfo.priority = command;
     }
   },
   mounted: function () {
     this.dialogVisible = this.taskBoxDialogVisible;
   },
   computed: {
+    //计算优先级标签的颜色
+    priorityColor () {
+      let tagColor = 'info'
+      switch (this.taskInfo.priority) {
+        case '高优先级':
+          tagColor = 'danger';
+          break;
+        case '中优先级':
+          tagColor = 'warning';
+          break;
+        case '低优先级':
+          tagColor = 'success';
+          break;
+        default:
+          tagColor = 'info';
+          break;
+      }
+      return tagColor;
+    },
 
+    //计算ddl与此刻的相对时间差
+    timeLengthBetweenDDL () {
+      let ddlDate = this.taskInfo.timeRange[1];
+      if (ddlDate == '' || !ddlDate) {
+        return null;
+      }
+
+      var dateEnd = ddlDate;
+      var dateBegin = new Date();
+
+      var dateDiff = dateEnd.getTime() - dateBegin.getTime(); //时间差的毫秒数
+      var dayDiff = Math.floor(dateDiff / (24 * 3600 * 1000)); //计算出相差天数
+      var leave1 = dateDiff % (24 * 3600 * 1000); //计算天数后剩余的毫秒数
+      var hours = Math.floor(leave1 / (3600 * 1000)); //计算出小时数
+      //计算相差分钟数
+      var leave2 = leave1 % (3600 * 1000); //计算小时数后剩余的毫秒数
+      var minutes = Math.floor(leave2 / (60 * 1000)); //计算相差分钟数
+      //计算相差秒数
+      var leave3 = leave2 % (60 * 1000); //计算分钟数后剩余的毫秒数
+      var seconds = Math.round(leave3 / 1000);
+
+      //将时间差表示为一个对象
+      var timeLength = {
+        day: dayDiff,
+        hour: hours,
+        minute: minutes,
+        second: seconds
+      }
+
+      var Str = '';
+      if (Math.abs(timeLength.day) >= 1) {
+        Str = timeLength.day + "天";
+      }
+      else if (Math.abs(timeLength.hour) >= 1) {
+        Str = timeLength.hour + "小时";
+      }
+      else if (Math.abs(timeLength.minute) >= 1) {
+        Str = timeLength.minute + "分钟";
+      }
+
+
+      if (dateDiff > 0) {
+        Str += '后';
+      }
+      else if (dateDiff < 0) {
+        Str += '前';
+      }
+      else {
+        Str = "事项状态更新中..."
+      }
+
+      //删除首位负号
+      if (Str[0] == '-') {
+        Str = Str.slice(1);
+      }
+
+      return Str;
+    },
+
+    //确定显示时间差的颜色
+    timeLengthColor () {
+      if (!this.timeLengthBetweenDDL)
+        return null;
+
+      return this.timeLengthBetweenDDL.endsWith("前") ? "red" : "blue";
+    }
   },
   watch: {
     taskBoxDialogVisible: {
       handler (newVal) {
-          this.dialogVisible = newVal;
+        this.dialogVisible = newVal;
       },
       deep: true,
       immediate: true
+    },
+    dialogVisible: {
+      handler (newVal) {
+        //如果子组件被关闭了，把dialogVisible=false的值同步给父组件
+        if (newVal == false)
+          this.$emit('resetDialogVisible');
+      }
     },
   }
 }
@@ -220,46 +376,61 @@ export default {
   margin-bottom: 20px;
 }
 
-//侧边面板
-.siderPanel {
-  margin-bottom: 30px;
-  margin-left: 15px;
-}
-
-//详情信息
-.detailPanel {
-  margin-bottom: 20px;
-}
-
-//事项标题
-.taskTitle {
-  margin-top: 21px;
-  margin-bottom: 25px;
-  float: left;
-}
-
 //属性表单里的一项
 .formItem {
   text-align: left;
 }
-.el-header,
-.el-footer {
-  background-color: #b3c0d1;
-  color: #333;
-  line-height: 60px;
-}
 
-.el-main {
-  background-color: #e9eef3;
-  color: #333;
-  line-height: 5px;
-  height: 470px;
-}
+//页面布局css
+.el-container {
+  height: 530px;
+  border: 1px solid rgb(240, 243, 238);
+  background-color: #eaf6ea;
 
-.el-aside {
-  background-color: #ecf4eb;
-  color: #333;
-  line-height: 10px;
+  .el-header {
+    background-color: #ffffff;
+    color: #333;
+    line-height: 60px;
+    //勾选框
+    .isDone_radio {
+      margin-right: 0px;
+
+      //从默认圆改成方形勾
+      ::v-deep .el-radio__inner {
+        border-radius: 2px;
+        border-width: 2px;
+        border-color: var(--color-primary) !important; //外框颜色
+      }
+    }
+  }
+
+  .el-container {
+    height: 0%; //保证不溢出对话框
+    .el-aside {
+      color: #333;
+      line-height: 10px;
+      overflow: hidden; // 超出部分隐藏
+      overflow-y: scroll; // 设置y轴方向的滚动条
+
+      //事项标题
+      .taskTitle {
+        margin-top: 21px;
+        margin-bottom: 25px;
+        float: left;
+      }
+
+      //详情信息
+      .detailPanel {
+        margin-bottom: 20px;
+      }
+    }
+
+    .el-main {
+      background-color: #ffffff;
+      color: #333;
+      //line-height: 5px;
+    }
+  }
 }
 
 body > .el-container {
@@ -281,5 +452,46 @@ body > .el-container {
 }
 .el-icon-arrow-down {
   font-size: 12px;
+}
+
+//单选框样式
+.isDone_radio {
+  margin-right: 0px;
+
+  //从默认圆改成方形勾
+  ::v-deep .el-radio__inner {
+    border-radius: 2px;
+    border-width: 2px;
+    border-color: var(--color-primary) !important; //外框颜色
+  }
+
+  ::v-deep .el-radio__input.is-checked .el-radio__inner::after {
+    content: "";
+    width: 10px;
+    height: 5px;
+    border: 1px solid white;
+    border-top: transparent;
+    border-right: transparent;
+    text-align: center;
+    display: block;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    vertical-align: middle;
+    transform: rotate(-45deg);
+    border-radius: 0px;
+    background: none;
+  }
+}
+
+//修改下拉框
+.el-select {
+  ::v-deep .el-select {
+    width: 7em;
+  }
+
+  ::v-deep .el-input__inner {
+    background-color: transparent;
+  }
 }
 </style>

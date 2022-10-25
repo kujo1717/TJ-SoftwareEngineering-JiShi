@@ -6,18 +6,32 @@
 */
 <template>
   <div>
+    <span>请选择</span>
+    <el-select
+      v-model="value"
+      :popper-append-to-body="false"
+    >
+
+      <el-option
+        v-for="item in options"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value"
+      >
+      </el-option>
+    </el-select>
     <FullCalendar :options="calendarOptions" />
 
     <!--用于每次调用子组件都按照当前时间重新生成DOM元素-->
     <CreateTaskBox
       :createTaskBoxDialogVisible="createTaskBoxDialogVisible"
       :dateObj="chosen_dateObj"
-      :key="new Date().getTime() + 5"
+      @resetDialogVisible="resetDialogVisible()"
     />
     <TaskBox
       :taskBoxDialogVisible="taskBoxDialogVisible"
       :taskid="chosen_taskid"
-      :key="new Date().getTime()"
+      @resetDialogVisible="resetDialogVisible()"
     />
   </div>
 </template>
@@ -42,6 +56,25 @@ export default {
   components: { FullCalendar, CreateTaskBox, TaskBox },
   data () {
     return {
+      options: [{
+        value: '选项1',
+        label: '黄金糕'
+      }, {
+        value: '选项2',
+        label: '双皮奶'
+      }, {
+        value: '选项3',
+        label: '蚵仔煎'
+      }, {
+        value: '选项4',
+        label: '龙须面'
+      }, {
+        value: '选项5',
+        label: '北京烤鸭'
+      }],
+      value: '',
+
+
       chosen_dateObj: "", //当前选中的日期
       chosen_taskid: "", //当前选中的任务
 
@@ -140,12 +173,13 @@ export default {
       this.chosen_dateObj = arg;
       this.resetDialogVisible();
       this.createTaskBoxDialogVisible = true;
+      console.group("日期信息");
       console.log("选中的日期信息为：", arg);
+      console.groupEnd("日期信息");
     },
     //选中事项，查看事项详情
     handleEventClick: function (arg) {
       this.chosen_taskid = arg.event.id;
-      this.resetDialogVisible();
       this.taskBoxDialogVisible = true;
 
       console.log("事项信息：", arg);
@@ -177,4 +211,30 @@ export default {
 /deep/ .fc-license-message {
   opacity: 0 !important;
 }
+
+
+//修改下拉框
+::v-deep .el-select {
+  width: 7em;
+}
+
+::v-deep .el-input__inner {
+  background-color: transparent;
+}
+
+// ::v-deep .el-input__inner:hover {
+//   background-color: transparent;
+//   border-color: transparent;
+// }
+
+// ::v-deep .el-input__inner:active {
+//   background-color: transparent;
+//   border-color: transparent;
+// }
+
+
+
+
+
+
 </style>
