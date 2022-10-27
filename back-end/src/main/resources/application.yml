@@ -13,8 +13,6 @@ spring:
     url: jdbc:mysql://localhost:3306/mydb?useUnicode=true&characterEncoding=UTF-8&useSSL=false  # 需要更改数据库名称
     username: root
     password: root
-    type: com.alibaba.druid.pool.DruidDataSource
-
 
 # mybatis-plus相关配置
 mybatis-plus:
