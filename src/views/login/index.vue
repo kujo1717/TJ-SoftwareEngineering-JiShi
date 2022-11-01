@@ -1,12 +1,12 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
+    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" :class="loginFormClass" auto-complete="on" label-position="top">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 :class="titleClass">登录</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="username" class="input-box">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
@@ -18,10 +18,11 @@
           type="text"
           tabindex="1"
           auto-complete="on"
+          
         />
       </el-form-item>
 
-      <el-form-item prop="password">
+      <el-form-item prop="password" class="input-box">
         <span class="svg-container">
           <svg-icon icon-class="password" />
         </span>
@@ -41,12 +42,17 @@
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-form-item>
+        <el-checkbox v-model="loginForm.remeber">记住我</el-checkbox>
+      </el-form-item>
+      <el-button  type="success" style="width:25%;" @click.native.prevent="handleRegister" >前往注册</el-button>
+      <el-button :loading="loading" type="primary" style="width:25%;margin-left: 50%;" @click.native.prevent="handleLogin" >登录</el-button>
+      
 
-      <div class="tips">
+      <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
         <span> password: any</span>
-      </div>
+      </div> -->
 
     </el-form>
   </div>
@@ -75,7 +81,8 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '111111'
+        password: '123456',
+        remeber:false
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -83,13 +90,17 @@ export default {
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      redirect: undefined,
+      titleClass:'title',
+      loginFormClass:'login-form'
+      
     }
   },
   watch: {
     $route: {
       handler: function(route) {
         this.redirect = route.query && route.query.redirect
+        console.log(this.redirect)
       },
       immediate: true
     }
@@ -120,6 +131,19 @@ export default {
           return false
         }
       })
+    },
+    handleRegister(){
+      console.log('register/?redirect=' || this.redirect)
+      this.titleClass='title-leave'
+      setTimeout(()=>{
+        this.loginFormClass='login-form-leave'
+    },500)
+      
+      setTimeout(()=>{
+        this.$router.push('/register')
+        this.loading=false
+    },1000)
+      
     }
   }
 }
@@ -163,7 +187,7 @@ $cursor: #fff;
     }
   }
 
-  .el-form-item {
+  .input-box {
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(0, 0, 0, 0.1);
     border-radius: 5px;
@@ -190,6 +214,18 @@ $light_gray:#eee;
     padding: 160px 35px 0;
     margin: 0 auto;
     overflow: hidden;
+    animation: rotateInDownLeft; /* referring directly to the animation's @keyframe declaration */
+    animation-duration: 1s; /* don't forget to set a duration! */
+  }
+  .login-form-leave {
+    position: relative;
+    width: 520px;
+    max-width: 100%;
+    padding: 160px 35px 0;
+    margin: 0 auto;
+    overflow: hidden;
+    animation: rotateOutDownLeft; /* referring directly to the animation's @keyframe declaration */
+    animation-duration: 1s; /* don't forget to set a duration! */
   }
 
   .tips {
@@ -221,6 +257,17 @@ $light_gray:#eee;
       margin: 0px auto 40px auto;
       text-align: center;
       font-weight: bold;
+      animation: bounceInLeft; /* referring directly to the animation's @keyframe declaration */
+      animation-duration: 1s; /* don't forget to set a duration! */
+    }
+    .title-leave{
+      font-size: 26px;
+      color: $light_gray;
+      margin: 0px auto 40px auto;
+      text-align: center;
+      font-weight: bold;
+      animation: bounceOutRight; /* referring directly to the animation's @keyframe declaration */
+      animation-duration: 2s; /* don't forget to set a duration! */
     }
   }
 
