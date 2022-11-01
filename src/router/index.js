@@ -190,15 +190,34 @@ export const constantRoutes = [
     ],
   },
   {
-    path: '/PersonalSchedule',
+    path: '/personal',
     component: Layout,
+    redirect: '/personal/overView',
+    name: 'personal',
+    meta: {
+      title: '我的日程管理',
+      icon: 'nested'
+    },
     children: [
       {
-        path: 'index',
-        name: 'PersonalSchedule',
-        component: () => import('@/views/personalSchedule/index'),
-        meta: { title: '我的日程管理', icon: 'form' }
-      }
+        path: 'overView',
+        name: 'overView',
+        component: () => import('@/views/personalSchedule/overview/index'),
+        meta: { title: '概览', icon: 'form' }
+      },
+      {
+        path: 'tasklist',
+        name: 'tasklist',
+        component: () => import('@/views/personalSchedule/tasklist/index'),
+        meta: { title: '事项', icon: 'form' }
+      },
+      {
+        path: 'schedule',
+        name: 'schedule',
+        component: () => import('@/views/personalSchedule/schedule/index'),
+        meta: { title: '日程', icon: 'form' }
+      },
+
     ],
   },
   {

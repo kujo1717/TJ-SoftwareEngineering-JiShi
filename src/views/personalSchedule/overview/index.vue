@@ -1,9 +1,9 @@
 <template>
-  <div>PersonalSchedule</div>
+  <div>OverView</div>
 </template>
 <script>
 export default {
-  name: "PersonalSchedule",
+  name: "OverView",
   data() {
     return {};
   },
