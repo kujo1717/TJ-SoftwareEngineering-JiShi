@@ -52,7 +52,8 @@ export const constantRoutes = [
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
       meta: { title: 'Dashboard', icon: 'dashboard' }
-    }]
+    }],
+    hidden: true
   },
 
   {
@@ -74,7 +75,8 @@ export const constantRoutes = [
         component: () => import('@/views/tree/index'),
         meta: { title: 'Tree', icon: 'tree' }
       }
-    ]
+    ],
+    hidden: true
   },
 
   {
@@ -87,7 +89,8 @@ export const constantRoutes = [
         component: () => import('@/views/form/index'),
         meta: { title: 'Form', icon: 'form' }
       }
-    ]
+    ],
+    hidden: true
   },
 
   {
@@ -146,7 +149,8 @@ export const constantRoutes = [
         name: 'Menu2',
         meta: { title: 'menu2' }
       }
-    ]
+    ],
+    hidden: true
   },
 
   {
@@ -157,7 +161,20 @@ export const constantRoutes = [
         path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
         meta: { title: 'External Link', icon: 'link' }
       }
-    ]
+    ],
+    hidden: true
+  },
+  {
+    path: '/calendarView',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'calendarView',
+        component: () => import('@/views/calendarView/index'),
+        meta: { title: '日程', icon: 'form' }
+      }
+    ],
   },
 
   {
@@ -168,10 +185,62 @@ export const constantRoutes = [
         path: 'index',
         name: 'viewList',
         component: () => import('@/views/viewList/index'),
-        meta: { title: 'viewList', icon: 'form' }
+        meta: { title: '事项列表', icon: 'form' }
       }
-    ]
+    ],
   },
+  {
+    path: '/PersonalSchedule',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'PersonalSchedule',
+        component: () => import('@/views/personalSchedule/index'),
+        meta: { title: '我的日程管理', icon: 'form' }
+      }
+    ],
+  },
+  {
+    path: '/teams',
+    component: Layout,
+    redirect: '/teams/menu1',
+    name: 'Teams',
+    meta: {
+      title: '团队',
+      icon: 'nested'
+    },
+    children: [
+      {
+        path: 'team1',
+        component: () => import('@/views/nested/menu1/index'), // Parent router-view
+        name: 'team1',
+        meta: { title: 'team1' },
+        children: [
+          {
+            path: '项目1-1',
+            component: () => import('@/views/nested/menu1/menu1-1'),
+            name: '项目1-1',
+            meta: { title: '项目1-1' }
+          },
+          {
+            path: '项目1-2',
+            component: () => import('@/views/nested/menu1/menu1-2'),
+            name: '项目1-2',
+            meta: { title: '项目1-2' },
+          },
+        ]
+      },
+      {
+        path: 'team2',
+        component: () => import('@/views/nested/menu2/index'),
+        name: 'team2',
+        meta: { title: 'team2' }
+      }
+    ],
+  },
+
+
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
