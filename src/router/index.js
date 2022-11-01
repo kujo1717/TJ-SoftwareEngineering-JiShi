@@ -93,65 +93,7 @@ export const constantRoutes = [
     hidden: true
   },
 
-  {
-    path: '/nested',
-    component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
-    meta: {
-      title: 'Nested',
-      icon: 'nested'
-    },
-    children: [
-      {
-        path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'Menu1',
-        meta: { title: 'Menu1' },
-        children: [
-          {
-            path: 'menu1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
-            name: 'Menu1-1',
-            meta: { title: 'Menu1-1' }
-          },
-          {
-            path: 'menu1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
-            name: 'Menu1-2',
-            meta: { title: 'Menu1-2' },
-            children: [
-              {
-                path: 'menu1-2-1',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-                name: 'Menu1-2-1',
-                meta: { title: 'Menu1-2-1' }
-              },
-              {
-                path: 'menu1-2-2',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-                name: 'Menu1-2-2',
-                meta: { title: 'Menu1-2-2' }
-              }
-            ]
-          },
-          {
-            path: 'menu1-3',
-            component: () => import('@/views/nested/menu1/menu1-3'),
-            name: 'Menu1-3',
-            meta: { title: 'Menu1-3' }
-          }
-        ]
-      },
-      {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        name: 'Menu2',
-        meta: { title: 'menu2' }
-      }
-    ],
-    hidden: true
-  },
+
 
   {
     path: 'external-link',
@@ -223,7 +165,7 @@ export const constantRoutes = [
   {
     path: '/teams',
     component: Layout,
-    redirect: '/teams/menu1',
+    redirect: '/teams/team1',
     name: 'Teams',
     meta: {
       title: '团队',
@@ -232,19 +174,19 @@ export const constantRoutes = [
     children: [
       {
         path: 'team1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
+        component: () => import('@/views/teams/team1/index'), // Parent router-view
         name: 'team1',
         meta: { title: 'team1' },
         children: [
           {
             path: '项目1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
+            component: () => import('@/views/teams/team1/proj1-1'),
             name: '项目1-1',
             meta: { title: '项目1-1' }
           },
           {
             path: '项目1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
+            component: () => import('@/views/teams/team1/proj1-2'),
             name: '项目1-2',
             meta: { title: '项目1-2' },
           },
@@ -252,7 +194,7 @@ export const constantRoutes = [
       },
       {
         path: 'team2',
-        component: () => import('@/views/nested/menu2/index'),
+        component: () => import('@/views/teams/team2/index'),
         name: 'team2',
         meta: { title: 'team2' }
       }
