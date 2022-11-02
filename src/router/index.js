@@ -47,6 +47,11 @@ export const constantRoutes = [
     component:()=>import('@/views/login/register.vue'),
     hidden:true
   },
+  {
+    path:'/forget',
+    component:()=> import('@/views/login/forget.vue'),
+    hidden:true
+  },
 
   {
     path: '/',

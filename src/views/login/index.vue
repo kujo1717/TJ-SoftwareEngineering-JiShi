@@ -45,9 +45,11 @@
       <el-form-item>
         <el-checkbox v-model="loginForm.remeber">记住我</el-checkbox>
       </el-form-item>
+      <div style="display:flex;justify-content:space-around">
       <el-button  type="success" style="width:25%;" @click.native.prevent="handleRegister" >前往注册</el-button>
-      <el-button :loading="loading" type="primary" style="width:25%;margin-left: 50%;" @click.native.prevent="handleLogin" >登录</el-button>
-      
+      <el-button type="text" @click="handleForget">忘记密码?</el-button>
+      <el-button :loading="loading" type="primary" style="width:25%;" @click.native.prevent="handleLogin" >登录</el-button>
+      </div>
 
       <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
@@ -92,7 +94,7 @@ export default {
       passwordType: 'password',
       redirect: undefined,
       titleClass:'title',
-      loginFormClass:'login-form'
+      loginFormClass: this.$route.query.from ? 'login-form-in-forget':'login-form'
       
     }
   },
@@ -100,7 +102,7 @@ export default {
     $route: {
       handler: function(route) {
         this.redirect = route.query && route.query.redirect
-        console.log(this.redirect)
+        //console.log()
       },
       immediate: true
     }
@@ -133,7 +135,6 @@ export default {
       })
     },
     handleRegister(){
-      console.log('register/?redirect=' || this.redirect)
       this.titleClass='title-leave'
       setTimeout(()=>{
         this.loginFormClass='login-form-leave'
@@ -141,6 +142,18 @@ export default {
       
       setTimeout(()=>{
         this.$router.push('/register')
+        this.loading=false
+    },1000)
+      
+    },
+    handleForget(){
+      this.titleClass='title-leave'
+      setTimeout(()=>{
+        this.loginFormClass='login-form-leave-forget'
+    },500)
+      
+      setTimeout(()=>{
+        this.$router.push('/forget')
         this.loading=false
     },1000)
       
@@ -217,6 +230,16 @@ $light_gray:#eee;
     animation: rotateInDownLeft; /* referring directly to the animation's @keyframe declaration */
     animation-duration: 1s; /* don't forget to set a duration! */
   }
+  .login-form-in-forget {
+    position: relative;
+    width: 520px;
+    max-width: 100%;
+    padding: 160px 35px 0;
+    margin: 0 auto;
+    overflow: hidden;
+    animation: rollIn; /* referring directly to the animation's @keyframe declaration */
+    animation-duration: 1s; /* don't forget to set a duration! */
+  }
   .login-form-leave {
     position: relative;
     width: 520px;
@@ -225,6 +248,16 @@ $light_gray:#eee;
     margin: 0 auto;
     overflow: hidden;
     animation: rotateOutDownLeft; /* referring directly to the animation's @keyframe declaration */
+    animation-duration: 1s; /* don't forget to set a duration! */
+  }
+  .login-form-leave-forget{
+    position: relative;
+    width: 520px;
+    max-width: 100%;
+    padding: 160px 35px 0;
+    margin: 0 auto;
+    overflow: hidden;
+    animation: rollOut; /* referring directly to the animation's @keyframe declaration */
     animation-duration: 1s; /* don't forget to set a duration! */
   }
 
