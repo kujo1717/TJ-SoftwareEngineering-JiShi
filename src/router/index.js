@@ -125,21 +125,57 @@ export const constantRoutes = [
     children: [
       {
         path: 'index',
-        name: 'quadrantView',
-        component: () => import('@/views/quadrantView/index'),
-        meta: { title: '事项列表', icon: 'form' }
+        name: 'viewList',
+        component: () => import('@/views/viewList/index'),
+        meta: { title: '视图', icon: 'form' }
       }
     ],
   },
   {
-    path: '/viewList',
+    path: '/quadrantView',
     component: Layout,
     children: [
       {
         path: 'index',
-        name: 'viewList',
-        component: () => import('@/views/viewList/index'),
+        name: 'quadrantView',
+        component: () => import('@/views/quadrantView/index'),
         meta: { title: '四象限视图', icon: 'form' }
+      }
+    ],
+  },
+  {
+    path: '/dataReport',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'DataReport',
+        component: () => import('@/views/dataReport/index'),
+        meta: { title: '数据分析', icon: 'form' }
+      }
+    ],
+  },
+  {
+    path: '/concentration',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'concentration',
+        component: () => import('@/views/concentration/index'),
+        meta: { title: '专注', icon: 'form' }
+      }
+    ],
+  },
+  {
+    path: '/message',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'message',
+        component: () => import('@/views/message/index'),
+        meta: { title: '消息', icon: 'form' }
       }
     ],
   },
@@ -148,7 +184,7 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/personal/overView',
     name: 'personal',
-    hidden:true,
+    hidden: true,
     meta: {
       title: '我的日程管理',
       icon: 'nested'
@@ -196,7 +232,7 @@ export const constantRoutes = [
             path: '项目1-1',
             component: () => import('@/views/teams/team1/proj1-1'),
             name: '项目1-1',
-            meta: { title: '项目1-1' }
+            meta: { title: '项目1-1' },
           },
           {
             path: '项目1-2',
