@@ -125,9 +125,21 @@ export const constantRoutes = [
     children: [
       {
         path: 'index',
+        name: 'quadrantView',
+        component: () => import('@/views/quadrantView/index'),
+        meta: { title: '事项列表', icon: 'form' }
+      }
+    ],
+  },
+  {
+    path: '/viewList',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
         name: 'viewList',
         component: () => import('@/views/viewList/index'),
-        meta: { title: '事项列表', icon: 'form' }
+        meta: { title: '四象限视图', icon: 'form' }
       }
     ],
   },
