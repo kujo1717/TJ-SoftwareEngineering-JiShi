@@ -1,6 +1,5 @@
 <template>
   <div style="padding:30px;">
-    team1
       <router-view />
   </div>
 </template>
