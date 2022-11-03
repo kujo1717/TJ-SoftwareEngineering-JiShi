@@ -55,57 +55,6 @@ export const constantRoutes = [
     }],
     hidden: true
   },
-
-  {
-    path: '/example',
-    component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'el-icon-s-help' },
-    children: [
-      {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
-      }
-    ],
-    hidden: true
-  },
-
-  {
-    path: '/form',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
-      }
-    ],
-    hidden: true
-  },
-
-
-
-  {
-    path: 'external-link',
-    component: Layout,
-    children: [
-      {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
-      }
-    ],
-    hidden: true
-  },
   {
     path: '/calendarView',
     component: Layout,
@@ -127,80 +76,108 @@ export const constantRoutes = [
         path: 'index',
         name: 'viewList',
         component: () => import('@/views/viewList/index'),
-        meta: { title: '事项列表', icon: 'form' }
+        meta: { title: '视图', icon: 'form' }
       }
     ],
   },
   {
-    path: '/personal',
+    path: '/quadrantView',
     component: Layout,
-    redirect: '/personal/overView',
-    name: 'personal',
-    meta: {
-      title: '我的日程管理',
-      icon: 'nested'
-    },
     children: [
       {
-        path: 'overView',
-        name: 'overView',
-        component: () => import('@/views/personalSchedule/overview/index'),
-        meta: { title: '概览', icon: 'form' }
-      },
-      {
-        path: 'tasklist',
-        name: 'tasklist',
-        component: () => import('@/views/personalSchedule/tasklist/index'),
-        meta: { title: '事项', icon: 'form' }
-      },
-      {
-        path: 'schedule',
-        name: 'schedule',
-        component: () => import('@/views/personalSchedule/schedule/index'),
-        meta: { title: '日程', icon: 'form' }
-      },
-
+        path: 'index',
+        name: 'quadrantView',
+        component: () => import('@/views/quadrantView/index'),
+        meta: { title: '四象限视图#待合并', icon: 'form' }
+      }
     ],
   },
   {
-    path: '/teams',
+    path: '/viewLog',
     component: Layout,
-    redirect: '/teams/team1',
-    name: 'Teams',
+    children: [
+      {
+        path: 'logview',
+        name: 'viewLog',
+        component: () => import('@/views/logviewing/logview'),
+        meta: { title: '日志查看#待删除', icon: 'form' }
+      }
+    ]
+  },
+  {
+    path: '/dataReport',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'DataReport',
+        component: () => import('@/views/dataReport/index'),
+        meta: { title: '数据分析', icon: 'form' }
+      }
+    ],
+  },
+  {
+    path: '/concentration',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'concentration',
+        component: () => import('@/views/concentration/index'),
+        meta: { title: '专注', icon: 'form' }
+      }
+    ],
+  },
+  {
+    path: '/message',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'message',
+        component: () => import('@/views/message/index'),
+        meta: { title: '消息', icon: 'form' }
+      }
+    ],
+  },
+  {
+    path: '/teamspace',
+    component: Layout,
+    redirect: '/teamspace/team1',
+    name: 'TeamSpace',
     meta: {
       title: '团队',
       icon: 'nested'
     },
     children: [
       {
-        path: 'team1',
-        component: () => import('@/views/teams/team1/index'), // Parent router-view
-        name: 'team1',
-        meta: { title: 'team1' },
-        children: [
-          {
-            path: '项目1-1',
-            component: () => import('@/views/teams/team1/proj1-1'),
-            name: '项目1-1',
-            meta: { title: '项目1-1' }
-          },
-          {
-            path: '项目1-2',
-            component: () => import('@/views/teams/team1/proj1-2'),
-            name: '项目1-2',
-            meta: { title: '项目1-2' },
-          },
-        ]
+        path: '团队1',
+        component: () => import('@/views/teamspace/team1'),
+        name: '团队1',
+        meta: { title: '团队1' },
       },
       {
-        path: 'team2',
-        component: () => import('@/views/teams/team2/index'),
-        name: 'team2',
-        meta: { title: 'team2' }
+        path: '团队2',
+        component: () => import('@/views/teamspace/team2'),
+        name: '团队2',
+        meta: { title: '团队2' },
+      },
+
+
+    ],
+  },
+  {
+    path: '/teamproject',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'TeamProject',
+        component: () => import('@/views/teamproject/index'),
+        meta: { title: '测试用团队项目', icon: 'form' }
       }
     ],
   },
-
 
 
   // 404 page must be placed at the end !!!

@@ -1,13 +1,6 @@
-/**
-全日历页面
-@author yy
-@editor yy, hym
-@lastUpdata hym 10.22
-*/
 <template>
   <div>
     <FullCalendar :options="calendarOptions" />
-
     <!--用于每次调用子组件都按照当前时间重新生成DOM元素-->
     <CreateTaskBox
       :createTaskBoxDialogVisible="createTaskBoxDialogVisible"
@@ -25,8 +18,10 @@
 
 <script>
 // 引入日历组件
-import CreateTaskBox from "../../components/CreateTaskBox";
-import TaskBox from "../../components/TaskBox";
+import CreateTaskBox from "../../../components/CreateTaskBox/index.vue";
+
+import TaskBox from  "../../../components/TaskBox/index.vue";
+
 import "@fullcalendar/core/vdom"; // solves problem with Vite
 import FullCalendar from "@fullcalendar/vue";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -39,7 +34,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 // import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 
 export default {
-  name: "CalenderView",
+  name: "TimeSchedule",
   components: { FullCalendar, CreateTaskBox, TaskBox },
   data () {
     return {
@@ -59,63 +54,18 @@ export default {
       createTaskBoxDialogVisible: false,
       taskBoxDialogVisible: false,
       isDateClicking: false,
-      calendarOptions: {
-        plugins: [
-          dayGridPlugin,
-          interactionPlugin,
-          resourceTimelinePlugin,
-          listPlugin,
-          timeGridPlugin,
-          //bootstrap5Plugin,
-        ],
-        locale: "zh",
-        timeZone: "local",
-        buttonText: {
-          today: "今天",
-          month: "月",
-          week: "周",
-          day: "日",
-          resourceTimeline: "子任务列表",
-        },
-        headerToolbar: {
-          left: "prev,next today",
-          center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay resourceTimeline",
-        },
-        initialView: "dayGridMonth",
-        //themeSystem: 'bootstrap5',
-        selectable: true,
-        editable: true, //拖拽编辑
-        nowIndicator: true, //当前时间指示器
 
-        //事件的回调函数
-        select: this.handleDateSelect,
-        eventClick: this.handleEventClick,
-        eventDrop: this.handleEventDragAndResize,
-        eventResize: this.handleEventDragAndResize,
-
-        //每格显示数量限制
-        dayMaxEventRows: true,
-        views: {
-          timeGrid: {
-            dayMaxEventRows: 6, // adjust to 6 only for timeGridWeek/timeGridDay
-          },
-        },
-        events: this.getEvents(),
-        resources: this.getResources()
-      },
-
-      //事项列表
+      //task列表
       taskList: [
         {
           id: '001',
           taskTitle: '背单词1',
           taskDetail: "先背两小时单词",//详情的文字
           isdone: true,
-          taskState: '进行中',
+          taskState: '延期完成',
           classification: '学习',
           priority: '无优先级',
-          timeRange: ["2022-11-01T12:30:00", "2022-11-02T12:30:00"],
+          timeRange: ["2022-11-01T12:30:00", '2022-11-02T12:30:00'],
           familyPosition: 'parent',
           familyMembers: [],
         },
@@ -124,24 +74,68 @@ export default {
           taskTitle: '背单词2',
           taskDetail: "先背两小时单词",//详情的文字
           isdone: true,
-          taskState: '延期中',
+          taskState: '延期完成',
           classification: '学习',
           priority: '无优先级',
-          timeRange: ["2022-11-02T12:30:00", "2022-11-02T13:30:00"],
+          timeRange: ['2022-11-02T10:30:00', '2022-11-02T12:30:00'],
           familyPosition: 'parent',
           familyMembers: [],
         }
-      ]
+      ],
+      calendarOptions: {
+        plugins: [
+          dayGridPlugin,
+          interactionPlugin,
+          resourceTimelinePlugin,
+          listPlugin,
+          timeGridPlugin,
+        ],
+        locale: "zh",
+        timeZone: "local",
+        buttonText: {
+          today: "今天",
+          dayGridThreeDays: "四天",
+          resourceTimelineMonth: "月",
+        },
+        headerToolbar: {
+          left: "prev,next today",
+          center: "title",
+          right: "dayGridThreeDays,resourceTimelineMonth",
+        },
+        initialView: "dayGridThreeDays",
+        //themeSystem: 'bootstrap5',
+        selectable: true,
+        editable: false, //拖拽编辑
+        nowIndicator: true, //当前时间指示器
+
+        //事件的回调函数
+        select: this.handleDateSelect,
+        eventClick: this.handleEventClick,
+
+
+        //每格显示数量限制
+        dayMaxEventRows: true,
+        views: {
+          dayGridThreeDays: {
+            type: 'dayGridDay',
+            duration: { days: 4 }
+          }
+        },
+        events: this.getEvents(),
+        resources: this.getResources()
+      },
+
     };
   },
+
   methods: {
     resetDialogVisible () {
       this.createTaskBoxDialogVisible = false;
       this.taskBoxDialogVisible = false;
     },
     /*
-      处理回调
-    */
+     处理回调
+   */
     //选中日期，进入创建事项
     handleDateSelect: function (arg) {
       this.chosen_dateObj = [arg.start, arg.end];
@@ -160,29 +154,7 @@ export default {
       }
       this.taskBoxDialogVisible = true;
     },
-    //处理drag和resize
-    handleEventDragAndResize: function (arg) {
-      console.log(arg)
-      //1.更新taskList
-      for (let i = 0; i < this.taskList.length; i++) {
-        if (this.taskList[i].id == arg.event.id) {
-          this.taskList[i].timeRange = [arg.event.start, arg.event.end];
-        }
-      }
 
-      //2.更新event
-      for (let i = 0; i < this.calendarOptions.events.length; i++) {
-        if (this.calendarOptions.events[i].id == arg.event.id) {
-          this.calendarOptions.events[i].start = arg.event.start;
-          this.calendarOptions.events[i].end = arg.event.end;
-        }
-      }
-      console.log('hahaha', this.calendarOptions)
-
-      //3.向后端发出更改put请求
-      //code here...
-
-    },
 
     /*
       获取events和resources
@@ -207,7 +179,7 @@ export default {
           taskTitle: '背单词2',
           taskDetail: "先背两小时单词",//详情的文字
           isdone: true,
-          taskState: '延期中',
+          taskState: '延期完成',
           classification: '学习',
           priority: '无优先级',
           timeRange: ["2022-11-02T12:30:00", "2022-11-02T13:30:00"],
@@ -221,14 +193,9 @@ export default {
         let my_allDay = value['timeRange'] === [] || value.taskState.indexOf("完成") >= 0 ? true : false;
 
         //如果完成了，就标灰
-        let my_color;
-        if (value.taskState.indexOf("完成") >= 0)
-          my_color = "#378006"//完成：灰色       
-        else if (value.taskState == "进行中")
-          my_color = "#d1d2c8"//进行中：绿色
-        else if (value.taskState == "延期中")
-          my_color = "#c6cb25"//延期：黄色
-
+        let my_color = "#378006"//灰色       
+        if (value.taskState.indexOf("完成") > 0)//如果完成
+          my_color = "#d1d2c8"
 
         //往event列表里加
         eventList.push({
@@ -241,6 +208,7 @@ export default {
           resourceIds: [value['id']],
           color: my_color
         })
+
       })
       return eventList;
     },//end of method
@@ -288,17 +256,13 @@ export default {
       })
       return resourceList
     }
-
   },
 
-  watch: {
-    calendarOptions: {
-      handler (newVal) {
-        console.log(newVal);
-      },
-      deep: true
-    }
-  },
+
+  mounted: function () {
+
+  }
+
 };
 </script>
 
