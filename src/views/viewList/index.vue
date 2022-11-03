@@ -4,62 +4,30 @@
     <div class="drop_down_box">
       <div class="left_box">
         <!-- 左边的下拉框，可快捷筛选，即为表格的筛选器赋值 -->
-        <el-select
-          @change="TopSelectValChange"
-          v-model="select_allTasks_Option"
-          placeholder="请选择"
-        >
-          <el-option
-            v-for="item in select_allTasks_Options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          >
-          </el-option>
+        <el-select v-model="select_allTasks_Option" placeholder="请选择" @change="TopSelectValChange">
+          <el-option v-for="item in select_allTasks_Options" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
       </div>
       <div class="right_box">
         <div class="search_allTasks">
-          <el-input
-            v-model="searchText"
-            placeholder="请输入"
-            style="width: 300px; float: right"
-            size="small"
-            @keyup.enter.native="search"
-          ></el-input>
+          <el-input v-model="searchText" placeholder="请输入" style="width: 300px; float: right" size="small" @keyup.enter.native="search" />
         </div>
         <!-- 表头设置 -->
         <div class="arrange_head">
           <!-- poper弹框 -->
-          <el-popover
-            class="headset_pop"
-            placement="top"
-            width="160"
-            v-model="ShowHeadSet"
-            @after-leave="HeadSetAfterLeave"
-          >
+          <el-popover v-model="ShowHeadSet" class="headset_pop" placement="top" width="160" @after-leave="HeadSetAfterLeave">
             <!-- 可拖拽内容 -->
             <div class="headset_list">
               <draggable v-model="HeadSetData" filter=".undraggable">
                 <transition-group>
-                  <div
-                    v-for="element in HeadSetData"
-                    :key="element.label"
-                    :key-name="element.key"
-                    :class="{
+                  <div v-for="element in HeadSetData" :key="element.label" :key-name="element.key" :class="{
                       undraggable: element.key == 'name',
-                    }"
-                  >
+                    }">
                     <span>{{ element.label }}</span>
 
-                    <el-radio
-                      v-model="element.isShow"
-                      :label="true"
-                      @click.native.prevent="
+                    <el-radio v-model="element.isShow" :label="true" @click.native.prevent="
                         (event) => HeadSetClickRadio(event, element)
-                      "
-                      ><span> </span
-                    ></el-radio>
+                      "><span /></el-radio>
                   </div>
                 </transition-group>
               </draggable>
@@ -81,46 +49,21 @@
 
     <!-- 表格部分 -->
     <div class="contents_table_box">
-      <el-table
-        v-if="contents_data.length > 0"
-        class="contents_table"
-        :data="contents_data"
-        border
-        :row-class-name="GetRowClass"
-        :show-header="true"
-        @cell-dblclick="
+      <el-table v-if="contents_data.length > 0" class="contents_table" :data="contents_data" border :row-class-name="GetRowClass" :show-header="true" @cell-dblclick="
           (row, column, cell, event) => cellDbClick(row, column, cell, event)
-        "
-        @cell-click="
+        " @cell-click="
           (row, column, cell, event) => cellClick(row, column, cell, event)
-        "
-      >
+        ">
         <!-- 列排序，每次表头顺序修改都重新渲染 -->
-        <span
-          v-for="(head_item, head_index) in head_data_common"
-          :key="head_index"
-        >
+        <span v-for="(head_item, head_index) in head_data_common" :key="head_index">
           <!-- <el-table-column width="1" /> -->
           <!-- fixed 名称 Col,name -->
-          <el-table-column
-            fixed
-            :label="head_data_common_dict['name'].label"
-            class-name="name_col"
-            :width="head_data_common_dict['name'].width"
-            v-if="
+          <el-table-column v-if="
               head_item.key == 'name' && head_data_common_dict['name'].isShow
-            "
-            :key="head_data_common_dict['name'].prio"
-            ref="name_col_ref"
-          >
+            " :key="head_data_common_dict['name'].prio" ref="name_col_ref" fixed :label="head_data_common_dict['name'].label" class-name="name_col" :width="head_data_common_dict['name'].width">
             <template slot-scope="props">
               <!-- isDone的勾选 -->
-              <el-radio
-                class="isDone_radio"
-                v-model="props.row.isDone"
-                :label="true"
-                @click.native.prevent="onTaskDoneRadioChange(props.row)"
-                ><span></span>
+              <el-radio v-model="props.row.isDone" class="isDone_radio" :label="true" @click.native.prevent="onTaskDoneRadioChange(props.row)"><span />
               </el-radio>
 
               <span>{{ props.row.name }}</span>
@@ -128,82 +71,42 @@
           </el-table-column>
 
           <!-- 事项时间Col,task_time -->
-          <el-table-column
-            :label="head_data_common_dict['task_time'].label"
-            class-name="task_time_col"
-            :width="head_data_common_dict['task_time'].width"
-            v-if="
+          <el-table-column v-if="
               head_item.key == 'task_time' &&
-              head_data_common_dict['task_time'].isShow
-            "
-            :key="head_data_common_dict['task_time'].prio"
-          >
+                head_data_common_dict['task_time'].isShow
+            " :key="head_data_common_dict['task_time'].prio" :label="head_data_common_dict['task_time'].label" class-name="task_time_col" :width="head_data_common_dict['task_time'].width">
             <template slot-scope="props">
-              <el-dialog
-                :title="props.row.rowIndex + '行 事项的日期和时间选择器'"
-                v-if="
+              <el-dialog v-if="
                   props.row.rowIndex === cellSgRowIndex &&
-                  'task_time_col' == cellSgColClass
-                "
-                :before-close="HandleCloseTaskTimeDialog"
-                :visible.sync="TaskTimePickerBlur"
-                :modal="false"
-                custom-class="el_dialog"
-              >
+                    'task_time_col' == cellSgColClass
+                " :title="props.row.rowIndex + '行 事项的日期和时间选择器'" :before-close="HandleCloseTaskTimeDialog" :visible.sync="TaskTimePickerBlur" :modal="false" custom-class="el_dialog">
                 <!-- 月日的选择器 -->
 
-                <el-date-picker
-                  class="TaskDatePicker"
-                  v-model="props.row.task_time.date"
-                  type="daterange"
-                  align="right"
-                  unlink-panels
-                  range-separator="至"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  @change="(val) => HandleTaskTimeDateChange(val, props.row)"
-                  :picker-options="TaskTimeDatePickerOptions"
-                >
-                </el-date-picker>
+                <el-date-picker v-model="props.row.task_time.date" class="TaskDatePicker" type="daterange" align="right" unlink-panels range-separator="至" start-placeholder="开始日期"
+                  end-placeholder="结束日期" :picker-options="TaskTimeDatePickerOptions" @change="(val) => HandleTaskTimeDateChange(val, props.row)" />
 
                 <span class="TaskTimePickers">
                   <!-- 时间的选择器,分为开始和结束2个 -->
-                  <el-time-picker
-                    v-model="props.row.task_time.time.start"
-                    format="HH:mm"
-                    placeholder="添加起始时间"
-                    :picker-options="{}"
-                    @change="
+                  <el-time-picker v-model="props.row.task_time.time.start" format="HH:mm" placeholder="添加起始时间" :picker-options="{}" class="TaskTimePicker" @change="
                       (val) => HandleTaskTimeStartTimeChange(val, props.row)
-                    "
-                    class="TaskTimePicker"
-                  >
-                  </el-time-picker>
+                    " />
 
-                  <el-time-picker
-                    v-model="props.row.task_time.time.end"
-                    format="HH:mm"
-                    placeholder="添加结束时间"
-                    :picker-options="{
+                  <el-time-picker v-model="props.row.task_time.time.end" format="HH:mm" placeholder="添加结束时间" :picker-options="{
                       selectableRange: `${
                         props.row.task_time.time.start
                           ? props.row.task_time.time.start + ':00'
                           : '00:00:00'
                       }-23:59:00`,
-                    }"
-                    @change="
+                    }" class="TaskTimePicker" @change="
                       (val) => HandleTaskTimeEndTimeChange(val, props.row)
-                    "
-                    class="TaskTimePicker"
-                  >
-                  </el-time-picker>
+                    " />
                 </span>
               </el-dialog>
               <span>
                 <span>{{
                   FormatTaskTime_Date(props.row.task_time_label)
                 }}</span>
-                <br />
+                <br>
                 <span>{{
                   FormatTaskTime_Time(props.row.task_time_label)
                 }}</span>
@@ -212,15 +115,9 @@
           </el-table-column>
 
           <!-- 分组Col,group -->
-          <el-table-column
-            :label="head_data_common_dict['group'].label"
-            class-name="group_col"
-            :width="head_data_common_dict['group'].width"
-            v-if="
+          <el-table-column v-if="
               head_item.key == 'group' && head_data_common_dict['group'].isShow
-            "
-            :key="head_data_common_dict['group'].prio"
-          >
+            " :key="head_data_common_dict['group'].prio" :label="head_data_common_dict['group'].label" class-name="group_col" :width="head_data_common_dict['group'].width">
             <template slot-scope="props">
               <span>{{ props.row.group }}</span>
             </template>
@@ -228,40 +125,27 @@
 
           <!-- 参与人Col,participator -->
 
-          <el-table-column
-            :label="head_data_common_dict['participator'].label"
-            class-name="participator_col"
-            :width="head_data_common_dict['participator'].width"
-            v-if="
+          <el-table-column v-if="
               head_item.key == 'participator' &&
-              head_data_common_dict['participator'].isShow
-            "
-            :key="head_data_common_dict['participator'].prio"
-          >
+                head_data_common_dict['participator'].isShow
+            " :key="head_data_common_dict['participator'].prio" :label="head_data_common_dict['participator'].label" class-name="participator_col"
+            :width="head_data_common_dict['participator'].width">
             <template slot-scope="props">
               <span>{{ props.row.participator }}</span>
             </template>
           </el-table-column>
 
           <!-- 事项状态Col,state_label -->
-          <el-table-column
-            :label="head_data_common_dict['state_label'].label"
-            class-name="state_label_col"
-            :width="head_data_common_dict['state_label'].width"
-            v-if="
+          <el-table-column v-if="
               head_item.key == 'state_label' &&
-              head_data_common_dict['state_label'].isShow
-            "
-            :key="head_data_common_dict['state_label'].prio"
-            :filters="[
+                head_data_common_dict['state_label'].isShow
+            " :key="head_data_common_dict['state_label'].prio" ref="state_col_ref" :label="head_data_common_dict['state_label'].label" class-name="state_label_col"
+            :width="head_data_common_dict['state_label'].width" :filters="[
               { text: '已完成', value: '0' },
               { text: '进行中', value: '1' },
               { text: '延期中', value: '2' },
               { text: '延期完成', value: '3' },
-            ]"
-            :filter-method="StateFilterHandler"
-            ref="state_col_ref"
-          >
+            ]" :filter-method="StateFilterHandler">
             <template slot-scope="props">
               <el-tag :type="StateTagName(props.row.state_val, props.row)">
                 <span>{{ props.row["state_label"] }}</span>
@@ -270,41 +154,18 @@
           </el-table-column>
 
           <!-- 项目Col,project -->
-          <el-table-column
-            :label="head_data_common_dict['project'].label"
-            class-name="project_col"
-            :width="head_data_common_dict['project'].width"
-            v-if="
+          <el-table-column v-if="
               head_item.key == 'project' &&
-              head_data_common_dict['project'].isShow
-            "
-            :key="head_data_common_dict['project'].prio"
-          >
+                head_data_common_dict['project'].isShow
+            " :key="head_data_common_dict['project'].prio" :label="head_data_common_dict['project'].label" class-name="project_col" :width="head_data_common_dict['project'].width">
             <template slot-scope="props">
               <!-- 下拉的项目选择器 -->
-              <el-select
-                @change="HandleProjectChange(props.row)"
-                v-model="props.row.project"
-                value-key="id"
-                placeholder="选择项目"
-                v-if="
+              <el-select v-if="
                   props.row.rowIndex == cellSgRowIndex &&
-                  'project_col' == cellSgColClass
-                "
-              >
-                <el-option-group
-                  v-for="TeamProjects in MyTeamProjects"
-                  :key="TeamProjects.id"
-                  :label="TeamProjects.teamName"
-                >
-                  <el-option
-                    v-for="project in TeamProjects.projects"
-                    :key="project.id"
-                    :label="project.name"
-                    :value="project"
-                    :disabled="DisbledProjectSelectOption(props.row)"
-                  >
-                  </el-option>
+                    'project_col' == cellSgColClass
+                " v-model="props.row.project" value-key="id" placeholder="选择项目" @change="HandleProjectChange(props.row)">
+                <el-option-group v-for="TeamProjects in MyTeamProjects" :key="TeamProjects.id" :label="TeamProjects.teamName">
+                  <el-option v-for="project in TeamProjects.projects" :key="project.id" :label="project.name" :value="project" :disabled="DisbledProjectSelectOption(props.row)" />
                 </el-option-group>
               </el-select>
               <span v-else class="textflow">{{
@@ -314,157 +175,99 @@
           </el-table-column>
 
           <!-- 总结Col,conclusion -->
-          <el-table-column
-            :label="head_data_common_dict['conclusion'].label"
-            class-name="conclusion_col"
-            :width="head_data_common_dict['conclusion'].width"
-            v-if="
+          <el-table-column v-if="
               head_item.key == 'conclusion' &&
-              head_data_common_dict['conclusion'].isShow
-            "
-            :key="head_data_common_dict['conclusion'].prio"
-          >
+                head_data_common_dict['conclusion'].isShow
+            " :key="head_data_common_dict['conclusion'].prio" :label="head_data_common_dict['conclusion'].label" class-name="conclusion_col" :width="head_data_common_dict['conclusion'].width">
             <template slot-scope="props">
               <span>{{ props.row.conclusion }}</span>
             </template>
           </el-table-column>
 
           <!-- 团队Col,team -->
-          <el-table-column
-            :label="head_data_common_dict['team'].label"
-            class-name="team_col"
-            :width="head_data_common_dict['team'].width"
-            v-if="
+          <el-table-column v-if="
               head_item.key == 'team' && head_data_common_dict['team'].isShow
-            "
-            :key="head_data_common_dict['team'].prio"
-          >
+            " :key="head_data_common_dict['team'].prio" :label="head_data_common_dict['team'].label" class-name="team_col" :width="head_data_common_dict['team'].width">
             <template slot-scope="props">
               <span>{{ props.row.team }}</span>
             </template>
           </el-table-column>
 
           <!-- 日程隐藏Col,hidden -->
-          <el-table-column
-            :label="head_data_common_dict['hidden'].label"
-            class-name="hidden_col"
-            :width="head_data_common_dict['hidden'].width"
-            v-if="
+          <el-table-column v-if="
               head_item.key == 'hidden' &&
-              head_data_common_dict['hidden'].isShow
-            "
-            :key="head_data_common_dict['hidden'].prio"
-          >
+                head_data_common_dict['hidden'].isShow
+            " :key="head_data_common_dict['hidden'].prio" :label="head_data_common_dict['hidden'].label" class-name="hidden_col" :width="head_data_common_dict['hidden'].width">
             <template slot-scope="props">
               <span>
-                <el-switch v-model="props.row['hidden']"> </el-switch>
+                <el-switch v-model="props.row['hidden']" />
                 <span>{{ props.row["hidden"] ? "显示" : "隐藏" }}</span>
               </span>
             </template>
           </el-table-column>
 
           <!-- 事项完成时间Col,taskDoneTime -->
-          <el-table-column
-            :label="head_data_common_dict['taskDoneTime'].label"
-            class-name="taskDoneTime_col"
-            :width="head_data_common_dict['taskDoneTime'].width"
-            v-if="
+          <el-table-column v-if="
               head_item.key == 'taskDoneTime' &&
-              head_data_common_dict['taskDoneTime'].isShow
-            "
-            :key="head_data_common_dict['taskDoneTime'].prio"
-          >
+                head_data_common_dict['taskDoneTime'].isShow
+            " :key="head_data_common_dict['taskDoneTime'].prio" :label="head_data_common_dict['taskDoneTime'].label" class-name="taskDoneTime_col"
+            :width="head_data_common_dict['taskDoneTime'].width">
             <template slot-scope="props">
               <span>{{ props.row.taskDoneTime }}</span>
             </template>
           </el-table-column>
 
           <!-- 我的完成时间Col,taskDoneMyTime -->
-          <el-table-column
-            :label="head_data_common_dict['taskDoneMyTime'].label"
-            class-name="taskDoneMyTime_col"
-            :width="head_data_common_dict['taskDoneMyTime'].width"
-            v-if="
+          <el-table-column v-if="
               head_item.key == 'taskDoneMyTime' &&
-              head_data_common_dict['taskDoneMyTime'].isShow
-            "
-            :key="head_data_common_dict['taskDoneMyTime'].prio"
-          >
+                head_data_common_dict['taskDoneMyTime'].isShow
+            " :key="head_data_common_dict['taskDoneMyTime'].prio" :label="head_data_common_dict['taskDoneMyTime'].label" class-name="taskDoneMyTime_col"
+            :width="head_data_common_dict['taskDoneMyTime'].width">
             <template slot-scope="props">
               <span>{{ props.row.taskDoneMyTime }}</span>
             </template>
           </el-table-column>
 
           <!-- 关注Col,star -->
-          <el-table-column
-            :label="head_data_common_dict['star'].label"
-            class-name="star_col"
-            :width="head_data_common_dict['star'].width"
-            v-if="
+          <el-table-column v-if="
               head_item.key == 'star' && head_data_common_dict['star'].isShow
-            "
-            :key="head_data_common_dict['star'].prio"
-          >
+            " :key="head_data_common_dict['star'].prio" :label="head_data_common_dict['star'].label" class-name="star_col" :width="head_data_common_dict['star'].width">
             <template slot-scope="props">
               <span>{{ props.row["star"] }}</span>
-              <star
-                :isActive="props.row['star']"
-                :star_ref="props.row.id + '_star'"
-                :eventName="'StarEvent'"
-                :valName="'SetViewListVal'"
-                :otherStaff="{
+              <star :is-active="props.row['star']" :star_ref="props.row.id + '_star'" :event-name="'StarEvent'" :val-name="'SetViewListVal'" :other-staff="{
                   line_index: contents_data.findIndex(
                     (line) => line.id == props.row.id
                   ),
-                }"
-                v-on:StarEvent="HandleStarEvent"
-              ></star>
+                }" @StarEvent="HandleStarEvent" />
             </template>
           </el-table-column>
 
           <!-- 完成情况Col,taskAchievement -->
-          <el-table-column
-            :label="head_data_common_dict['taskAchievement'].label"
-            class-name="taskAchievement_col"
-            :width="head_data_common_dict['taskAchievement'].width"
-            v-if="
+          <el-table-column v-if="
               head_item.key == 'taskAchievement' &&
-              head_data_common_dict['taskAchievement'].isShow
-            "
-            :key="head_data_common_dict['taskAchievement'].prio"
-          >
+                head_data_common_dict['taskAchievement'].isShow
+            " :key="head_data_common_dict['taskAchievement'].prio" :label="head_data_common_dict['taskAchievement'].label" class-name="taskAchievement_col"
+            :width="head_data_common_dict['taskAchievement'].width">
             <template slot-scope="props">
               <span>{{ props.row.taskAchievement }}</span>
             </template>
           </el-table-column>
 
           <!-- 创建人Col,creator -->
-          <el-table-column
-            :label="head_data_common_dict['creator'].label"
-            class-name="creator_col"
-            :width="head_data_common_dict['creator'].width"
-            v-if="
+          <el-table-column v-if="
               head_item.key == 'creator' &&
-              head_data_common_dict['creator'].isShow
-            "
-            :key="head_data_common_dict['creator'].prio"
-          >
+                head_data_common_dict['creator'].isShow
+            " :key="head_data_common_dict['creator'].prio" :label="head_data_common_dict['creator'].label" class-name="creator_col" :width="head_data_common_dict['creator'].width">
             <template slot-scope="props">
               <span>{{ props.row.creator }}</span>
             </template>
           </el-table-column>
 
           <!-- 更新时间Col,updateTime -->
-          <el-table-column
-            :label="head_data_common_dict['updateTime'].label"
-            class-name="updateTime_col"
-            :width="head_data_common_dict['updateTime'].width"
-            v-if="
+          <el-table-column v-if="
               head_item.key == 'updateTime' &&
-              head_data_common_dict['updateTime'].isShow
-            "
-            :key="head_data_common_dict['updateTime'].prio"
-          >
+                head_data_common_dict['updateTime'].isShow
+            " :key="head_data_common_dict['updateTime'].prio" :label="head_data_common_dict['updateTime'].label" class-name="updateTime_col" :width="head_data_common_dict['updateTime'].width">
             <template slot-scope="props">
               <span>{{ props.row.updateTime }}</span>
             </template>
@@ -476,11 +279,19 @@
 </template>
 
 <script>
-import { star } from "../../components/Star/index.vue";
-import draggable from "vuedraggable";
+import draggable from 'vuedraggable'
+import { star } from '../../components/Star/index.vue'
 export default {
-  name: "ViewList",
+  name: 'ViewList',
   components: { star, draggable },
+  directives: {
+    focus: {
+      // 指令的定义
+      inserted: function (el) {
+        el.focus()
+      },
+    },
+  },
   data() {
     return {
       /**
@@ -488,126 +299,126 @@ export default {
        */
       contents_data: [],
 
-      //表格真正使用的表头数据
+      // 表格真正使用的表头数据
       head_data_common: [
-        //名称
+        // 名称
         {
-          key: "name",
-          width: "200rem",
+          key: 'name',
+          width: '200rem',
           isShow: true,
-          label: "名称",
+          label: '名称',
           prio: 0,
         },
-        //事项时间
+        // 事项时间
         {
-          key: "task_time",
-          width: "150rem",
+          key: 'task_time',
+          width: '150rem',
           isShow: true,
-          label: "事项时间",
+          label: '事项时间',
           prio: 1,
         },
-        //分组
+        // 分组
         {
-          key: "group",
-          width: "150rem",
+          key: 'group',
+          width: '150rem',
           isShow: true,
-          label: "分组",
+          label: '分组',
           prio: 2,
         },
-        //参与人
+        // 参与人
         {
-          key: "participator",
-          width: "150rem",
+          key: 'participator',
+          width: '150rem',
           isShow: true,
-          label: "参与人",
+          label: '参与人',
           prio: 3,
         },
-        //事项状态
+        // 事项状态
         {
-          key: "state_label",
-          width: "100rem",
+          key: 'state_label',
+          width: '100rem',
           isShow: true,
-          label: "事项状态",
+          label: '事项状态',
           prio: 4,
         },
-        //项目
+        // 项目
         {
-          key: "project",
-          width: "200rem",
+          key: 'project',
+          width: '200rem',
           isShow: true,
-          label: "项目",
+          label: '项目',
           prio: 5,
         },
-        //总结
+        // 总结
         {
-          key: "conclusion",
-          width: "300rem",
+          key: 'conclusion',
+          width: '300rem',
           isShow: true,
-          label: "总结",
+          label: '总结',
           prio: 6,
         },
-        //团队
+        // 团队
         {
-          key: "team",
-          width: "300rem",
+          key: 'team',
+          width: '300rem',
           isShow: true,
-          label: "团队",
+          label: '团队',
           prio: 7,
         },
-        //日程隐藏
+        // 日程隐藏
         {
-          key: "hidden",
-          width: "120rem",
+          key: 'hidden',
+          width: '120rem',
           isShow: true,
-          label: "日程隐藏",
+          label: '日程隐藏',
           prio: 8,
         },
-        //事项完成时间
+        // 事项完成时间
         {
-          key: "taskDoneTime",
-          width: "150rem",
+          key: 'taskDoneTime',
+          width: '150rem',
           isShow: true,
-          label: "事项完成时间",
+          label: '事项完成时间',
           prio: 9,
         },
-        //我的完成时间
+        // 我的完成时间
         {
-          key: "taskDoneMyTime",
-          width: "150rem",
+          key: 'taskDoneMyTime',
+          width: '150rem',
           isShow: true,
-          label: "我的完成时间",
+          label: '我的完成时间',
           prio: 10,
         },
-        //关注
+        // 关注
         {
-          key: "star",
-          width: "80rem",
+          key: 'star',
+          width: '80rem',
           isShow: true,
-          label: "关注",
+          label: '关注',
           prio: 11,
         },
-        //完成情况
+        // 完成情况
         {
-          key: "taskAchievement",
-          width: "150rem",
+          key: 'taskAchievement',
+          width: '150rem',
           isShow: true,
-          label: "完成情况",
+          label: '完成情况',
           prio: 12,
         },
-        //创建人
+        // 创建人
         {
-          key: "creator",
-          width: "150rem",
+          key: 'creator',
+          width: '150rem',
           isShow: true,
-          label: "创建人",
+          label: '创建人',
           prio: 13,
         },
-        //更新时间
+        // 更新时间
         {
-          key: "updateTime",
-          width: "150rem",
+          key: 'updateTime',
+          width: '150rem',
           isShow: true,
-          label: "更新时间",
+          label: '更新时间',
           prio: 14,
         },
       ],
@@ -615,31 +426,31 @@ export default {
       /**
        * 表头位置的的下拉框，快捷筛选
        */
-      //下拉框元数据
+      // 下拉框元数据
       select_allTasks_Options: [
         {
-          value: "all_task",
-          label: "所有事项",
+          value: 'all_task',
+          label: '所有事项',
         },
         {
-          value: "I_not_done",
-          label: "我未完成",
+          value: 'I_not_done',
+          label: '我未完成',
         },
         {
-          value: "I_am_doing",
-          label: "我进行中",
+          value: 'I_am_doing',
+          label: '我进行中',
         },
         {
-          value: "I_am_delaying",
-          label: "我延期中",
+          value: 'I_am_delaying',
+          label: '我延期中',
         },
         {
-          value: "I_have_done",
-          label: "我已完成",
+          value: 'I_have_done',
+          label: '我已完成',
         },
       ],
-      //下拉框取得的数据
-      select_allTasks_Option: "all_task",
+      // 下拉框取得的数据
+      select_allTasks_Option: 'all_task',
 
       /**
        * 表头排序
@@ -647,7 +458,7 @@ export default {
        */
       ShowHeadSet: false,
       HeadSetData: [
-        //名称
+        // 名称
         // {
         //   key: "name",
         //   width: "200rem",
@@ -655,249 +466,256 @@ export default {
         //   label: "名称",
         //   prio: 0,
         // },
-        //事项时间
+        // 事项时间
         {
-          key: "task_time",
-          width: "150rem",
+          key: 'task_time',
+          width: '150rem',
           isShow: true,
-          label: "事项时间",
+          label: '事项时间',
           prio: 1,
         },
-        //分组
+        // 分组
         {
-          key: "group",
-          width: "150rem",
+          key: 'group',
+          width: '150rem',
           isShow: true,
-          label: "分组",
+          label: '分组',
           prio: 2,
         },
-        //参与人
+        // 参与人
         {
-          key: "participator",
-          width: "150rem",
+          key: 'participator',
+          width: '150rem',
           isShow: true,
-          label: "参与人",
+          label: '参与人',
           prio: 3,
         },
-        //事项状态
+        // 事项状态
         {
-          key: "state_label",
-          width: "100rem",
+          key: 'state_label',
+          width: '100rem',
           isShow: true,
-          label: "事项状态",
+          label: '事项状态',
           prio: 4,
         },
-        //项目
+        // 项目
         {
-          key: "project",
-          width: "200rem",
+          key: 'project',
+          width: '200rem',
           isShow: true,
-          label: "项目",
+          label: '项目',
           prio: 5,
         },
-        //总结
+        // 总结
         {
-          key: "conclusion",
-          width: "300rem",
+          key: 'conclusion',
+          width: '300rem',
           isShow: true,
-          label: "总结",
+          label: '总结',
           prio: 6,
         },
-        //团队
+        // 团队
         {
-          key: "team",
-          width: "300rem",
+          key: 'team',
+          width: '300rem',
           isShow: true,
-          label: "团队",
+          label: '团队',
           prio: 7,
         },
-        //日程隐藏
+        // 日程隐藏
         {
-          key: "hidden",
-          width: "120rem",
+          key: 'hidden',
+          width: '120rem',
           isShow: true,
-          label: "日程隐藏",
+          label: '日程隐藏',
           prio: 8,
         },
-        //事项完成时间
+        // 事项完成时间
         {
-          key: "taskDoneTime",
-          width: "150rem",
+          key: 'taskDoneTime',
+          width: '150rem',
           isShow: true,
-          label: "事项完成时间",
+          label: '事项完成时间',
           prio: 9,
         },
-        //我的完成时间
+        // 我的完成时间
         {
-          key: "taskDoneMyTime",
-          width: "150rem",
+          key: 'taskDoneMyTime',
+          width: '150rem',
           isShow: true,
-          label: "我的完成时间",
+          label: '我的完成时间',
           prio: 10,
         },
-        //关注
+        // 关注
         {
-          key: "star",
-          width: "80rem",
+          key: 'star',
+          width: '80rem',
           isShow: true,
-          label: "关注",
+          label: '关注',
           prio: 11,
         },
-        //完成情况
+        // 完成情况
         {
-          key: "taskAchievement",
-          width: "150rem",
+          key: 'taskAchievement',
+          width: '150rem',
           isShow: true,
-          label: "完成情况",
+          label: '完成情况',
           prio: 12,
         },
-        //创建人
+        // 创建人
         {
-          key: "creator",
-          width: "150rem",
+          key: 'creator',
+          width: '150rem',
           isShow: true,
-          label: "创建人",
+          label: '创建人',
           prio: 13,
         },
-        //更新时间
+        // 更新时间
         {
-          key: "updateTime",
-          width: "150rem",
+          key: 'updateTime',
+          width: '150rem',
           isShow: true,
-          label: "更新时间",
+          label: '更新时间',
           prio: 14,
         },
       ],
       /**
        * 搜索框
        */
-      searchText: "",
+      searchText: '',
       /**
        * 单元格
        */
-      //双击单元格的坐标信息。行下标,列class名称
+      // 双击单元格的坐标信息。行下标,列class名称
       cellDbRowIndex: null,
-      cellDbColClass: "",
-      //单击单元格的坐标信息。行下标,列class名称
+      cellDbColClass: '',
+      // 单击单元格的坐标信息。行下标,列class名称
       cellSgRowIndex: null,
-      cellSgColClass: "",
+      cellSgColClass: '',
 
       /**
        * filter筛选
        */
-      //我缓存的filter配置数据
+      // 我缓存的filter配置数据
       MyFilterConfig: {
         state: [],
       },
-      //表头cell是否需要点击，来使得filter元素出现并获取到
+      // 表头cell是否需要点击，来使得filter元素出现并获取到
       HeadCellNeddClick: true,
-      //全部的filter元素的按钮，等待按下confirm按钮
+      // 全部的filter元素的按钮，等待按下confirm按钮
       AllFilterCellsButtons: [],
-      //表格中拥有filter的列ref
+      // 表格中拥有filter的列ref
       tableFilterColRefs: {
         state: null,
       },
-      //名称列
+      // 名称列
       NameColRef: null,
       /**
        * 事项时间
        **/
-      //日期、时间选择器dialog的显示
+      // 日期、时间选择器dialog的显示
       TaskTimePickerBlur: false,
-      //日期选择器的快捷时间
+      // 日期选择器的快捷时间
       TaskTimeDatePickerOptions: {
         shortcuts: [
           {
-            text: "最近一周",
+            text: '最近一周',
             onClick(picker) {
-              const start = new Date();
-              const end = new Date();
-              end.setTime(end.getTime() + 3600 * 1000 * 24 * 7);
-              picker.$emit("pick", [start, end]);
+              const start = new Date()
+              const end = new Date()
+              end.setTime(end.getTime() + 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
             },
           },
           {
-            text: "最近一个月",
+            text: '最近一个月',
             onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              end.setTime(end.getTime() + 3600 * 1000 * 24 * 30);
-              picker.$emit("pick", [start, end]);
+              const end = new Date()
+              const start = new Date()
+              end.setTime(end.getTime() + 3600 * 1000 * 24 * 30)
+              picker.$emit('pick', [start, end])
             },
           },
           {
-            text: "最近三个月",
+            text: '最近三个月',
             onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              end.setTime(end.getTime() + 3600 * 1000 * 24 * 90);
-              picker.$emit("pick", [start, end]);
+              const end = new Date()
+              const start = new Date()
+              end.setTime(end.getTime() + 3600 * 1000 * 24 * 90)
+              picker.$emit('pick', [start, end])
             },
           },
         ],
       },
 
-      /***
+      /** *
        * 项目
        */
-      //我的所有项目，缓存;按照team进行分组
+      // 我的所有项目，缓存;按照team进行分组
       MyTeamProjects: -1,
-      //项目下拉选择器的显示
+      // 项目下拉选择器的显示
       ShowProjectSelect: false,
-    };
+    }
+  },
+  computed: {
+    // 方便直接获取head_data_common的值
+    head_data_common_dict: {
+      // getter
+      get: function () {
+        const dict = {}
+        this.head_data_common.forEach((ele) => {
+          dict[ele.key] = ele
+        })
+        return dict
+      },
+      // setter
+      // set: function (newValue) {},
+    },
   },
   mounted() {
     this.$nextTick(() => {
-      //contents data 初始化
-      this.SetContentsData();
-      //用户的所有项目简洁数据
-      this.GetMyTeamProjects();
-      //点击表头，使得filter元素出现
+      // contents data 初始化
+      this.SetContentsData()
+      // 用户的所有项目简洁数据
+      this.GetMyTeamProjects()
+      // 点击表头，使得filter元素出现
       // this.ClickTableHead();
-    });
-  },
-  directives: {
-    focus: {
-      // 指令的定义
-      inserted: function (el) {
-        el.focus();
-      },
-    },
+    })
   },
   destroyed() {
-    //监听事件解绑
+    // 监听事件解绑
   },
   methods: {
     TestClick() {
-      console.log(this.HeadSetData);
+      console.log(this.HeadSetData)
     },
     /**
      * 单元格
      */
-    //表格的单元格,双击
+    // 表格的单元格,双击
     cellDbClick(row, column, cell, event) {
       // console.group("cellDbClick");
-      //点击cell，记录下行列信息
+      // 点击cell，记录下行列信息
 
-      this.cellDbRowIndex = row.rowIndex;
-      this.cellDbColClass = column.className;
+      this.cellDbRowIndex = row.rowIndex
+      this.cellDbColClass = column.className
 
       // console.log("cellDbRowIndex", this.cellDbRowIndex);
       // console.groupEnd("cellDbClick");
     },
-    //表格的单元格，单击事件
+    // 表格的单元格，单击事件
     cellClick(row, column, cell, event) {
       // console.group("cellClick");
       // console.log(this.cellSgRowIndex);
       // console.log(this.cellSgColClass);
       // console.log("----");
-      this.cellSgRowIndex = row.rowIndex;
-      this.cellSgColClass = column.className;
-      //事项时间的列
-      if (this.cellSgColClass == "task_time_col") {
-        this.TaskTimePickerBlur = true;
+      this.cellSgRowIndex = row.rowIndex
+      this.cellSgColClass = column.className
+      // 事项时间的列
+      if (this.cellSgColClass == 'task_time_col') {
+        this.TaskTimePickerBlur = true
       } else {
-        this.TaskTimePickerBlur = false;
+        this.TaskTimePickerBlur = false
       }
       // console.log(this.cellSgRowIndex);
       // console.log(this.cellSgColClass);
@@ -905,18 +723,18 @@ export default {
       // console.groupEnd("cellClick");
     },
 
-    //根据每行的childrenNum，返回对应的class
+    // 根据每行的childrenNum，返回对应的class
     GetRowClass(props) {
-      //为每行更新rowIndex
-      props.row.rowIndex = props.rowIndex;
+      // 为每行更新rowIndex
+      props.row.rowIndex = props.rowIndex
       switch (props.row.childrenNum) {
         case -1:
-          return "noBorder childRow";
+          return 'noBorder childRow'
         default:
           if (props.row.showChildren) {
-            return "noBorder parentRow";
+            return 'noBorder parentRow'
           } else {
-            return "";
+            return ''
           }
       }
     },
@@ -926,8 +744,8 @@ export default {
      * 顶部工具栏
      */
 
-    //顶部左边的下拉框,值改变时
-    //根据下拉框的值，给my筛选器重新赋值
+    // 顶部左边的下拉框,值改变时
+    // 根据下拉框的值，给my筛选器重新赋值
     async TopSelectValChange(val) {
       /**
        * 事项状态的filter取值范围
@@ -935,50 +753,50 @@ export default {
             { text: '进行中', value: '1' },
             { text: '延期中', value: '2' },
             { text: '延期完成', value: '3' },
-            
+
        */
       await this.MyFilterInit().then(async (res) => {
-        if (val == "all_task") {
-          //所有事项
-          this.MyFilterConfig.state = ["0", "1", "2", "3"];
-        } else if (val == "I_not_done") {
-          //我未完成
-          this.MyFilterConfig.state = ["1", "2"];
-        } else if (val == "I_am_doing") {
-          //我进行中
-          this.MyFilterConfig.state = ["1"];
-        } else if (val == "I_am_delaying") {
-          //我延期中
-          this.MyFilterConfig.state = ["2"];
-        } else if (val == "I_have_done") {
-          //已经完成的
-          this.MyFilterConfig.state = ["0", "3"];
+        if (val == 'all_task') {
+          // 所有事项
+          this.MyFilterConfig.state = ['0', '1', '2', '3']
+        } else if (val == 'I_not_done') {
+          // 我未完成
+          this.MyFilterConfig.state = ['1', '2']
+        } else if (val == 'I_am_doing') {
+          // 我进行中
+          this.MyFilterConfig.state = ['1']
+        } else if (val == 'I_am_delaying') {
+          // 我延期中
+          this.MyFilterConfig.state = ['2']
+        } else if (val == 'I_have_done') {
+          // 已经完成的
+          this.MyFilterConfig.state = ['0', '3']
         }
 
         await this.UseMyFilterConfig().then((res) => {
-          this.ConfirmFilterCell();
-        });
-      });
+          this.ConfirmFilterCell()
+        })
+      })
     },
 
     /**
      * 表头设置
      */
-    //表头设置的click,弃用
+    // 表头设置的click,弃用
     ClickHeadSet() {
-      this.ShowHeadSet = !this.ShowHeadSet;
+      this.ShowHeadSet = !this.ShowHeadSet
       // console.log("ClickHeadSet");
     },
 
-    //表头设置pop的关闭事件,包括了所有的情况
+    // 表头设置pop的关闭事件,包括了所有的情况
     HeadSetAfterLeave() {
       // console.log("HeadSetAfterLeave");
 
-      //HeadSet检查是否相较于head_data_common变化了
-      let changed = false;
-      let keys = ["key", "isShow"];
+      // HeadSet检查是否相较于head_data_common变化了
+      let changed = false
+      const keys = ['key', 'isShow']
       for (let i = 0; i < this.HeadSetData.length; i++) {
-        for (let key in keys) {
+        for (const key in keys) {
           // console.log(
           //   this.head_data_common[i + 1][keys[key]],
           //   this.HeadSetData[i][keys[key]]
@@ -987,16 +805,16 @@ export default {
             this.head_data_common[i + 1][keys[key]] !=
             this.HeadSetData[i][keys[key]]
           ) {
-            changed = true;
-            break;
+            changed = true
+            break
           }
         }
         if (changed) {
-          break;
+          break
         }
       }
       if (changed) {
-        console.log("changed");
+        console.log('changed')
         this.HeadSetData = this.HeadSetData.map((ele, index) => {
           // console.log(ele, "#", index + 1);
           // if (ele.prio == index+1) {
@@ -1010,32 +828,32 @@ export default {
             isShow: ele.isShow,
             label: ele.label,
             prio: Math.random(),
-          };
-        });
+          }
+        })
 
         // HeadSet数据赋值给head_data_common
-        this.head_data_common.splice(1, this.HeadSetData.length);
+        this.head_data_common.splice(1, this.HeadSetData.length)
         this.HeadSetData.forEach((ele) => {
-          let newEle = { ...ele };
-          this.head_data_common.push(newEle);
-        });
+          const newEle = { ...ele }
+          this.head_data_common.push(newEle)
+        })
       }
 
       // this.$forceUpdate();
-      console.log("this.head_data_common", this.head_data_common);
+      console.log('this.head_data_common', this.head_data_common)
     },
-    //表头设置pop的按钮取消
+    // 表头设置pop的按钮取消
     HeadSetPopCancel() {
-      this.ShowHeadSet = false;
+      this.ShowHeadSet = false
     },
-    //表头设置pop的按钮确认
+    // 表头设置pop的按钮确认
     HeadSetPopConfirm() {
-      this.ShowHeadSet = false;
+      this.ShowHeadSet = false
     },
 
-    //表头元素isShow的勾选
+    // 表头元素isShow的勾选
     HeadSetClickRadio(event, element) {
-      element.isShow = !element.isShow;
+      element.isShow = !element.isShow
       // console.log("this.head_data_common", this.head_data_common);
       // this.$forceUpdate();
       // console.log(element.isShow);
@@ -1045,38 +863,38 @@ export default {
      */
 
     async MyFilterInit() {
-      //是否需要重新初始化，
-      //点击表头cell，获取表头filter元素，获取拥有filter元素的列
+      // 是否需要重新初始化，
+      // 点击表头cell，获取表头filter元素，获取拥有filter元素的列
       if (this.HeadCellNeddClick) {
         await this.ClickTableHead().then((click_res) => {
           return new Promise((resolve, reject) => {
             setTimeout(async () => {
-              //获取所有的filter cells按钮
+              // 获取所有的filter cells按钮
               await this.GetAllFilterCell().then((res) => {
-                //获取拥有filter的列
-                this.GetAllFilterColRefs();
-                this.HeadCellNeddClick = false;
+                // 获取拥有filter的列
+                this.GetAllFilterColRefs()
+                this.HeadCellNeddClick = false
                 // console.log(
                 //   "AllFilterCellsButtons",
                 //   this.AllFilterCellsButtons
                 // );
-                this.ClickTableHead();
+                this.ClickTableHead()
 
-                resolve(true);
-              });
-            }, 20);
-          });
-        });
+                resolve(true)
+              })
+            }, 20)
+          })
+        })
       }
     },
 
-    //使用我缓存的filter config数据，赋值给对应的filter cell元素
-    //后面需要获取filter cell元素，并且按下它们的confirm按钮即可筛选
-    //达到的效果：不用点击表头筛选器也能筛选
-    //场景：顶部工具栏，左侧下拉框可快捷筛选，单点下拉框后即可进行筛选
+    // 使用我缓存的filter config数据，赋值给对应的filter cell元素
+    // 后面需要获取filter cell元素，并且按下它们的confirm按钮即可筛选
+    // 达到的效果：不用点击表头筛选器也能筛选
+    // 场景：顶部工具栏，左侧下拉框可快捷筛选，单点下拉框后即可进行筛选
     async UseMyFilterConfig() {
       return new Promise((resolve, reject) => {
-        //赋值state
+        // 赋值state
         // console.group("UseMyFilterConfig");
         // console.log(
         //   "this.tableFilterColRefs.state",
@@ -1085,140 +903,140 @@ export default {
 
         // console.log("this.MyFilterConfig.state", this.MyFilterConfig.state);
         this.tableFilterColRefs.state.columnConfig.filteredValue =
-          this.MyFilterConfig.state;
-        resolve(true);
+          this.MyFilterConfig.state
+        resolve(true)
         // console.groupEnd("UseMyFilterConfig");
-      });
+      })
     },
 
-    //点击表头单元格，使得filter元素出现
+    // 点击表头单元格，使得filter元素出现
     async ClickTableHead() {
       return new Promise((resolve, reject) => {
-        //点击表头的cell，对应的filter才会出现
-        let headersHTML = document.getElementsByClassName(
-          "el-table__header-wrapper"
-        );
-        let headersArr = Array.from(headersHTML);
+        // 点击表头的cell，对应的filter才会出现
+        const headersHTML = document.getElementsByClassName(
+          'el-table__header-wrapper'
+        )
+        const headersArr = Array.from(headersHTML)
         headersArr.forEach((header) => {
-          let cells = Array.from(
-            header.getElementsByClassName("el-table__cell")
-          );
+          const cells = Array.from(
+            header.getElementsByClassName('el-table__cell')
+          )
           cells.forEach((cell) => {
-            cell.click();
-          });
-        });
+            cell.click()
+          })
+        })
         // console.log(headersHTML);
-        resolve(true);
-      });
+        resolve(true)
+      })
     },
-    //获取拥有filter的列
+    // 获取拥有filter的列
     GetAllFilterColRefs() {
-      //事项状态列
-      let state_;
-      state_ = this.$refs.state_col_ref;
+      // 事项状态列
+      let state_
+      state_ = this.$refs.state_col_ref
       if (state_ instanceof Array) {
-        state_ = state_[0];
+        state_ = state_[0]
       }
 
       this.tableFilterColRefs = {
         state: state_,
-      };
+      }
       // console.log("this.tableFilterColRefs ", this.tableFilterColRefs);
     },
 
-    //获取所有filter cell元素，只是为了按click启动筛选
+    // 获取所有filter cell元素，只是为了按click启动筛选
     async GetAllFilterCell() {
       return new Promise((resolve, reject) => {
-        let filters_cell = document.getElementsByClassName("el-table-filter");
-        let cellButtons = [];
-        for (let c of filters_cell) {
-          let bottom = Array.from(
-            c.getElementsByClassName("el-table-filter__bottom")
-          );
+        const filters_cell = document.getElementsByClassName('el-table-filter')
+        const cellButtons = []
+        for (const c of filters_cell) {
+          const bottom = Array.from(
+            c.getElementsByClassName('el-table-filter__bottom')
+          )
           let twoButtons = {
-            confirm: "",
-            reset: "",
-          };
+            confirm: '',
+            reset: '',
+          }
           // 获取到俩按钮，一个confirm，一个reset
-          let buttons = Array.from(bottom[0].getElementsByTagName("button"));
+          const buttons = Array.from(bottom[0].getElementsByTagName('button'))
 
-          if (buttons[0].innerText.includes("筛选")) {
+          if (buttons[0].innerText.includes('筛选')) {
             twoButtons = {
               confirm: buttons[0],
               reset: buttons[1],
-            };
+            }
           } else {
             twoButtons = {
               confirm: buttons[1],
               reset: buttons[0],
-            };
+            }
           }
 
-          cellButtons.push(twoButtons);
+          cellButtons.push(twoButtons)
           // console.log('twoButtons',twoButtons);
         }
-        this.AllFilterCellsButtons = cellButtons;
-        resolve(this.AllFilterCellsButtons.length);
+        this.AllFilterCellsButtons = cellButtons
+        resolve(this.AllFilterCellsButtons.length)
         // console.log(this.AllFilterCellsButtons);
         // console.log(filters_cell);
-      });
+      })
     },
-    //按下所有filter cell元素的确定按钮
+    // 按下所有filter cell元素的确定按钮
     ConfirmFilterCell() {
       // console.log("AllFilterCellsButtons", this.AllFilterCellsButtons);
       this.AllFilterCellsButtons.forEach((ele) => {
-        ele.confirm.click();
+        ele.confirm.click()
 
         // console.log(ele.confirm);
-      });
+      })
     },
 
-    //事项状态 state的真正filter
-    //state按照这个模式来过滤
+    // 事项状态 state的真正filter
+    // state按照这个模式来过滤
     StateFilterHandler(value, row, column) {
       /**
        *    { text: '已完成', value: '0' },
             { text: '进行中', value: '1' },
             { text: '延期中', value: '2' },
             { text: '延期完成', value: '3' },
-            
+
        */
 
-      return row.state_val == value;
+      return row.state_val == value
     },
 
     /**
      *
      * 数据初始化与获取
      */
-    //表格数据contents data初始化
+    // 表格数据contents data初始化
     SetContentsData() {
       this.contents_data = [
         {
-          id: "t1l1",
-          name: "名称1",
+          id: 't1l1',
+          name: '名称1',
           task_time: {
-            date: "",
+            date: '',
             time: {
-              start: "",
-              end: "",
+              start: '',
+              end: '',
             },
           },
           task_time_label: {
-            start_date: { year: "", month: "", day: "" },
-            end_date: { year: "", month: "", day: "" },
-            start_time: { hour: "", minute: "" },
-            end_time: { hour: "", minute: "" },
+            start_date: { year: '', month: '', day: '' },
+            end_date: { year: '', month: '', day: '' },
+            start_time: { hour: '', minute: '' },
+            end_time: { hour: '', minute: '' },
           },
-          group: "分组1",
+          group: '分组1',
           project: {
-            name: "",
-            id: "",
+            name: '',
+            id: '',
           },
-          conclusion: "总结1",
-          team: "团队1",
+          conclusion: '总结1',
+          team: '团队1',
           state_val: 0,
-          state_label: "",
+          state_label: '',
           isDone: false,
           childrenNum: 2,
           showChildren: false,
@@ -1227,30 +1045,30 @@ export default {
           Children: -1,
         },
         {
-          id: "t1l2",
-          name: "名称2",
+          id: 't1l2',
+          name: '名称2',
           task_time: {
-            date: "",
+            date: '',
             time: {
-              start: "",
-              end: "",
+              start: '',
+              end: '',
             },
           },
           task_time_label: {
-            start_date: { year: "", month: "", day: "" },
-            end_date: { year: "", month: "", day: "" },
-            start_time: { hour: "", minute: "" },
-            end_time: { hour: "", minute: "" },
+            start_date: { year: '', month: '', day: '' },
+            end_date: { year: '', month: '', day: '' },
+            start_time: { hour: '', minute: '' },
+            end_time: { hour: '', minute: '' },
           },
-          group: "分组1",
+          group: '分组1',
           project: {
-            name: "",
-            id: "",
+            name: '',
+            id: '',
           },
-          conclusion: "总结1",
-          team: "团队2",
+          conclusion: '总结1',
+          team: '团队2',
           state_val: 1,
-          state_label: "",
+          state_label: '',
           isDone: false,
           childrenNum: 3,
           showChildren: false,
@@ -1259,30 +1077,30 @@ export default {
           Children: -1,
         },
         {
-          id: "t1l3",
-          name: "名称3",
+          id: 't1l3',
+          name: '名称3',
           task_time: {
-            date: "",
+            date: '',
             time: {
-              start: "",
-              end: "",
+              start: '',
+              end: '',
             },
           },
           task_time_label: {
-            start_date: { year: "", month: "", day: "" },
-            end_date: { year: "", month: "", day: "" },
-            start_time: { hour: "", minute: "" },
-            end_time: { hour: "", minute: "" },
+            start_date: { year: '', month: '', day: '' },
+            end_date: { year: '', month: '', day: '' },
+            start_time: { hour: '', minute: '' },
+            end_time: { hour: '', minute: '' },
           },
-          group: "分组1",
+          group: '分组1',
           project: {
-            name: "",
-            id: "",
+            name: '',
+            id: '',
           },
-          conclusion: "总结1",
-          team: "团队3",
+          conclusion: '总结1',
+          team: '团队3',
           state_val: 2,
-          state_label: "",
+          state_label: '',
           isDone: false,
           childrenNum: 1,
           showChildren: false,
@@ -1291,30 +1109,30 @@ export default {
           Children: -1,
         },
         {
-          id: "t1l4",
-          name: "名称4",
+          id: 't1l4',
+          name: '名称4',
           task_time: {
-            date: "",
+            date: '',
             time: {
-              start: "",
-              end: "",
+              start: '',
+              end: '',
             },
           },
           task_time_label: {
-            start_date: { year: "", month: "", day: "" },
-            end_date: { year: "", month: "", day: "" },
-            start_time: { hour: "", minute: "" },
-            end_time: { hour: "", minute: "" },
+            start_date: { year: '', month: '', day: '' },
+            end_date: { year: '', month: '', day: '' },
+            start_time: { hour: '', minute: '' },
+            end_time: { hour: '', minute: '' },
           },
-          group: "分组1",
+          group: '分组1',
           project: {
-            name: "",
-            id: "",
+            name: '',
+            id: '',
           },
-          conclusion: "总结1",
-          team: "团队4",
+          conclusion: '总结1',
+          team: '团队4',
           state_val: 3,
-          state_label: "",
+          state_label: '',
           isDone: false,
           childrenNum: 4,
           showChildren: false,
@@ -1322,7 +1140,7 @@ export default {
           star: false,
           Children: -1,
         },
-      ];
+      ]
     },
 
     // 请求某id事项的children事项，
@@ -1332,182 +1150,167 @@ export default {
      * 事项名字
      */
     onTaskDoneRadioChange(model) {
-      model.isDone = !model.isDone;
+      model.isDone = !model.isDone
     },
-    /***
+    /** *
      *
      * 事项时间
      */
-    //dialog关闭前事件
+    // dialog关闭前事件
     HandleCloseTaskTimeDialog(done) {
-      done();
-      this.TaskTimePickerBlur = false;
-      this.cellSgColClass = "";
+      done()
+      this.TaskTimePickerBlur = false
+      this.cellSgColClass = ''
       // console.log(this.TaskTimePickerBlur);
     },
-    //date picker;
-    //值改变时,更新task_time_label
+    // date picker;
+    // 值改变时,更新task_time_label
     HandleTaskTimeDateChange(val, model) {
       model.task_time_label.start_date = {
         year: val[0].getFullYear(),
         month: val[0].getMonth() + 1,
         day: val[0].getDate(),
-      };
+      }
       model.task_time_label.end_date = {
         year: val[0].getFullYear(),
         month: val[1].getMonth() + 1,
         day: val[1].getDate(),
-      };
+      }
     },
-    //time picker,start time
-    //值改变时,更新task_time_label
+    // time picker,start time
+    // 值改变时,更新task_time_label
     HandleTaskTimeStartTimeChange(val, model) {
       model.task_time_label.start_time = {
         hour: val.getHours(),
         minute: val.getMinutes(),
-      };
+      }
     },
-    //time picker,end time
-    //值改变时,更新task_time_label
+    // time picker,end time
+    // 值改变时,更新task_time_label
     HandleTaskTimeEndTimeChange(val, model) {
       model.task_time_label.end_time = {
         hour: val.getHours(),
         minute: val.getMinutes(),
-      };
+      }
       // console.log(model.task_time_label.end_time);
     },
-    //事项时间，返回task_time的 月日 的打印字符串
+    // 事项时间，返回task_time的 月日 的打印字符串
     FormatTaskTime_Date(model) {
-      const m = model;
-      let str = "";
-      str = `开始:${m.start_date.year}年${m.start_date.month}月${m.start_date.day}日`;
+      const m = model
+      let str = ''
+      str = `开始:${m.start_date.year}年${m.start_date.month}月${m.start_date.day}日`
       str +=
-        "\n" +
-        `结束:${m.end_date.year}年${m.end_date.month}月${m.end_date.day}日`;
-      return str;
+        '\n' +
+        `结束:${m.end_date.year}年${m.end_date.month}月${m.end_date.day}日`
+      return str
     },
 
-    //事项时间，返回task_time的 时分 的打印字符串
+    // 事项时间，返回task_time的 时分 的打印字符串
     FormatTaskTime_Time(model) {
-      const m = model;
-      let str = "";
-      str += `${m.start_time.hour}:${m.start_time.minute}`;
+      const m = model
+      let str = ''
+      str += `${m.start_time.hour}:${m.start_time.minute}`
 
-      str += "\n~" + `${m.end_time.hour}:${m.end_time.minute}`;
+      str += '\n~' + `${m.end_time.hour}:${m.end_time.minute}`
 
-      return str;
+      return str
     },
 
     /**
      * 事项状态
      */
-    //根据事项的状态值state_val，返回对应的type类型
-    //同时为每一行的state_label赋值
+    // 根据事项的状态值state_val，返回对应的type类型
+    // 同时为每一行的state_label赋值
     StateTagName(state_val, model) {
-      //tag的类型
-      let tag_name;
+      // tag的类型
+      let tag_name
       switch (state_val) {
         case 0:
-          tag_name = "success";
-          break;
+          tag_name = 'success'
+          break
         case 1:
-          tag_name = "";
-          break;
+          tag_name = ''
+          break
         case 2:
-          tag_name = "danger";
-          break;
+          tag_name = 'danger'
+          break
         case 3:
-          tag_name = "warning";
-          break;
+          tag_name = 'warning'
+          break
       }
-      //state_label赋值
-      let label;
+      // state_label赋值
+      let label
       switch (model.state_val) {
         case 0:
-          label = "已完成";
-          break;
+          label = '已完成'
+          break
         case 1:
-          label = "进行中";
-          break;
+          label = '进行中'
+          break
         case 2:
-          label = "延期中";
-          break;
+          label = '延期中'
+          break
         case 3:
-          label = "延期完成";
-          break;
+          label = '延期完成'
+          break
       }
-      model.state_label = label;
-      return tag_name;
+      model.state_label = label
+      return tag_name
     },
 
-    /***
+    /** *
      * 项目
      */
-    //项目,返回用户的所有项目简洁数据
+    // 项目,返回用户的所有项目简洁数据
     GetMyTeamProjects() {
-      //没有缓存，请求获取
+      // 没有缓存，请求获取
       if (this.MyTeamProjects == -1) {
-        let projects = [];
-        [1, 2, 3].forEach((i) => {
+        const projects = []
+        ;[1, 2, 3].forEach((i) => {
           projects.push({
-            teamName: "团队" + i.toString(),
-            id: "团队" + i.toString() + "-ID",
+            teamName: '团队' + i.toString(),
+            id: '团队' + i.toString() + '-ID',
             projects: [
               {
-                name: "项目" + i.toString() + ".1",
-                id: "项目" + i.toString() + ".1-ID",
+                name: '项目' + i.toString() + '.1',
+                id: '项目' + i.toString() + '.1-ID',
               },
               {
-                name: "项目" + i.toString() + ".2",
-                id: "项目" + i.toString() + ".2-ID",
+                name: '项目' + i.toString() + '.2',
+                id: '项目' + i.toString() + '.2-ID',
               },
               {
-                name: "项目" + i.toString() + ".3",
-                id: "项目" + i.toString() + ".3-ID",
+                name: '项目' + i.toString() + '.3',
+                id: '项目' + i.toString() + '.3-ID',
               },
             ],
-          });
-        });
+          })
+        })
 
-        this.MyTeamProjects = projects;
+        this.MyTeamProjects = projects
       }
 
-      return this.MyTeamProjects;
+      return this.MyTeamProjects
     },
-    //项目，project;下拉选择器 值变化时
+    // 项目，project;下拉选择器 值变化时
     HandleProjectChange(prop) {
       // console.log(prop);
       // //回显后选择强制刷新
-      this.$forceUpdate();
+      this.$forceUpdate()
     },
-    //项目，下拉选择器，判断能否取这个值
+    // 项目，下拉选择器，判断能否取这个值
     DisbledProjectSelectOption() {},
 
-    /***
+    /** *
      * 关注
      */
-    //组件star 返回值事件
+    // 组件star 返回值事件
     HandleStarEvent(val) {
-      //根据传回来的line index，设置对应的行的star值
-      this.contents_data[val.line_index].star = val.isActive;
+      // 根据传回来的line index，设置对应的行的star值
+      this.contents_data[val.line_index].star = val.isActive
     },
   },
-  computed: {
-    //方便直接获取head_data_common的值
-    head_data_common_dict: {
-      // getter
-      get: function () {
-        let dict = {};
-        this.head_data_common.forEach((ele) => {
-          dict[ele.key] = ele;
-        });
-        return dict;
-      },
-      // setter
-      // set: function (newValue) {},
-    },
-  },
-};
+}
 </script>
 <style lang="less" scoped>
 .viewList_view {
@@ -1519,8 +1322,8 @@ export default {
     margin-bottom: 1em;
     display: flex;
     flex-direction: row;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue",
-      Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue',
+      Helvetica, Arial, 'Lucida Grande', sans-serif;
     font-size: 0.9rem;
     // color: var(--head--grey);
 
@@ -1598,7 +1401,7 @@ export default {
           }
 
           ::v-deep .el-radio__input.is-checked .el-radio__inner::after {
-            content: "";
+            content: '';
             width: 10px;
             height: 5px;
             border: 1px solid white;
@@ -1624,6 +1427,4 @@ export default {
   }
 }
 </style>
-
-
 

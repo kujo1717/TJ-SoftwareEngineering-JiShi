@@ -44,13 +44,13 @@ export const constantRoutes = [
   },
   {
     path: '/register',
-    component:()=>import('@/views/login/register.vue'),
-    hidden:true
+    component: () => import('@/views/login/register.vue'),
+    hidden: true
   },
   {
-    path:'/forget',
-    component:()=> import('@/views/login/forget.vue'),
-    hidden:true
+    path: '/forget',
+    component: () => import('@/views/login/forget.vue'),
+    hidden: true
   },
 
   {
@@ -184,9 +184,8 @@ export const constantRoutes = [
         component: () => import('@/views/calendarView/index'),
         meta: { title: '日程', icon: 'form' }
       }
-    ],
+    ]
   },
-
   {
     path: '/viewList',
     component: Layout,
@@ -197,7 +196,32 @@ export const constantRoutes = [
         component: () => import('@/views/viewList/index'),
         meta: { title: '事项列表', icon: 'form' }
       }
-    ],
+    ]
+  },
+  {
+    path: '/viewLog',
+    component: Layout,
+    children: [
+      {
+        path: 'logview',
+        name: 'viewLog',
+        component: () => import('@/views/logviewing/logview'),
+        meta: { title: '日志查看', icon: 'form' }
+      }
+    ]
+  },
+  // 想要按照yy说的整合到team，失败，先暂时另开页面
+  {
+    path: '/viewTeam',
+    component: Layout,
+    children: [
+      {
+        path: 'teamview',
+        name: 'viewTeam',
+        component: () => import('@/views/teamspace/teamviewing'),
+        meta: { title: '团队主页', icon: 'form' }
+      }
+    ]
   },
   {
     path: '/personal',
@@ -226,9 +250,9 @@ export const constantRoutes = [
         name: 'schedule',
         component: () => import('@/views/personalSchedule/schedule/index'),
         meta: { title: '日程', icon: 'form' }
-      },
+      }
 
-    ],
+    ]
   },
   {
     path: '/teams',
@@ -256,8 +280,8 @@ export const constantRoutes = [
             path: '项目1-2',
             component: () => import('@/views/nested/menu1/menu1-2'),
             name: '项目1-2',
-            meta: { title: '项目1-2' },
-          },
+            meta: { title: '项目1-2' }
+          }
         ]
       },
       {
@@ -265,11 +289,21 @@ export const constantRoutes = [
         component: () => import('@/views/nested/menu2/index'),
         name: 'team2',
         meta: { title: 'team2' }
+      },
+      {
+        path: 'create',
+        component: () => import('@/views/nested/create/index'),
+        name: 'create',
+        meta: { title: 'create' }
+      },
+      {
+        path: 'add',
+        component: () => import('@/views/nested/add/index'),
+        name: 'add',
+        meta: { title: 'add' }
       }
-    ],
+    ]
   },
-
-
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
@@ -278,7 +312,8 @@ export const constantRoutes = [
 const createRouter = () => new Router({
   // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
-  routes: constantRoutes
+  routes: constantRoutes,
+  mode: 'history'
 })
 
 const router = createRouter()
