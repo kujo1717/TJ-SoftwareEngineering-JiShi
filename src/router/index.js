@@ -162,7 +162,18 @@ export const constantRoutes = [
         name: '团队2',
         meta: { title: '团队2' },
       },
-
+      {
+        path: 'create',
+        component: () => import('@/views/create/index'),
+        name: 'create',
+        meta: { title: 'create' }
+      },
+      {
+        path: 'add',
+        component: () => import('@/views/add/index'),
+        name: 'add',
+        meta: { title: 'add' }
+      }
 
     ],
   },
