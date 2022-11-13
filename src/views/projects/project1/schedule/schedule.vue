@@ -18,9 +18,9 @@
 
 <script>
 // 引入日历组件
-import CreateTaskBox from "../../../components/CreateTaskBox/index.vue";
+import CreateTaskBox from "../../../../components/CreateTaskBox/index.vue";
 
-import TaskBox from  "../../../components/TaskBox/index.vue";
+import TaskBox from  "../../../../components/TaskBox/index.vue";
 
 import "@fullcalendar/core/vdom"; // solves problem with Vite
 import FullCalendar from "@fullcalendar/vue";

@@ -141,6 +141,30 @@ export const constantRoutes = [
     ],
   },
   {
+    path: '/projects',
+    component: Layout,
+    redirect: '/projects/project1',
+    name: 'Projects',
+    meta: {
+      title: '项目',
+      icon: 'nested'
+    },
+    children: [
+      {
+        path: '项目1',
+        component: () => import('@/views/projects/project1'),
+        name: '项目1',
+        meta: { title: '项目1' },
+      },
+      {
+        path: '项目2',
+        component: () => import('@/views/projects/project2'),
+        name: '项目2',
+        meta: { title: '项目2' },
+      },
+    ],
+  },
+  {
     path: '/teamspace',
     component: Layout,
     redirect: '/teamspace/team1',
@@ -166,18 +190,7 @@ export const constantRoutes = [
 
     ],
   },
-  {
-    path: '/teamproject',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'TeamProject',
-        component: () => import('@/views/teamproject/index'),
-        meta: { title: '测试用团队项目#实际不显示在菜单', icon: 'form' }
-      }
-    ],
-  },
+
 
 
   // 404 page must be placed at the end !!!
