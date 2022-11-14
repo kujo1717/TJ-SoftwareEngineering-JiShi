@@ -151,17 +151,17 @@ export const constantRoutes = [
     },
     children: [
       {
-        path: '项目1',
-        component: () => import('@/views/projects/project1'),
-        name: '项目1',
-        meta: { title: '项目1' },
+        path: 'myproject',
+        component: () => import('@/views/projects/MyProject'),
+        name: '我的项目',
+        meta: { title: '我的项目' },
       },
       {
-        path: '项目2',
-        component: () => import('@/views/projects/project2'),
-        name: '项目2',
-        meta: { title: '项目2' },
-      },
+        path: 'project1',
+        component: () => import('@/views/projects/project1'),
+        name: 'project1',
+        meta: { title: '测试用静态项目页面' },
+      }
     ],
   },
   {
