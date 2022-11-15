@@ -1,6 +1,23 @@
 <template>
   <div class="mp_view">
-    <div class="mp_head_box">顶部的加入项目box</div>
+    <el-card class="mp_head_card">
+      <el-row class="mp_head_box">
+        <el-col class="join_label" :span="3">
+          <span>通过邀请码加入项目</span>
+        </el-col>
+        <el-col :span="10">
+          <el-input
+            class="join_input"
+            placeholder="请输入分享码"
+            prefix-icon="el-icon-search"
+            v-model="join_proj_code"
+          >
+          </el-input>
+          <el-button @click="JoinProjByShareCode" type="primary" class="join_button">加入</el-button>
+        </el-col>
+      </el-row>
+    </el-card>
+
     <div class="mp_main_projects_box">
       <el-card class="mp_all_proj_cards">
         <!-- 创建项目 -->
@@ -76,9 +93,39 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button class="marginLeftAuto" type="primary" @click="CreateNewProj">立即创建</el-button>
+          <el-button
+            class="marginLeftAuto"
+            type="primary"
+            @click="CreateNewProj"
+            >立即创建</el-button
+          >
         </el-form-item>
       </el-form>
+    </el-dialog>
+
+    <!-- 新项目创建成功的弹窗 -->
+    <el-dialog
+      :modal="false"
+      :v-if="isShow_dialog_createdDone"
+      :visible.sync="isShow_dialog_createdDone"
+      class="mpcd_dialog"
+    >
+      <div class="mpdc_content">
+        <div v-show="loading_createNewProj">
+          <div class="mpcd_head">项目创建中</div>
+          <div class="mpcd_main" v-loading="loading_createNewProj"></div>
+        </div>
+        <div v-show="!loading_createNewProj">
+          <div class="mpcd_head">项目创建成功！</div>
+          <div class="proj_code_box">
+            <span class="code_label">分享码:</span>
+            <span class="code_value">1123321</span>
+          </div>
+          <el-button type="primary" @click="isShow_dialog_createdDone = false"
+            >确定</el-button
+          >
+        </div>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -92,6 +139,7 @@ export default {
       /*
       创建新项目
        */
+
       isShow_dialog_createProj: false,
       isShow_dialog_createdDone: false,
       form_creatNewProj: {
@@ -103,6 +151,10 @@ export default {
           { required: true, message: "请输入项目名称", trigger: "blur" },
         ],
       },
+      //创建新项目中loading
+      loading_createNewProj: true,
+      /*加入项目 */
+      join_proj_code: "123321",
     };
   },
   methods: {
@@ -171,8 +223,16 @@ export default {
       this.isShow_dialog_createProj = true;
       console.log(true);
     },
+    //创建项目
     CreateNewProj() {
       console.log(this.form_creatNewProj);
+      this.isShow_dialog_createProj = false;
+      this.isShow_dialog_createdDone = true;
+      this.loading_createNewProj = true;
+      //后端请求，创建新项目
+      setTimeout(() => {
+        this.loading_createNewProj = false;
+      }, 500);
     },
   },
   mounted() {
@@ -183,8 +243,26 @@ export default {
 </script>
 <style lang="less" scoped>
 .mp_view {
-  .mp_head_box {
+  .mp_head_card {
+    font-family: "Goudy Bookletter 1911", sans-serif;
+
+    margin-bottom: 0.5em;
+    .mp_head_box {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      .join_label {
+      }
+      .join_input {
+        width: auto;
+        display: inline-block;
+      }
+      .join_button {
+        margin-left: 0.3em;
+      }
+    }
   }
+
   .mp_main_projects_box {
     .mp_all_proj_cards {
       display: flex;
@@ -231,8 +309,27 @@ export default {
       }
     }
   }
-  /deep/.marginLeftAuto{
-    margin-right: auto !important;
+  .mpcd_dialog {
+    .mpdc_content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      .mpcd_head {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-bottom: 1em;
+      }
+      .proj_code_box {
+        font-size: 1.5em;
+        .code_label {
+        }
+        .code_value {
+        }
+      }
+      .mpcd_main {
+      }
+    }
   }
 }
 </style>

@@ -10,7 +10,6 @@ taskObj: obj 事项
 */
 <template>
   <div>
-
     <!--对话框-->
     <el-dialog
       :visible.sync="dialogVisible"
@@ -18,7 +17,6 @@ taskObj: obj 事项
       :append-to-body="true"
     >
       <el-container>
-
         <!--header-->
         <el-header>
           <!--勾选框-->
@@ -31,33 +29,35 @@ taskObj: obj 事项
             <span></span>
           </el-radio>
           <!--事项状态-->
-          <el-tag :type='tagStateColor'>{{taskInfo.taskState}}</el-tag>
+          <el-tag :type="tagStateColor">{{ taskInfo.taskState }}</el-tag>
 
           <!--事项与ddl的时间差-->
-          <font :color="timeLengthColor">{{timeLengthBetweenDDL}}</font>
+          <font :color="timeLengthColor">{{ timeLengthBetweenDDL }}</font>
         </el-header>
         <el-container>
-
           <el-aside width="40em">
             <!--事项详情-->
             <div class="detailPanel">
-              <h2 class="taskTitle">{{taskInfo.taskTitle}}</h2>
+              <h2 class="taskTitle">{{ taskInfo.taskTitle }}</h2>
               <!--点击编辑详情-->
               <el-button
                 size="mini"
                 @click="changeEditState()"
                 class="editButton"
-              ><i
-                  :class="isEditting ? 'el-icon-document-checked' : 'el-icon-edit'"></i>
+                ><i
+                  :class="
+                    isEditting ? 'el-icon-document-checked' : 'el-icon-edit'
+                  "
+                ></i>
               </el-button>
 
               <div v-if="!isEditting">
-                {{taskInfo.taskDetail}}
+                {{ taskInfo.taskDetail }}
               </div>
               <el-input
                 v-else
                 type="textarea"
-                :autosize="{ minRows: 2, maxRows: 5}"
+                :autosize="{ minRows: 2, maxRows: 5 }"
                 placeholder="请输入内容"
                 v-model="taskInfo.taskDetail"
               >
@@ -73,7 +73,6 @@ taskObj: obj 事项
                   v-model="taskInfo.classification"
                   :popper-append-to-body="false"
                 >
-
                   <el-option
                     v-for="item in typeList"
                     :key="item.value"
@@ -87,34 +86,44 @@ taskObj: obj 事项
               <!--优先级-->
               <el-form-item class="formItem">
                 <i class="iconfont icon-louti"></i>优先级：
-                <el-dropdown
-                  trigger="click"
-                  @command="handlePriorityCommand"
-                >
+                <el-dropdown trigger="click" @command="handlePriorityCommand">
                   <span class="el-dropdown-link">
                     <el-tag
                       :type="priorityColor"
                       effect="dark"
                       class="el-icon-arrow-down el-icon--right"
-                    >{{taskInfo.priority}}</el-tag>
+                      >{{ taskInfo.priority }}</el-tag
+                    >
                   </span>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item command="高优先级"><i
+                    <el-dropdown-item command="高优先级"
+                      ><i
                         class="iconfont icon-youxianji"
-                        style="color:#d81e06"
-                      ></i>高优先级</el-dropdown-item>
-                    <el-dropdown-item command="中优先级"><i
+                        style="color: #d81e06"
+                      ></i
+                      >高优先级</el-dropdown-item
+                    >
+                    <el-dropdown-item command="中优先级"
+                      ><i
                         class="iconfont icon-youxianji"
-                        style="color:#f4ea2a"
-                      ></i>中优先级</el-dropdown-item>
-                    <el-dropdown-item command="低优先级"><i
+                        style="color: #f4ea2a"
+                      ></i
+                      >中优先级</el-dropdown-item
+                    >
+                    <el-dropdown-item command="低优先级"
+                      ><i
                         class="iconfont icon-youxianji"
-                        style="color:#1afa29"
-                      ></i>低优先级</el-dropdown-item>
-                    <el-dropdown-item command="无优先级"><i
+                        style="color: #1afa29"
+                      ></i
+                      >低优先级</el-dropdown-item
+                    >
+                    <el-dropdown-item command="无优先级"
+                      ><i
                         class="iconfont icon-youxianji"
-                        style="color:#bfbfbf"
-                      ></i>无优先级</el-dropdown-item>
+                        style="color: #bfbfbf"
+                      ></i
+                      >无优先级</el-dropdown-item
+                    >
                   </el-dropdown-menu>
                 </el-dropdown>
               </el-form-item>
@@ -139,8 +148,10 @@ taskObj: obj 事项
 
               <el-form-item class="formItem">
                 <i class="iconfont icon-org"></i>
-                <span v-if="taskInfo.familyPosition=='child'">父事项：</span>
-                <span v-else-if="taskInfo.familyPosition=='parent'">子事项：</span>
+                <span v-if="taskInfo.familyPosition == 'child'">父事项：</span>
+                <span v-else-if="taskInfo.familyPosition == 'parent'"
+                  >子事项：</span
+                >
 
                 <el-table
                   ref="multipleTable"
@@ -148,148 +159,144 @@ taskObj: obj 事项
                   tooltip-effect="dark"
                   style="width: 100%"
                 >
-                  <el-table-column
-                    type="selection"
-                    width="55"
-                  >
+                  <el-table-column type="selection" width="55">
                   </el-table-column>
-                  <el-table-column
-                    label="事项名称"
-                    width="120"
-                  >
+                  <el-table-column label="事项名称" width="120">
                     <template slot-scope="scope">{{ scope.row.date }}</template>
                   </el-table-column>
-                  <el-table-column
-                    prop="name"
-                    label="状态"
-                    width="120"
-                  >
+                  <el-table-column prop="name" label="状态" width="120">
                   </el-table-column>
                 </el-table>
               </el-form-item>
             </el-form>
-
           </el-aside>
 
           <!--main-->
           <el-main>
             这里是团队项目的聊天窗口
+           <ChatBox></ChatBox>
           </el-main>
-
         </el-container>
       </el-container>
-
     </el-dialog>
-
   </div>
 </template>
 
 <script>
+import ChatBox from "../ChatBox/index.vue";
 export default {
   name: "TaskBox",
-  data () {
+  components: { ChatBox },
+  data() {
     return {
-      dialogVisible: this.taskBoxDialogVisible,//是否弹出对话框
-      isEditting: false,//是否正在编辑，用于动态class
+      dialogVisible: this.taskBoxDialogVisible, //是否弹出对话框
+      isEditting: false, //是否正在编辑，用于动态class
 
       //事项详细数据
       taskInfo: {
-        taskTitle: '背单词',
-        taskDetail: "先背两小时单词",//详情的文字
-        isdone: null,//初始时计算得出，不是从后端请求来的
-        taskState: '进行中',
-        classification: '学习',
-        priority: '无优先级',
-        timeRange: [new Date(), ''],
-        familyPosition: 'parent',
+        taskTitle: "背单词",
+        taskDetail: "先背两小时单词", //详情的文字
+        isdone: null, //初始时计算得出，不是从后端请求来的
+        taskState: "进行中",
+        classification: "学习",
+        priority: "无优先级",
+        timeRange: [new Date(), ""],
+        familyPosition: "parent",
         familyMembers: [],
       },
 
-      typeList: [{
-        value: '选项1',
-        label: '学习'
-      }, {
-        value: '选项2',
-        label: '工作'
-      }, {
-        value: '选项3',
-        label: '生活'
-      }],
+      typeList: [
+        {
+          value: "选项1",
+          label: "学习",
+        },
+        {
+          value: "选项2",
+          label: "工作",
+        },
+        {
+          value: "选项3",
+          label: "生活",
+        },
+      ],
 
       //日历选择
       pickerOptions: {
-        shortcuts: [{
-          text: '今天',
-          onClick (picker) {
-            picker.$emit('pick', new Date());
-          }
-        }, {
-          text: '昨天',
-          onClick (picker) {
-            const date = new Date();
-            date.setTime(date.getTime() - 3600 * 1000 * 24);
-            picker.$emit('pick', date);
-          }
-        }, {
-          text: '一周前',
-          onClick (picker) {
-            const date = new Date();
-            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
-            picker.$emit('pick', date);
-          }
-        }]
+        shortcuts: [
+          {
+            text: "今天",
+            onClick(picker) {
+              picker.$emit("pick", new Date());
+            },
+          },
+          {
+            text: "昨天",
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24);
+              picker.$emit("pick", date);
+            },
+          },
+          {
+            text: "一周前",
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", date);
+            },
+          },
+        ],
       },
-
-    }
+    };
   },
   props: ["taskBoxDialogVisible", "taskObj"],
   methods: {
     //显示组件
-    openDialog () {
+    openDialog() {
       this.dialogVisible = true;
     },
     //切换"编辑"/"保存"按钮
-    changeEditState () {
+    changeEditState() {
       this.isEditting = !this.isEditting;
     },
     //处理isdone勾选框事件
-    onTaskDoneRadioChange () {
+    onTaskDoneRadioChange() {
       this.taskInfo.isdone = !this.taskInfo.isdone;
     },
     //处理优先级下拉框的指令
-    handlePriorityCommand (command) {
+    handlePriorityCommand(command) {
       this.taskInfo.priority = command;
     },
     //确定isdone属性
-    setIsdone () {
+    setIsdone() {
       this.taskInfo.isdone = this.taskInfo.taskState.indexOf("完成") >= 0;
-    }
+    },
   },
   computed: {
     //计算优先级标签的颜色
-    priorityColor () {
-      let tagColor = 'info'
+    priorityColor() {
+      let tagColor = "info";
       switch (this.taskInfo.priority) {
-        case '高优先级':
-          tagColor = 'danger';
+        case "高优先级":
+          tagColor = "danger";
           break;
-        case '中优先级':
-          tagColor = 'warning';
+        case "中优先级":
+          tagColor = "warning";
           break;
-        case '低优先级':
-          tagColor = 'success';
+        case "低优先级":
+          tagColor = "success";
           break;
         default:
-          tagColor = 'info';
+          tagColor = "info";
           break;
       }
       return tagColor;
     },
 
     //计算ddl与此刻的相对时间差
-    timeLengthBetweenDDL () {
+    timeLengthBetweenDDL() {
       let ddlDate = this.taskInfo.timeRange[1];
-      if (ddlDate == '' || !ddlDate) {
+      if (ddlDate == "" || !ddlDate) {
         return null;
       }
 
@@ -308,7 +315,6 @@ export default {
       var leave3 = leave2 % (60 * 1000); //计算分钟数后剩余的毫秒数
       var seconds = Math.round(leave3 / 1000);
 
-
       //将时间差表示为一个对象
       //负数不应该地板除，应该天花板除
       var timeLength = {
@@ -316,33 +322,28 @@ export default {
         hour: hours < 0 ? hours + 1 : hours,
         minute: minutes < 0 ? minutes + 1 : minutes,
         second: seconds < 0 ? seconds + 1 : seconds,
-      }
-      console.log(timeLength)
+      };
+      console.log(timeLength);
 
-      var Str = '';
+      var Str = "";
       if (Math.abs(timeLength.day) >= 1) {
         Str = timeLength.day + "天";
-      }
-      else if (Math.abs(timeLength.hour) >= 1) {
+      } else if (Math.abs(timeLength.hour) >= 1) {
         Str = timeLength.hour + "小时";
-      }
-      else if (Math.abs(timeLength.minute) >= 1) {
+      } else if (Math.abs(timeLength.minute) >= 1) {
         Str = timeLength.minute + "分钟";
       }
 
-
       if (dateDiff > 0) {
-        Str += '后';
-      }
-      else if (dateDiff < 0) {
-        Str += '前';
-      }
-      else {
-        Str = "事项状态更新中..."
+        Str += "后";
+      } else if (dateDiff < 0) {
+        Str += "前";
+      } else {
+        Str = "事项状态更新中...";
       }
 
       //删除首位负号
-      if (Str[0] == '-') {
+      if (Str[0] == "-") {
         Str = Str.slice(1);
       }
 
@@ -350,58 +351,54 @@ export default {
     },
 
     //确定显示时间差的颜色
-    timeLengthColor () {
-      if (!this.timeLengthBetweenDDL)
-        return null;
+    timeLengthColor() {
+      if (!this.timeLengthBetweenDDL) return null;
 
       return this.timeLengthBetweenDDL.endsWith("前") ? "red" : "blue";
     },
 
     //确定状态标签的颜色
-    tagStateColor () {
-      var color = ''
+    tagStateColor() {
+      var color = "";
       switch (this.taskInfo.taskState) {
-        case '已完成':
-          color = 'success';
+        case "已完成":
+          color = "success";
           break;
-        case '延期完成':
-          color = 'warning';
+        case "延期完成":
+          color = "warning";
           break;
-        case '延期中':
-          color = 'danger';
+        case "延期中":
+          color = "danger";
           break;
         default:
-          color = '';
+          color = "";
           break;
       }
       return color;
     },
-
-
   },
   watch: {
     taskBoxDialogVisible: {
-      handler (newVal) {
+      handler(newVal) {
         this.dialogVisible = newVal;
       },
       deep: true,
-      immediate: true
+      immediate: true,
     },
     dialogVisible: {
-      handler (newVal) {
+      handler(newVal) {
         //如果子组件被关闭了，把dialogVisible=false的值同步给父组件
-        if (newVal == false)
-          this.$emit('resetDialogVisible');
-      }
+        if (newVal == false) this.$emit("resetDialogVisible");
+      },
     },
   },
   mounted: function () {
-    this.taskInfo = this.taskObj;//接收从父组件传来的事项信息
-    console.log('对象信息：', this.taskObj)
+    this.taskInfo = this.taskObj; //接收从父组件传来的事项信息
+    console.log("对象信息：", this.taskObj);
     this.dialogVisible = this.taskBoxDialogVisible;
     this.setIsdone();
-  }
-}
+  },
+};
 </script>
 
 <style lang="less" scoped>

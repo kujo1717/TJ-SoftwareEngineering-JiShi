@@ -1,4 +1,12 @@
 import Vue from 'vue'
+//kanban组件
+import vueKanban from 'vue-kanban'
+Vue.use(vueKanban)
+
+//chat box
+import LemonIMUI from 'lemon-imui'
+import 'lemon-imui/dist/index.css';
+Vue.use(LemonIMUI)
 
 import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 
