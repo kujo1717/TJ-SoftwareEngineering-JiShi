@@ -1,18 +1,12 @@
-import { debounce } from '@/utils'
+import { debounce } from '../utils'
 
 export default {
   data() {
     return {
-      $_sidebarElm: null,
-      $_resizeHandler: null
+      $_sidebarElm: null
     }
   },
   mounted() {
-    this.$_resizeHandler = debounce(() => {
-      if (this.chart) {
-        this.chart.resize()
-      }
-    }, 100)
     this.$_initResizeEvent()
     this.$_initSidebarResizeEvent()
   },
@@ -20,8 +14,6 @@ export default {
     this.$_destroyResizeEvent()
     this.$_destroySidebarResizeEvent()
   },
-  // to fixed bug when cached by keep-alive
-  // https://github.com/PanJiaChen/vue-element-admin/issues/2116
   activated() {
     this.$_initResizeEvent()
     this.$_initSidebarResizeEvent()
@@ -31,8 +23,13 @@ export default {
     this.$_destroySidebarResizeEvent()
   },
   methods: {
-    // use $_ for mixins properties
-    // https://vuejs.org/v2/style-guide/index.html#Private-property-names-essential
+    $_resizeHandler() {
+      return debounce(() => {
+        if (this.chart) {
+          this.chart.resize()
+        }
+      }, 100)()
+    },
     $_initResizeEvent() {
       window.addEventListener('resize', this.$_resizeHandler)
     },

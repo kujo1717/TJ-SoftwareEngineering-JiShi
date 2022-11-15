@@ -141,6 +141,30 @@ export const constantRoutes = [
     ],
   },
   {
+    path: '/projects',
+    component: Layout,
+    redirect: '/projects/project1',
+    name: 'Projects',
+    meta: {
+      title: '项目',
+      icon: 'nested'
+    },
+    children: [
+      {
+        path: 'myproject',
+        component: () => import('@/views/projects/MyProject'),
+        name: '我的项目',
+        meta: { title: '我的项目' },
+      },
+      {
+        path: 'project1',
+        component: () => import('@/views/projects/project1'),
+        name: 'project1',
+        meta: { title: '测试用静态项目页面' },
+      }
+    ],
+  },
+  {
     path: '/teamspace',
     component: Layout,
     redirect: '/teamspace/team1',
@@ -162,33 +186,11 @@ export const constantRoutes = [
         name: '团队2',
         meta: { title: '团队2' },
       },
-      {
-        path: 'create',
-        component: () => import('@/views/create/index'),
-        name: 'create',
-        meta: { title: 'create' }
-      },
-      {
-        path: 'add',
-        component: () => import('@/views/add/index'),
-        name: 'add',
-        meta: { title: 'add' }
-      }
+
 
     ],
   },
-  {
-    path: '/teamproject',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'TeamProject',
-        component: () => import('@/views/teamproject/index'),
-        meta: { title: '测试用团队项目', icon: 'form' }
-      }
-    ],
-  },
+
 
 
   // 404 page must be placed at the end !!!
