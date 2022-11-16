@@ -117,6 +117,18 @@ export const constantRoutes = [
     ],
   },
   {
+    path: '/dustbin',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'Dustbin',
+        component: () => import('@/views/dustbin/index'),
+        meta: { title: '回收站', icon: 'form' }
+      }
+    ],
+  },
+  {
     path: '/concentration',
     component: Layout,
     children: [
