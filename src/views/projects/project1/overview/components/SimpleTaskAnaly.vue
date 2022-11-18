@@ -3,38 +3,38 @@
     <div class="sta_content_box">
       <div class="sta_line1">
         <div class="sta_all_task sta_numberspan">
-          <span class="colornum">{{ sta_content_data_dict.all_task.num }}</span>
-          <span class="hint">{{ sta_content_data_dict.all_task.label }}</span>
+          <span class="colornum">{{ all_task.num }}</span>
+          <span class="hint">{{ all_task.label }}</span>
         </div>
         <div class="sta_done sta_numberspan">
-          <span class="colornum">{{ sta_content_data_dict.done.num }}</span>
-          <span class="hint">{{ sta_content_data_dict.done.label }}</span>
+          <span class="colornum">{{ done.num }}</span>
+          <span class="hint">{{ done.label }}</span>
         </div>
         <div class="sta_not_done sta_numberspan">
-          <span class="colornum">{{ sta_content_data_dict.not_done.num }}</span>
-          <span class="hint">{{ sta_content_data_dict.not_done.label }}</span>
+          <span class="colornum">{{not_done.num }}</span>
+          <span class="hint">{{not_done.label }}</span>
         </div>
       </div>
 
       <div class="sta_line2">
         <div class="sta_todoay_task sta_numberspan">
           <span class="colornum">{{
-            sta_content_data_dict.todoay_task.num
+           todoay_task.num
           }}</span>
           <span class="hint">{{
-            sta_content_data_dict.todoay_task.label
+           todoay_task.label
           }}</span>
         </div>
         <div class="sta_delayed sta_numberspan">
-          <span class="colornum">{{ sta_content_data_dict.delayed.num }}</span>
-          <span class="hint">{{ sta_content_data_dict.delayed.label }}</span>
+          <span class="colornum">{{delayed.num }}</span>
+          <span class="hint">{{delayed.label }}</span>
         </div>
         <div class="sta_delayed_done sta_numberspan">
           <span class="colornum">{{
-            sta_content_data_dict.delayed_done.num
+           delayed_done.num
           }}</span>
           <span class="hint">{{
-            sta_content_data_dict.delayed_done.label
+           delayed_done.label
           }}</span>
         </div>
       </div>
@@ -48,62 +48,54 @@ export default {
   data() {
     return {
       //报表展示的数据
-      sta_content_data: [],
+      all_task: {},
+      done: {},
+      not_done: {},
+      todoay_task: {},
+      delayed: {},
+      delayed_done: {},
     };
   },
   mounted() {
-    this.GetStaContentData();
+    this.$nextTick(() => {
+      this.GetStaContentData();
+    });
   },
   methods: {
     GetStaContentData() {
-      this.sta_content_data = [
-        {
-          key: "all_task",
-          label: "总事项",
-          num: 5,
-        },
-        {
-          key: "done",
-          label: "已完成",
-          num: 2,
-        },
-        {
-          key: "not_done",
-          label: "未完成",
-          num: 3,
-        },
-        {
-          key: "todoay_task",
-          label: "今日事项",
-          num: 0,
-        },
-        {
-          key: "delayed",
-          label: "已延期",
-          num: 1,
-        },
-        {
-          key: "delayed_done",
-          label: "延期完成",
-          num: 0,
-        },
-      ];
+      this.all_task = {
+        key: "all_task",
+        label: "总事项",
+        num: 5,
+      };
+      this.done = {
+        key: "done",
+        label: "已完成",
+        num: 2,
+      };
+      this.not_done = {
+        key: "not_done",
+        label: "未完成",
+        num: 3,
+      };
+      this.todoay_task = {
+        key: "todoay_task",
+        label: "今日事项",
+        num: 0,
+      };
+      this.delayed = {
+        key: "delayed",
+        label: "已延期",
+        num: 1,
+      };
+      this.delayed_done = {
+        key: "delayed_done",
+        label: "延期完成",
+        num: 0,
+      };
     },
   },
-  computed: {
-    sta_content_data_dict: {
-      // getter
-      get: function () {
-        let dict = {};
-        this.sta_content_data.forEach((ele) => {
-          dict[ele.key] = ele;
-        });
-        return dict;
-      },
-      // setter
-      // set: function (newValue) {},
-    },
-  },
+  computed: {},
 };
 </script>
 
@@ -139,9 +131,9 @@ export default {
       font-size: 0.8em;
       color: #8f8f8f;
     }
-    .colornum{
-        font-size: 2em;
-        font-weight: bold;
+    .colornum {
+      font-size: 2em;
+      font-weight: bold;
     }
   }
   .sta_bottom {

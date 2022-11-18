@@ -2,7 +2,8 @@ import Vue from 'vue'
 //kanban组件
 import vueKanban from 'vue-kanban'
 Vue.use(vueKanban)
-
+//全局样式
+import './assets/css/global.css'
 //chat box
 import LemonIMUI from 'lemon-imui'
 import 'lemon-imui/dist/index.css';

@@ -60,7 +60,7 @@
               v-for="(manager, index) in manager_datalist"
               :key="index"
             >
-              <el-dropdown>
+           
                 <el-popover
                   placement="bottom"
                   :title="manager.name"
@@ -78,7 +78,7 @@
                     {{ manager.name }}
                   </el-avatar>
                 </el-popover>
-              </el-dropdown>
+             
             </div>
           </el-tab-pane>
           <el-tab-pane class="pmb_member" label="一般成员" name="member">
@@ -87,7 +87,7 @@
               v-for="(member, index) in member_datalist"
               :key="index"
             >
-              <el-dropdown>
+             
                 <el-popover
                   placement="bottom"
                   :title="member.name"
@@ -105,7 +105,6 @@
                     {{ member.name }}
                   </el-avatar>
                 </el-popover>
-              </el-dropdown>
             </div>
           </el-tab-pane>
         </el-tabs>

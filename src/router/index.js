@@ -95,6 +95,7 @@ export const constantRoutes = [
   {
     path: '/viewLog',
     component: Layout,
+    hidden: true,
     children: [
       {
         path: 'logview',
@@ -117,18 +118,6 @@ export const constantRoutes = [
     ],
   },
   {
-    path: '/concentration',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'concentration',
-        component: () => import('@/views/concentration/index'),
-        meta: { title: '专注', icon: 'form' }
-      }
-    ],
-  },
-  {
     path: '/message',
     component: Layout,
     children: [
@@ -141,12 +130,36 @@ export const constantRoutes = [
     ],
   },
   {
+    path: '/activity',
+    component: Layout,
+    redirect: '/activity/project1',
+    name: 'Activity',
+    meta: {
+      title: '活动',
+      icon: 'nested'
+    },
+    children: [
+      {
+        path: 'activityIndex',
+        component: () => import('@/views/activity/activityIndex'),
+        name: 'ActivityIndex',
+        meta: { title: '活动广场' },
+      },
+      {
+        path: 'mineActivity',
+        component: () => import('@/views/activity/mineActivity'),
+        name: 'MineActivity',
+        meta: { title: '我的活动' },
+      }
+    ],
+  },
+  {
     path: '/projects',
     component: Layout,
     redirect: '/projects/project1',
     name: 'Projects',
     meta: {
-      title: '项目',
+      title: '项目#待删除',
       icon: 'nested'
     },
     children: [
@@ -169,6 +182,7 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/teamspace/team1',
     name: 'TeamSpace',
+    hidden: true,
     meta: {
       title: '团队',
       icon: 'nested'
@@ -188,6 +202,18 @@ export const constantRoutes = [
       },
 
 
+    ],
+  },
+  {
+    path: '/user',
+    component: Layout,
+    children: [
+      {
+        path: 'user',
+        name: 'User',
+        component: () => import('@/views/user/index'),
+        meta: { title: '用户中心', icon: 'form' }
+      }
     ],
   },
 

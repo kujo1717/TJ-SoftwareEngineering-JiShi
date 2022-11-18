@@ -1,9 +1,9 @@
 <template>
-  <div>专注页面</div>
+  <div>ActivityIndex</div>
 </template>
 <script>
 export default {
-  name: "Concentration",
+  name: "ActivityIndex",
   data() {
     return {};
   },

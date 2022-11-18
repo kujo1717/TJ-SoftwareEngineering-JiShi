@@ -12,7 +12,7 @@
       <!-- 项目简介卡片 -->
       <intro-card> </intro-card>
       <!-- 数据概要 -->
-      <pie-chart></pie-chart>
+      <pie-chart style="margin-top: 1em"></pie-chart>
       <!-- 项目动态 -->
       <project-log></project-log>
     </el-col>
@@ -56,4 +56,5 @@ export default {
 </script>
 
 <style lang="less" scoped>
+
 </style>
