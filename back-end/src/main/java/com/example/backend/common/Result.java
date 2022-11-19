@@ -1,4 +1,5 @@
-package com.backend.common;
+package com.example.backend.common;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
