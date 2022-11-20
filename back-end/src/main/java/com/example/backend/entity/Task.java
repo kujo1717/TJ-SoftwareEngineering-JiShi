@@ -25,13 +25,13 @@ import java.sql.Timestamp;
 @TableName("task")
 public class Task {
     @TableId(type = IdType.ASSIGN_ID)
-    Long task_id;
-    String task_title;
-    String task_detail;
-    short task_state;
-    String classification_title;
+    Long taskId;
+    String taskTitle;
+    String taskDetail;
+    short taskState;
+    String classificationTitle;
     short priority;
-    Timestamp start_time;
-    Timestamp end_time;
-    short is_parent;
+    Timestamp startTime;
+    Timestamp endTime;
+    short isParent;
 }
