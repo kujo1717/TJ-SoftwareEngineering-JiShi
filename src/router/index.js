@@ -36,13 +36,11 @@ export const constantRoutes = [
     component: () => import('@/views/login/index'),
     hidden: true
   },
-
   {
     path: '/404',
     component: () => import('@/views/404'),
     hidden: true
   },
-
   {
     path: '/',
     component: Layout,
@@ -132,7 +130,7 @@ export const constantRoutes = [
   {
     path: '/activity',
     component: Layout,
-    redirect: '/activity/project1',
+    redirect: '/activity/activityIndex',
     name: 'Activity',
     meta: {
       title: '活动',
@@ -150,9 +148,32 @@ export const constantRoutes = [
         component: () => import('@/views/activity/mineActivity'),
         name: 'MineActivity',
         meta: { title: '我的活动' },
+      },
+      {
+        path: 'activityPage',
+        hidden:true,
+        component: () => import('@/views/activity/activityPage'),
+        name: 'ActivityPage',
+        meta: { title: '测试用活动页面' },
+      },
+      {
+        path: 'template',
+        name: 'TemplateView',
+        hidden: true,
+        component: () => import('@/views/activity/mineActivity/template'),
+        meta: { title: '我的模板', icon: 'form' }
+      },
+      {
+        path: 'activityedit',
+        name: 'ActivityEdit',
+        hidden: true,
+        component: () => import('@/views/activity/activityPage/activityEdit'),
+        meta: { title: '修改活动', icon: 'form' }
       }
+
     ],
   },
+
   {
     path: '/projects',
     component: Layout,

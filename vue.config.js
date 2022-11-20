@@ -39,7 +39,7 @@ module.exports = {
     //跨域配置
     proxy: {
       "/api": {
-        target: "http://localhost:8081/", // 目标代理接口地址
+        target: "http://42.192.45.95:8773/", // 目标代理接口地址
         secure: false,
         changeOrigin: true, // 开启代理，在本地创建一个虚拟服务端
         //ws: true, // 是否启用websockets
@@ -99,7 +99,7 @@ module.exports = {
             .plugin('ScriptExtHtmlWebpackPlugin')
             .after('html')
             .use('script-ext-html-webpack-plugin', [{
-            // `runtime` must same as runtimeChunk name. default is `runtime`
+              // `runtime` must same as runtimeChunk name. default is `runtime`
               inline: /runtime\..*\.js$/
             }])
             .end()
