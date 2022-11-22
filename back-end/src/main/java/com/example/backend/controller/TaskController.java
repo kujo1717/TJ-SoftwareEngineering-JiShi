@@ -67,5 +67,26 @@ public class TaskController {
         return taskService.findAllTaskAndRelative();
     }
 
+    @ApiOperation("插入一条新的task")
+    @PostMapping("addOneNewTask")
+    public Result<String> insertOneNewTask(@RequestBody Task task)
+    {
+        return taskService.insertOneNewTask(task);
+    }
+
+    @ApiOperation("更新事项")
+    @PatchMapping("patchOneTask")
+    public Result<String> patchOneTask(@RequestBody Task task)
+    {
+        return taskService.patchOneTask(task);
+    }
+
+    @ApiOperation("根据ID删除事项")
+    @DeleteMapping("removeOneTask")
+    public Result<String> removeOneTask(@ApiParam(name="id", value="要删除的事项id", required = true)
+                                            @RequestParam("id") Long id)
+    {
+        return taskService.deleteById(id);
+    }
 
 }

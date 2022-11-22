@@ -1,10 +1,10 @@
 package com.example.backend.entity;
 
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,8 +25,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName("task")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Task {
     @TableId(type = IdType.ASSIGN_ID)
+    @JsonSerialize(using= ToStringSerializer.class)
     private Long taskId;
     private String taskTitle;
     private String taskDetail;
@@ -36,6 +38,7 @@ public class Task {
     private Timestamp startTime;
     private Timestamp endTime;
     private short isParent;
+    private String isInDustbin;
 
     @TableField(exist = false)
     private List<Task> relativeTask;

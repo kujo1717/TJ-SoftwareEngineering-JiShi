@@ -59,4 +59,8 @@ public interface TaskMapper extends BaseMapper<Task> {
             }
     )
     List<Task> selectAllTaskAndRelative();
+
+//    @Insert("INSERT INTO task VALUES(#{taskId},#{taskTitle},#{taskDetail},#{taskState},#{classificationTitle),#{priority}," +
+//            "#{startTime},#{endTime},#{isParent}")
+
 }

@@ -19,4 +19,7 @@ public interface TaskService {
     Result<List<Task>> findAll();
     Result<Task> findOneTaskAndRelative(Long task_id);
     Result<List<Task>> findAllTaskAndRelative();
+    Result<String> insertOneNewTask(Task task);
+    Result<String> deleteById(Long id);
+    Result<String> patchOneTask(Task task);
 }
