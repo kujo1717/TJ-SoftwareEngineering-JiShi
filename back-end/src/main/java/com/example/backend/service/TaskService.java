@@ -16,6 +16,7 @@ import java.util.List;
 public interface TaskService {
     Result<Task> findTask(Long task_id);
     Result<List<Task>> findTaskByMonth(int year, int month);
-
     Result<List<Task>> findAll();
+    Result<Task> findOneTaskAndRelative(Long task_id);
+    Result<List<Task>> findAllTaskAndRelative();
 }
