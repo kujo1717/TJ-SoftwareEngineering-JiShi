@@ -17,6 +17,6 @@ public interface UserMapper extends BaseMapper<User> {
     User selectByEmail(@Param("email") String email);
     @Insert("insert into user (name,email,password) VALUES ('${name}','${email}','${password}')")
     int insertUser(@Param("name") String name,@Param("email") String email,@Param("password")String password);
-    @Update("UPDATE user SET name='${name}',age='${age}',introduce='${introduce}' WHERE id='${id}'")
-    int updateUser(@Param("id")Long id,@Param("name")String name,@Param("age")int age,@Param("introduce")String introduce);
+    @Update("UPDATE user SET name='${name}',age='${age}',introduce='${introduce}',avatar='${imgUrl}' WHERE id='${id}'")
+    int updateUser(@Param("id")Long id,@Param("name")String name,@Param("age")int age,@Param("introduce")String introduce,@Param("imgUrl")String imgUrl);
 }

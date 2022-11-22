@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.File;
+
 /**
  * @Author hym
  * @Date 2022/10/29
@@ -24,4 +26,5 @@ public class User {
     private String email;
     private int age;
     private String introduce;
+    private String avatar;
 }
