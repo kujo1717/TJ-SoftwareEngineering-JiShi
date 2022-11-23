@@ -1,7 +1,8 @@
 package com.example.backend.entity;
 
-
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -9,9 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.List;
 
 /**
  * @Author hym
@@ -26,28 +25,13 @@ import java.util.List;
 @NoArgsConstructor
 @TableName("task")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Task {
+public class DustbinTask {
     @TableId(type = IdType.ASSIGN_ID)
     @JsonSerialize(using= ToStringSerializer.class)
     private Long taskId;
     private String taskTitle;
-    private String taskDetail;
-    private short taskState;
     private String classificationTitle;
-    private short priority;
-    private Timestamp startTime;
-    private Timestamp endTime;
-    private short isParent;
     private String isInDustbin;
-
-    @JsonSerialize(using= ToStringSerializer.class)
-    private Long userId;
-
-    @TableField(exist = false)
-    private List<Task> relativeTask;
-
-    public void addOneRelativeTask(Task task)
-    {
-        relativeTask.add(task);
-    }
+    private String startTime;
+    private String endTime;
 }

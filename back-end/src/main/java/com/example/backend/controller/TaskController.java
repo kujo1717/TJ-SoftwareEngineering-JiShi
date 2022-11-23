@@ -28,43 +28,39 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
-    @ApiOperation("根据id返回指定事项（不带亲戚）")
-    @GetMapping("findtask")
-    public Result<Task> findUser(@ApiParam(name="id", value="事项id", required = true)
-                                 @RequestParam("id") Long id){
-        return taskService.findTask(id);
-    }
+//
 
-    @ApiOperation("根据年、月信息返回事项列表（不带亲戚）")
-    @GetMapping("findmonth")
-    public Result<List<Task>> findTaskListByMonth(@ApiParam(name="year", value="事项在某个year能够出现", required = true)
-                                                  @RequestParam("year") int year,
-                                                  @ApiParam(name="month", value="事项在某个month能够出现", required = true)
-                                                  @RequestParam("month") int month)
-    {
-        return taskService.findTaskByMonth(year, month);
-    }
+//    @ApiOperation("根据年、月信息返回事项列表（不带亲戚）")
+//    @GetMapping("findmonth")
+//    public Result<List<Task>> findTaskListByMonth(@ApiParam(name="year", value="事项在某个year能够出现", required = true)
+//                                                  @RequestParam("year") int year,
+//                                                  @ApiParam(name="month", value="事项在某个month能够出现", required = true)
+//                                                  @RequestParam("month") int month)
+//    {
+//        return taskService.findTaskByMonth(year, month);
+//    }
 
-    @ApiOperation("返回task表的所有数据（不带亲戚）")
-    @GetMapping("findall")
-    public Result<List<Task>> findAllTask()
-    {
-        return taskService.findAll();
-    }
+//    @ApiOperation("返回task表的所有数据（不带亲戚）")
+//    @GetMapping("findall")
+//    public Result<List<Task>> findAllTask()
+//    {
+//        return taskService.findAll();
+//    }
 
     @ApiOperation("返回一个task和它的所有亲戚")
-    @GetMapping("findOneTaskAndRelative/{id}")
-    public Result<Task> findTaskAndRelative(@ApiParam(name="id", value="事项id", required = true)
-                                                @PathVariable("id") Long id)
+    @GetMapping("findOneTaskAndRelative/{taskId}")
+    public Result<Task> findTaskAndRelative(@ApiParam(name="taskId", value="事项id", required = true)
+                                                @PathVariable("taskId") Long taskId)
     {
-        return taskService.findOneTaskAndRelative(id);
+        return taskService.findOneTaskAndRelative(taskId);
     }
 
     @ApiOperation("返回所有task和它的所有亲戚")
-    @GetMapping("findAllTaskAndRelative")
-    public Result<List<Task>> findAllTaskAndRelative()
+    @GetMapping("findAllTaskAndRelative/{userId}")
+    public Result<List<Task>> findAllTaskAndRelative(@ApiParam(name="userId", value="用户id", required = true)
+                                                         @PathVariable("userId") Long userId)
     {
-        return taskService.findAllTaskAndRelative();
+        return taskService.findAllTaskAndRelative(userId);
     }
 
     @ApiOperation("插入一条新的task")

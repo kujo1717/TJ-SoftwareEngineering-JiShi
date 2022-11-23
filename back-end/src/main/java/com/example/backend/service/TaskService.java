@@ -18,8 +18,10 @@ public interface TaskService {
     Result<List<Task>> findTaskByMonth(int year, int month);
     Result<List<Task>> findAll();
     Result<Task> findOneTaskAndRelative(Long task_id);
-    Result<List<Task>> findAllTaskAndRelative();
+    Result<List<Task>> findAllTaskAndRelative(Long userId);
     Result<String> insertOneNewTask(Task task);
     Result<String> deleteById(Long id);
     Result<String> patchOneTask(Task task);
+
+    List<Task> selectOneUserOneSortAllTask(Long userId, String classificationTitle);
 }

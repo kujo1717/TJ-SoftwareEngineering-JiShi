@@ -40,7 +40,7 @@ public interface TaskMapper extends BaseMapper<Task> {
     )
     List<Task> selectOneTaskAndRelative(Serializable id);
 
-    @Select("SELECT * FROM task LEFT OUTER JOIN relativetask using(task_id)")
+    @Select("SELECT * FROM task LEFT OUTER JOIN relativetask using(task_id) WHERE user_id=${userId}")
     @Results(
             {
                     //column为数据库字段名，property为实体类字段名
@@ -58,9 +58,9 @@ public interface TaskMapper extends BaseMapper<Task> {
                     )
             }
     )
-    List<Task> selectAllTaskAndRelative();
+    List<Task> selectAllTaskAndRelative(@Param("userId") Long userId);
 
-//    @Insert("INSERT INTO task VALUES(#{taskId},#{taskTitle},#{taskDetail},#{taskState},#{classificationTitle),#{priority}," +
-//            "#{startTime},#{endTime},#{isParent}")
+    @Select("SELECT * FROM task WHERE user_id=${userId} AND classification_title='${classificationTitle}'")
+    List<Task> selectOneUserOneSortAllTask(@Param("userId") Long userId, @Param("classificationTitle") String classificationTitle);
 
 }

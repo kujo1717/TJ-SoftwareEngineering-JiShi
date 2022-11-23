@@ -73,29 +73,34 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Result<List<Task>> findAllTaskAndRelative() {
-        List<Task> taskList = taskMapper.selectAllTaskAndRelative();
+    public Result<List<Task>> findAllTaskAndRelative(Long userId) {
+        try {
+            List<Task> taskList = taskMapper.selectAllTaskAndRelative(userId);
 
 
-        List<Task> taskListResult = new ArrayList<>();
-        List<Long> okIdList = new ArrayList<>();
+            List<Task> taskListResult = new ArrayList<>();
+            List<Long> okIdList = new ArrayList<>();
 
-        Task currentTask = null;
-        for(Task t : taskList)
-        {
-            if(!okIdList.contains(t.getTaskId()))
-            {
-                if (currentTask != null)
-                    taskListResult.add(currentTask);
-                currentTask = t;
+            Task currentTask = null;
+            for (Task t : taskList) {
+                if (!okIdList.contains(t.getTaskId())) {
+                    if (currentTask != null)
+                        taskListResult.add(currentTask);
+                    currentTask = t;
+                }
+                //把相同的taskId进行合并，就是合并它们的relativeTask
+                else
+                    currentTask.addOneRelativeTask(t.getRelativeTask().get(0));
             }
-            //把相同的taskId进行合并，就是合并它们的relativeTask
-            else
-                currentTask.addOneRelativeTask(t.getRelativeTask().get(0));
+            if (currentTask != null)
+                taskListResult.add(currentTask);
+            return Result.success(taskListResult);
         }
-        if (currentTask != null)
-            taskListResult.add(currentTask);
-        return Result.success(taskListResult);
+        catch (Exception e)
+        {
+            System.out.println(e);
+            return Result.fail(500,"获取用户的所有事项失败！");
+        }
     }
 
     @Override
@@ -122,6 +127,12 @@ public class TaskServiceImpl implements TaskService {
         if(resultCount == 0)
             return Result.fail(500,"更新数据失败！");
         return Result.success("更新数据成功！");
+    }
+
+    @Override
+    public List<Task> selectOneUserOneSortAllTask(Long userId, String classificationTitle) {
+        List<Task> taskList = taskMapper.selectOneUserOneSortAllTask(userId, classificationTitle);
+        return taskList;
     }
 
 
