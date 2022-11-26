@@ -28,7 +28,8 @@ public class UserController {
     @ApiOperation("根据id返回指定用户")
     @GetMapping("finduser/{id}")
     public Result<User> findUser(@ApiParam(name="id", value="用户id", required = true)
-                                     @PathVariable("id") Long id){
+                                     @PathVariable("id") Long id)
+    {
         return userService.findUser(id);
     }
 }

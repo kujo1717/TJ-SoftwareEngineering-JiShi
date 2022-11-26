@@ -30,8 +30,15 @@ public class ClassificationServiceImpl implements ClassificationService {
 
     @Override
     public int insertOneClassification(Long userId, String classificationTitle) {
-        //Classification newClass = new Classification(classificationTitle, userId);
-        int res = classificationMapper.insertOneClassification(userId, classificationTitle);
+        Classification newClass = new Classification(classificationTitle, userId);
+        int res = classificationMapper.insertOneClassification(newClass);
+        return res;
+    }
+
+    @Override
+    public int deleteOneClassification(Long userId, String classificationTitle) {
+        Classification deletedClass = new Classification(classificationTitle, userId);
+        int res = classificationMapper.deleteOneClassification(deletedClass);
         return res;
     }
 }

@@ -39,6 +39,7 @@ public class Task {
     private Timestamp endTime;
     private short isParent;
     private String isInDustbin;
+    private Timestamp realFinishTime;
 
     @JsonSerialize(using= ToStringSerializer.class)
     private Long userId;

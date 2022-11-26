@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 public interface TaskService {
     Result<Task> findTask(Long task_id);
-    Result<List<Task>> findTaskByMonth(int year, int month);
+    List<Task> findTaskByMonth(Long userId, int year, int month);
     Result<List<Task>> findAll();
     Result<Task> findOneTaskAndRelative(Long task_id);
     Result<List<Task>> findAllTaskAndRelative(Long userId);
@@ -24,4 +24,5 @@ public interface TaskService {
     Result<String> patchOneTask(Task task);
 
     List<Task> selectOneUserOneSortAllTask(Long userId, String classificationTitle);
+    List<Task> selectOneDayFinishedTaskList(Long userId, int year, int month, int day);
 }

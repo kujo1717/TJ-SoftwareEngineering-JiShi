@@ -2,6 +2,7 @@ package com.example.backend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.R;
+import com.example.backend.common.DateUtil;
 import com.example.backend.common.Result;
 import com.example.backend.entity.Task;
 import com.example.backend.entity.User;
@@ -11,6 +12,7 @@ import com.example.backend.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,9 +42,9 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Result<List<Task>> findTaskByMonth(int year, int month) {
-        List<Task> taskList = taskMapper.selectByMonth(year, month);
-        return Result.success(taskList);
+    public List<Task> findTaskByMonth(Long userId, int year, int month) {
+        List<Task> taskList = taskMapper.selectByMonth(userId, year, month);
+        return taskList;
     }
 
     @Override
@@ -123,6 +125,17 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Result<String> patchOneTask(Task task) {
+        //如果是否完成发生变化，则要记录真实完成时间
+        Task oldTask = taskMapper.selectById(task.getTaskId());
+        //1: 如果之前没完成，更新后完成了：更新真实完成时间
+        if(oldTask.getTaskState() == 0 && task.getTaskState() != 0)
+            task.setRealFinishTime(DateUtil.getCurrentTimestamp());
+
+        //2: 如果之前完成了，更新后没完成，删掉真实完成时间
+        if(oldTask.getTaskState() != 0 && task.getTaskState() == 0)
+            task.setRelativeTask(null);
+
+        System.out.println(task);
         int resultCount = taskMapper.updateById(task);
         if(resultCount == 0)
             return Result.fail(500,"更新数据失败！");
@@ -132,6 +145,15 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<Task> selectOneUserOneSortAllTask(Long userId, String classificationTitle) {
         List<Task> taskList = taskMapper.selectOneUserOneSortAllTask(userId, classificationTitle);
+        return taskList;
+    }
+
+    @Override
+    public List<Task> selectOneDayFinishedTaskList(Long userId, int year, int month, int day) {
+        //保证一位数的日期也是dd格式
+        String dayStr = day < 10 ? "0" + Integer.toString(day) : Integer.toString(day);
+
+        List<Task> taskList = taskMapper.selectOneDayFinishedTaskList(userId, year, month, dayStr);
         return taskList;
     }
 

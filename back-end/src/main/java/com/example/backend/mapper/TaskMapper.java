@@ -16,8 +16,12 @@ import java.util.List;
 @Mapper
 public interface TaskMapper extends BaseMapper<Task> {
     //查询一个月内的所有事项
-    @Select("SELECT * FROM task WHERE end_time BETWEEN timestamp('${year}-${month}-01') AND (timestamp(date_add(timestamp('${year}-${month}-01'), interval - day('${year}-${month}-01') + 30 day))) OR start_time BETWEEN timestamp('${year}-${month}-01') AND (timestamp(date_add(timestamp('${year}-${month}-01'), interval - day('${year}-${month}-01') + 30 day)))")
-    List<Task> selectByMonth(@Param("year") int year, @Param("month") int month);
+    @Select("SELECT * FROM task WHERE user_id=${userId} AND end_time BETWEEN timestamp('${year}-${month}-01') AND (timestamp(date_add(timestamp('${year}-${month}-01'), interval - day('${year}-${month}-01') + 30 day))) OR start_time BETWEEN timestamp('${year}-${month}-01') AND (timestamp(date_add(timestamp('${year}-${month}-01'), interval - day('${year}-${month}-01') + 30 day)))")
+    List<Task> selectByMonth(@Param("userId") Long userId, @Param("year") int year, @Param("month") int month);
+
+    //查询某一天完成的事项
+    @Select("SELECT * FROM task WHERE user_id=${userId} AND real_finish_time like ('${year}-${month}-${day}%')")
+    List<Task> selectOneDayFinishedTaskList(@Param("userId") Long userId, @Param("year") int year, @Param("month") int month, @Param("day") String day);
 
 
     @Select("SELECT * FROM task LEFT OUTER JOIN relativetask using(task_id) WHERE task_id=${id}")

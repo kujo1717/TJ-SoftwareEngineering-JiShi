@@ -10,4 +10,5 @@ import java.util.List;
 public interface ClassificationService {
     List<Classification> findOneUserAllClassificationTitle(Long userId);
     int insertOneClassification(Long userId, String classificationTitle);
+    int deleteOneClassification(Long userId, String classificationTitle);
 }

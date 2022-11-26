@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -22,12 +23,14 @@ import java.util.List;
 public class SortedTask {
     private String classificationTitle;
     private List<Task> taskList;
+    private Timestamp createTime;
     private int numTask;
 
-    public SortedTask(String classificationTitle, List<Task> taskList)
+    public SortedTask(String classificationTitle, List<Task> taskList, Timestamp createTime)
     {
         this.classificationTitle = classificationTitle;
         this.taskList = taskList;
+        this.createTime = createTime;
         this.numTask = taskList.size();
     }
 
