@@ -1208,12 +1208,10 @@ export default {
     },
 
     /*修改活动信息 */
-
     //cancel
     CancelEdit() {
       this.isShow_dialog_edit = false;
     },
-
     //dialog 关闭事件
     handleClose_edit() {
       this.edit_confirm_loading = false;
@@ -1659,7 +1657,11 @@ export default {
     margin-bottom: 1em;
   }
 
+<<<<<<< HEAD
   .detail_text {
+=======
+  .intro_text {
+>>>>>>> lyf_front
     margin-bottom: 0.8em;
     margin-top: 0.8em;
     min-height: 3em;
@@ -1712,6 +1714,6 @@ export default {
 .font-bold {
   font-weight: bold;
 }
-</style>>
+</style>
 
 

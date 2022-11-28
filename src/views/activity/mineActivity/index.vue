@@ -110,7 +110,6 @@
             </el-card>
           </el-col>
         </el-tab-pane>
-
         <el-tab-pane label="正在进行" name="doing">
           <el-col
             :span="6"
@@ -355,7 +354,6 @@ export default {
       }
       this.activity_data_done = tmp;
     },
-
     //获取模板data
     GetTemplateData() {
       let prefix = "template";
