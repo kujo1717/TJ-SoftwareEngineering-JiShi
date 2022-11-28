@@ -1,38 +1,39 @@
 import request from '@/utils/request'
 
 export function login(data) {
+
   return request({
-    url: '/user/login',
+    url: '/api/user/login',
     method: 'post',
     data
   })
 }
 
-export function emailCode(data){
+export function emailCode(data) {
   return request({
-    
+
   })
 }
 
-export function register(data){
+export function register(data) {
   return request({
-    url: '/user/register',
+    url: '/api/user/register',
     method: 'post',
     data
   })
 }
 
-export function update(data){
+export function update(data) {
   return request({
-    url:'/user',
-    method:'put',
+    url: '/api/user',
+    method: 'put',
     data
   })
 }
 
 export function getInfo(token) {
   return request({
-    url: '/user',
+    url: '/api/user',
     method: 'get',
     params: { token }
   })
@@ -40,7 +41,7 @@ export function getInfo(token) {
 
 export function logout() {
   return request({
-    url: '/user/logout',
+    url: '/api/user/logout',
     method: 'get'
   })
 }

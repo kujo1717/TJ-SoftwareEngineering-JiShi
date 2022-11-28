@@ -1657,11 +1657,7 @@ export default {
     margin-bottom: 1em;
   }
 
-<<<<<<< HEAD
   .detail_text {
-=======
-  .intro_text {
->>>>>>> lyf_front
     margin-bottom: 0.8em;
     margin-top: 0.8em;
     min-height: 3em;
