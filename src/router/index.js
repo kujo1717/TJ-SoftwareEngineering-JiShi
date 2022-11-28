@@ -269,6 +269,20 @@ export const constantRoutes = [
     ],
   },
 
+  {
+    path: '/user',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'User',
+        component: () => import('@/views/user/index'),
+        meta: { title: 'User', icon: 'user' }
+      }
+    ],
+    hidden: true
+  },
+
 
 
   // 404 page must be placed at the end !!!

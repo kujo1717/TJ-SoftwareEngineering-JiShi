@@ -8,12 +8,12 @@
 
       <el-form-item prop="username" class="input-box">
         <span class="svg-container">
-          <svg-icon icon-class="user" />
+          <svg-icon icon-class="email" />
         </span>
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          placeholder="email"
           name="username"
           type="text"
           tabindex="1"
@@ -42,11 +42,8 @@
         </span>
       </el-form-item>
 
-      <el-form-item>
-        <el-checkbox v-model="loginForm.remeber">记住我</el-checkbox>
-      </el-form-item>
       <div style="display:flex;justify-content:space-around">
-      <el-button  type="success" style="width:25%;" @click.native.prevent="handleRegister" >前往注册</el-button>
+      <el-button type="success" style="width:25%;" @click.native.prevent="handleRegister" >前往注册</el-button>
       <el-button type="text" @click="handleForget">忘记密码?</el-button>
       <el-button :loading="loading" type="primary" style="width:25%;" @click.native.prevent="handleLogin" >登录</el-button>
       </div>
@@ -61,17 +58,22 @@
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
-
 export default {
   name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
+      var reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
+            if(!value)
+            {
+                callback(new Error('请输入邮箱'))
+            }
+            setTimeout(() => {
+                if (value && !reg.test(value)) {
+                    callback(new Error('请输入正确的邮箱'));
+                } else {
+                    callback()
+                }
+            }, 1000);
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
@@ -82,9 +84,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '123456',
-        remeber:false
+        username: 'wyyxyy1@qq.com',
+        password: 'testpass1'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -119,11 +120,15 @@ export default {
       })
     },
     handleLogin() {
+      this.loading = true
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true
+          
+          
           this.$store.dispatch('user/login', this.loginForm).then(() => {
+            
             this.$router.push({ path: this.redirect || '/' })
+            console.log("跳转")
             this.loading = false
           }).catch(() => {
             this.loading = false

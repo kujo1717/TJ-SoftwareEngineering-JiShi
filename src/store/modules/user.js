@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getInfo,register,update } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -6,7 +6,9 @@ const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: ''
+    avatar: '',
+    introduce:'',
+    age:'',
   }
 }
 
@@ -24,6 +26,12 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  },
+  SET_AGE:(state,age)=>{
+    state.age=age
+  },
+  SET_INTRODUCE:(state,introduce)=>{
+    state.introduce=introduce
   }
 }
 
@@ -32,12 +40,61 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ email: username, password: password }).then(response => {
+        console.log(response)
         const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+        commit('SET_TOKEN', data)
+        setToken(data)
         resolve()
       }).catch(error => {
+        
+        reject(error)
+      })
+    })
+  },
+  //user register
+  register({ commit },userInfo){
+    const { email,username, password } = userInfo
+    return new Promise((resolve,reject)=>{
+      console.log("进入action")
+      register({email:email,password:password,name:username}).then(response=>{
+        console.log(response)
+        //const{data}=response
+        //commit('SET_TOKEN', data)
+        //setToken(data)
+        resolve()
+      }).catch(error=>{
+        reject(error)
+      })
+    })
+  },
+  updateInfo({commit},userInfo){
+    console.log(userInfo)
+    const{name,age,introduce,avatarFile}=userInfo
+    let formData=new FormData()
+    formData.append('name',name)
+    formData.append('age',age)
+    formData.append('introduce',introduce)
+    if(avatarFile!=''){
+      formData.append('avatarFile',avatarFile.raw)
+    }
+    console.log(formData)
+    console.log("进入UpdateAction")
+    return new Promise((resolve,reject)=>{
+      
+      update(formData).then(response=>{
+        const{data}=response
+        if (!data) {
+          return reject('Verification failed, please Login again.')
+        }
+        const { name, age,introduce } = data
+        commit('SET_NAME', name)
+        commit('SET_AGE', age)
+        commit('SET_INTRODUCE',introduce)
+        commit('SET_AVATAR',avatar)
+        resolve()
+      }).catch(error=>{
+        console.log("")
         reject(error)
       })
     })
@@ -46,6 +103,7 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
+      console.log("获取信息")
       getInfo(state.token).then(response => {
         const { data } = response
 
@@ -53,10 +111,12 @@ const actions = {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar } = data
+        const { name, avatar,age,introduce } = data
 
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
+        commit('SET_AGE', age)
+        commit('SET_INTRODUCE',introduce)
         resolve(data)
       }).catch(error => {
         reject(error)

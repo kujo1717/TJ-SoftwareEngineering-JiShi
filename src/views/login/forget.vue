@@ -11,15 +11,17 @@
                     <svg-icon icon-class="email" />
                 </span>
                 <el-input ref="email" v-model="loginForm.email" placeholder="邮箱" name="email" type="email" tabindex="1"
-                    auto-complete="on" />
+                    auto-complete="on" /> 
             </el-form-item>
+            <el-button :loading="Emailloading" type="primary" style="width:25%;margin-bottom:30px;"
+                @click.native.prevent="sendEmail">发送验证码</el-button>
 
             <el-form-item prop="emailConfirm" class="input-box">
                 <span class="svg-container">
-                    <svg-icon icon-class="email" />
+                    <svg-icon icon-class="example" />
                 </span>
                 <el-input ref="emailConfirm" v-model="loginForm.emailConfirm" placeholder="验证码" name="emailConfirm" type="text"
-                    tabindex="2" auto-complete="on" />
+                    tabindex="2" auto-complete="off" />
             </el-form-item>
 
             <el-form-item prop="password" class="input-box">
@@ -61,9 +63,6 @@
 </template>
   
 <script>
-import { validUsername } from '@/utils/validate'
-import { call } from 'body-parser'
-
 export default {
     name: 'Login',
     data() {
@@ -80,12 +79,15 @@ export default {
                 } else {
                     callback()
                 }
-            }, 1000);
+            },100);
         }
       const validateemailConfirm = (rule, value, callback) => {
         if (!value) {
             callback(new Error('请输入验证码'))
-        } else {
+        }else if(value!=this.confirmCode){
+            callback(new Error('请输入正确的验证码'))
+        } 
+        else {
             callback()
         }
     }
@@ -130,8 +132,9 @@ export default {
         confirmPasswordType: 'password',
         redirect: undefined,
         titleClass: 'title',
-        loginFormClass: 'login-form'
-
+        loginFormClass: 'login-form',
+        Emailloading:false,
+        confirmCode:null
     }
 },
 watch: {
@@ -144,6 +147,20 @@ watch: {
     }
 },
 methods: {
+    sendEmail(){
+        this.Emailloading = true 
+        this.$refs.loginForm.validateField(["email"],async valid => {
+        if (!valid) {
+          
+          
+          
+        } else {
+          console.log('error submit!!')
+          this.Emailloading=false
+          return false
+        }
+      })
+    },
     showPwd() {
         if (this.passwordType === 'password') {
             this.passwordType = ''

@@ -46,9 +46,9 @@
                 </span>
             </el-form-item>
 
-            <el-button :loading="loading" type="primary" style="width:25%;margin-bottom:30px;"
+            <el-button type="primary" style="width:25%;margin-bottom:30px;"
                 @click.native.prevent="handleLogin">前往登录</el-button>
-            <el-button type="success" style="width:25%;margin-left: 50%;" @click.native.prevent="handleRegister">注册
+            <el-button type="success" style="width:25%;margin-left: 50%;" @click.native.prevent="handleRegister" :loading="loading">注册
             </el-button>
 
             <!-- <div class="tips">
@@ -113,10 +113,10 @@ export default {
     }
       return {
         loginForm: {
-            email: '',
-            username: '',
-            password: '',
-            confirmPassword: ''
+            email: '417695971@qq.com',
+            username: 'wyyxyy1',
+            password: 'testing135',
+            confirmPassword: 'testing135'
 
         },
         loginRules: {
@@ -177,8 +177,26 @@ methods: {
 
     },
     handleRegister(){
+        this.loading = true
+        this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          
+          this.loading = true
+          
+          this.$store.dispatch('user/register', this.loginForm).then(() => {
+            console.log("注册")
+            this.$router.push({ path: this.redirect || '/' })
+            this.loading = false
+          }).catch((error) => {
+            console.log(error)
+            this.loading = false
 
-        
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
 
     }
 }
