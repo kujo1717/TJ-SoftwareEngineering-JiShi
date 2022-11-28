@@ -14,7 +14,7 @@
     >
       <template #cover>
         <div class="cover">
-          <span>加载中</span>
+          <i class="el-icon-loading"></i>
         </div>
       </template>
     </lemon-imui>
@@ -231,5 +231,4 @@ export default {
 </script>
 
 <style>
-
 </style>
