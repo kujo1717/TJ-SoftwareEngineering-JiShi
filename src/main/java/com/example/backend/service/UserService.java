@@ -19,4 +19,4 @@ public interface UserService {
     Result<String> registerUser(String email,String password,String name);
     Result<User> putUser(Long id,String name,String introduce,int age,String imgUrl);
     Result<String> email(User user);
-}
+    }

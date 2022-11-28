@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@MapperScan(basePackages = {"com.example.backend.mapper"})
+@MapperScan("com.backend.user.mapper")
 public class MyBatisPlusConfig {
     @Bean
     public MybatisPlusInterceptor paginationInterceptor() {

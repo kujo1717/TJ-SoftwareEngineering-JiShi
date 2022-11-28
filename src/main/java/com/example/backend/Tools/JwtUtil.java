@@ -1,13 +1,16 @@
 package com.example.backend.Tools;
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTDecodeException;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 
 import java.util.Date;
 import java.util.Map;
+/**
+ * @desc   使用token验证用户是否登录
+ * @author zm
+ **/
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 
 public class JwtUtil {
     /**

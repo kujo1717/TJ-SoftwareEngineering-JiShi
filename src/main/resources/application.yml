@@ -10,7 +10,12 @@ spring:
     url: jdbc:mysql://localhost:3306/jishi?
     username: root
     password: 657826973YANGyan?
-
+  mail:
+    host: smtp.qq.com #发送邮件服务器
+    username: 417695971@qq.com #QQ邮箱
+    password: drvvnzlqxbddcahd #客户端授权码
+    protocol: smtp #发送邮件协议
+    default-encoding: utf-8
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
