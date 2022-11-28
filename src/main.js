@@ -21,13 +21,15 @@ import locale from 'element-ui/lib/locale/lang/en' // lang i18n
 import '@/styles/index.scss' // global css
 import './styles/element-variables.scss'
 
-import App from './App'
+import App from './App.vue'
 import store from './store'
 import router from './router'
-
+import animated from "animate.css"
 import '@/icons' // icon
 import '@/permission' // permission control
-
+//--------------------
+//-------------------
+Vue.use(animated)
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
