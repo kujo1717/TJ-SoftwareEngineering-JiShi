@@ -73,6 +73,8 @@ export default {
       deep: true,
       handler(val) {
         this.xAxisData = val
+        this.disposeChart()
+        this.initChart()
       }
     },
     seriesData: {

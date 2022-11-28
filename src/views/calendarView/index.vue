@@ -6,29 +6,32 @@
 */
 <template>
   <div>
-    <el-button @click="test()">测试按钮</el-button>
     <FullCalendar
+      v-if="this.displayCalendar==true"
       ref="fullCalendar"
       :options="calendarOptions"
     />
 
     <!--用于每次调用子组件都按照当前时间重新生成DOM元素-->
     <CreateTaskBox
+      v-if="this.displayCalendar==true"
       :createTaskBoxDialogVisible="createTaskBoxDialogVisible"
       :timeRange="chosen_dateObj"
       @resetDialogVisible="resetDialogVisible()"
     />
     <TaskBox
+      v-if="this.displayCalendar==true"
       :taskBoxDialogVisible="taskBoxDialogVisible"
-      :taskObj="chosen_taskObj"
+      :taskId="chosen_taskId"
       :key="new Date().toString()"
       @resetDialogVisible="resetDialogVisible()"
     />
   </div>
 </template>
 
+
 <script>
-import { getTaskListByMonth, getAllTask } from "@/api/task.js"
+import { getAllTaskAndRelative, patchOneTask } from "@/api/task.js"
 // 引入日历组件
 import CreateTaskBox from "../../components/CreateTaskBox";
 import TaskBox from "../../components/TaskBox";
@@ -47,7 +50,10 @@ export default {
   components: { FullCalendar, CreateTaskBox, TaskBox },
   data () {
     return {
+      userId: 1,//todo: 从cookie里拿
+      displayCalendar: false,
       fisrt: true,
+      chosen_taskId:0,
       chosen_dateObj: {}, //当前选中的日期
       chosen_taskObj: {//当前选中的任务
         taskTitle: '背单词',
@@ -113,8 +119,8 @@ export default {
             dayMaxEventRows: 6, // adjust to 6 only for timeGridWeek/timeGridDay
           },
         },
-        events: this.getEvents(),
-        resources: this.getResources(),
+        events: [],
+        resources: []
 
       },
 
@@ -151,6 +157,10 @@ export default {
     resetDialogVisible () {
       this.createTaskBoxDialogVisible = false;
       this.taskBoxDialogVisible = false;
+
+      //重新从后端拿取数据，然后渲染
+      this.displayCalendar = false;
+      this.getFrontendTaskList();
     },
     /*
       处理回调
@@ -158,25 +168,25 @@ export default {
     //选中日期，进入创建事项
     handleDateSelect: function (arg) {
       this.chosen_dateObj = [arg.start, arg.end];
-      console.group("日期信息");
-      console.log(this.chosen_dateObj)
-      console.groupEnd("日期信息");
+      // console.group("日期信息");
+      // console.log(this.chosen_dateObj)
+      // console.groupEnd("日期信息");
       this.createTaskBoxDialogVisible = true;
     },
     //选中事项，查看事项详情
     handleEventClick: function (arg) {
       for (let i = 0; i < this.taskList.length; i++) {
         if (this.taskList[i].id == arg.event.id) {
-          this.chosen_taskObj = this.taskList[i];
+          this.chosen_taskId = this.taskList[i].id;
+          console.log("this.chosen_taskId", this.chosen_taskId);
           break;
         }
       }
       this.taskBoxDialogVisible = true;
-      this.updateCurrentViewInfo();
+      //this.updateCurrentViewInfo();
     },
     //处理drag和resize
     handleEventDragAndResize: function (arg) {
-      console.log(arg)
       //1.更新taskList
       for (let i = 0; i < this.taskList.length; i++) {
         if (this.taskList[i].id == arg.event.id) {
@@ -189,13 +199,19 @@ export default {
         if (this.calendarOptions.events[i].id == arg.event.id) {
           this.calendarOptions.events[i].start = arg.event.start;
           this.calendarOptions.events[i].end = arg.event.end;
+
+          this.taskList[i].timeRange = [arg.event.start, arg.event.end];
+          //3.向后端发patch请求
+          //let backendTaskLi
+          patchOneTask(this.getBackendTaskList()[i])
+            .then((res) => {
+              console.log("patch请求成功！", res);
+            })
+            .catch((err) => {
+              console.log(err);
+            })
         }
       }
-      console.log('hahaha', this.calendarOptions)
-
-      //3.向后端发出更改put请求
-      //code here...
-
     },
 
     /*
@@ -203,227 +219,219 @@ export default {
     */
     getEvents () {
       let eventList = []
-      let taskList = []
-      new Promise((resolve, reject) => {
-        taskList = this.getFrontendTaskList(2022, 11)
-      })
-        .then(() => {
-          console.log("我先打印一下看看", taskList)
-          taskList.forEach((value) => {
 
-            //计算要不要allDay
-            let my_allDay = value['timeRange'] === [] || value.taskState.indexOf("完成") >= 0 ? true : false;
+      this.taskList.forEach((value) => {
 
-            //如果完成了，就标灰
-            let my_color;
-            if (value.taskState.indexOf("完成") >= 0)
-              my_color = "#378006"//完成：灰色       
-            else if (value.taskState == "进行中")
-              my_color = "#d1d2c8"//进行中：绿色
-            else if (value.taskState == "延期中")
-              my_color = "#c6cb25"//延期：黄色
+        //计算要不要allDay
+        let my_allDay = value['timeRange'] === [] || value.taskState.indexOf("完成") >= 0 ? true : false;
+
+        //如果完成了，就标灰
+        let my_color;
+        if (value.taskState.indexOf("完成") >= 0)
+          my_color = "#378006"//完成：灰色       
+        else if (value.taskState == "进行中")
+          my_color = "#d1d2c8"//进行中：绿色
+        else if (value.taskState == "延期中")
+          my_color = "#c6cb25"//延期：黄色
 
 
-            //往event列表里加
-            eventList.push({
-              id: value['id'],
-              title: value['taskTitle'],
-              start: value['timeRange'][0],
-              end: value['timeRange'][1],
-              allDay: my_allDay,
-              displayEventTime: false,
-              resourceIds: [value['id']],
-              color: my_color
-            })
-          })
-          return eventList;
+        //往event列表里加
+        eventList.push({
+          id: value['id'],
+          title: value['taskTitle'],
+          start: value['timeRange'][0],
+          end: value['timeRange'][1],
+          allDay: my_allDay,
+          displayEventTime: false,
+          resourceIds: [value['id']],
+          color: my_color
         })
+      })
+
+      return eventList;
+
+
+
     },//end of method
     getResources () {
       let resourceList = []
       let taskList = []
-      new Promise((resolve, reject) => {
-        taskList = this.getFrontendTaskList(2022, 11);
-      })
-        .then(() => {
-          taskList.forEach((value) => {
-            //计算要不要children
-            let my_children = [];
-            if (value['familyPosition'] == 'parent') {
-              my_children = value['familyMembers'].slice(0);
-            }
 
-            //往resource列表里加
-            resourceList.push({
-              id: value['id'],
-              title: value['taskTitle'],
-              children: my_children
-            })
-          })
-          return resourceList
+      taskList.forEach((value) => {
+        //计算要不要children
+        let my_children = [];
+        if (value['familyPosition'] == 'parent') {
+          my_children = value['familyMembers'].slice(0);
+        }
+
+        //往resource列表里加
+        resourceList.push({
+          id: value['id'],
+          title: value['taskTitle'],
+          children: my_children
         })
+      })
+      return resourceList
+
     },
-    updateCurrentViewInfo () {
-      //如果页面发生改变，就要从后端重新拉取数据
-      let time, start, end;
-      if (this.first) {
-        this.first = false;
-        //当月的月份
-        let monthNum = moment().month(); // 当月的月份
-        //某月第一天
-        let start = moment(time).month(monthNum - 1).date(1).startOf("month").format("YYYY-MM-DD");
-        //某月最后一天
-        let end = moment(time).month(monthNum - 1).date(1).endOf("month").format("YYYY-MM-DD");
-      }
+    getFrontendState (backendState, startTime, endTime) {
+      if (backendState == 1)
+        return '已完成';
+      else if (backendState == 2)
+        return '延期完成';
+
       else {
-        // 获取当前视图日历的范围
-        time = this.$refs.fullCalendar.getApi().currentDataManager.state.dateProfile.renderRange
-        this.currentViewInfo.currentViewType = this.$refs.fullCalendar.getApi().currentDataManager.data.currentViewType
-        this.currentViewInfo.currentViewStartTime = moment(time.start).format() // 视图开始时间
-        this.currentViewInfo.currentViewEndTime = moment(time.end).format() // 视图结束时间
-
-        console.log("检测到页面跳转！", this.currentViewInfo)
-
-        start = new Date(this.currentViewInfo.currentViewStartTime);
-        end = new Date(this.currentViewInfo.currentViewEndTime);
+        if (new Date() > Date.parse(endTime))
+          return '延期中';
+        else if (new Date()< Date.parse(startTime))
+          return '未开始';
+        else
+          return '进行中';
       }
-
-
-      const startYear = start.getFullYear();
-      const endYear = end.getFullYear();
-
-      const startMonth = start.getMonth() + 1;
-      const startDay = start.getDate();
-
-      const endMonth = end.getMonth() + 1;
-      const endDay = end.getDate();
-
-      //获取年份
-      const currentYear = startMonth > endMonth ? endYear : startYear;
-
-      //获取月份
-      let currentMonth = 0;
-      if (endMonth - startMonth == 2)
-        currentMonth = (startMonth + endMonth) / 2;
-      else
-        currentMonth = startDay > endDay ? endMonth : startMonth;
-
-      console.log(startYear, startMonth, startDay, endYear, endMonth, endDay)
-
-      this.taskList = this.getFrontendTaskList(currentYear, currentMonth);
     },
-    getFrontendTaskList (year, month) {
-      //从后端拉取数据
-      getAllTask()//todo
-        .then((res) => {
-          console.log("月份后端请求成功！");
 
+    getFrontendTaskList () {
+      //从后端拉取数据
+      getAllTaskAndRelative(this.userId)
+        .then((res) => {
           let taskList = []
           //然后要把后端拉回来的task对象转换成前端要用的对象
           if (res.data != null || res.data != []) {
-
             let backendDataList = res.data;
             if (backendDataList == null)
               return;
             backendDataList.forEach((value) => {
+              if (value.isInDustbin == '0') {
+                //获取taskState
+                let _taskState = this.getFrontendState(value.taskState, value.startTime, value.endTime);
 
-              //获取taskState
-              let _taskState = '';
-              switch (value.taskState) {
-                case 0:
-                  _taskState = "已完成";
-                  break;
-                case 1:
-                  _taskState = "进行中";
-                  break;
-                case 2:
-                  _taskState = "延期完成";
-                  break;
-                case 3:
-                  _taskState = "延期中";
-                  break;
+                //获取isdone
+                let _isdone = _taskState.indexOf("完成") >= 0 ? true : false;
+
+                //获取priority
+                let _priority = '';
+                switch (value.priority) {
+                  case 0:
+                    _priority = "无优先级";
+                    break;
+                  case 1:
+                    _priority = "低优先级";
+                    break;
+                  case 2:
+                    _priority = "中优先级";
+                    break;
+                  case 3:
+                    _priority = "高优先级";
+                    break;
+                }
+
+                taskList.push({
+                  id: value.taskId,
+                  taskTitle: value.taskTitle,
+                  taskDetail: value.taskDetail,
+                  isdone: _isdone,
+                  taskState: _taskState,
+                  classification: value.classificationTitle,
+                  priority: _priority,
+                  timeRange: [value.startTime, value.endTime],
+                  familyPosition: value.isParent == 1 ? 'parent' : 'child',
+                  familyMembers: value.relativeTask,
+                  isInDustbin: value.isInDusbin
+                })
               }
-
-              //获取isdone
-              let _isdone = _taskState.indexOf("完成") >= 0 ? true : false;
-
-              //获取priority
-              let _priority = '';
-              switch (value.priority) {
-                case 0:
-                  _priority = "无优先级";
-                  break;
-                case 1:
-                  _priority = "低优先级";
-                  break;
-                case 2:
-                  _priority = "中优先级";
-                  break;
-                case 3:
-                  _priority = "高优先级";
-                  break;
-              }
-
-              taskList.push({
-                id: value.taskId,
-                taskTitle: value.taskTitle,
-                taskDetail: value.taskDetail,
-                isdone: _isdone,
-                taskState: _taskState,
-                classification: value.classificationTitle,
-                priority: _priority,
-                timeRange: [value.startTime, value.endTime],
-                familyPosition: value.isParent == 1 ? 'parent' : 'child',
-                familyMembers: []//todo
-              })
             })
           }//end of if
-          return taskList;
 
+          this.taskList = taskList;
+          this.calendarOptions.events = this.getEvents();
+          this.calendarOptions.resources = this.getResources();
+          this.displayCalendar = true;
+          //return taskList;
+          console.log("前端请求结束！")
         })//end of then
         .catch((err) => {
+          this.displayCalendar = true;
           console.log("月份后端请求失败！", err);
           return null;
         })
       return null;
-    },
+    },//end of method
+    getBackendTaskList () {
+      let backendTaskList = []
+      this.taskList.forEach((value) => {
+
+        let _taskState = 0;
+        switch (value.taskState) {
+          case '进行中':
+            _taskState = 0;
+            break;
+          case '延期中':
+            _taskState = 0;
+            break;
+          case '已完成':
+            _taskState = 1;
+            break;
+          case '延期完成':
+            _taskState = 2;
+            break;
+        }
+
+        let _priority = 0;
+        switch (value.priority) {
+          case '无优先级':
+            _priority = 0;
+            break;
+          case '低优先级':
+            _priority = 1;
+            break;
+          case '中优先级':
+            _priority = 2;
+            break;
+          case '高优先级':
+            _priority = 3;
+            break;
+        }
+
+        backendTaskList.push({
+          taskId: value.id,
+          taskTitle: value.taskTitle,
+          taskDetail: value.taskDetail,
+          taskState: _taskState,
+          classificationTitle: value.classificationTitle,
+          priority: _priority,
+          startTime: value.timeRange[0],
+          endTime: value.timeRange[1],
+          isParent: value.familyPosition == 'parent' ? 1 : 0,
+          relativeTask: []//todo
+        })
+      })
+      return backendTaskList;
+    },//end of method
+
     updateTitleDOM () {
       this.titleDom = document.getElementById('fc-dom-1');
     },
-    test () {
-
-      this.$refs.fullCalendar.getApi().fullCalendar('gotoDate', new Date())
-    }
-
-
 
   },
 
   watch: {
     calendarOptions: {
       handler (newVal) {
-        console.log(newVal);
+        //console.log(newVal);
       },
       deep: true
     },
     titleDom: {
       handler (newVal) {
-        this.updateCurrentViewInfo();
+        //this.updateCurrentViewInfo();
       }
     }
   },
 
   mounted: function () {
-    console.log('mounted');
-    console.log(this.calendarOptions)
-    this.updateCurrentViewInfo();
-    this.updateTitleDOM();
+    this.getFrontendTaskList();
+  },
 
-    //添加DOM元素监听，识别页面跳转
-    var elements = document.getElementsByTagName('button')
-    for (let i = 0; i < elements.length; i++)
-      elements[i].addEventListener("click", () => { this.updateCurrentViewInfo() })
-  }
 };
 </script>
 

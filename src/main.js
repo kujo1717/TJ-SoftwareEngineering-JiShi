@@ -1,12 +1,4 @@
 import Vue from 'vue'
-//kanban组件
-import vueKanban from 'vue-kanban'
-Vue.use(vueKanban)
-
-//chat box
-import LemonIMUI from 'lemon-imui'
-import 'lemon-imui/dist/index.css';
-Vue.use(LemonIMUI)
 
 import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 
@@ -23,6 +15,8 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+
+import $ from 'jquery'
 
 /**
  * If you don't want to use mock-server
@@ -48,5 +42,6 @@ new Vue({
   el: '#app',
   router,
   store,
+  $,
   render: h => h(App)
 })
