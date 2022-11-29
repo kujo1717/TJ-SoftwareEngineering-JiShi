@@ -63,6 +63,7 @@
 </template>
   
 <script>
+import{forget,reset} from '@/api/user'
 export default {
     name: 'Login',
     data() {
@@ -151,8 +152,13 @@ methods: {
         this.Emailloading = true 
         this.$refs.loginForm.validateField(["email"],async valid => {
         if (!valid) {
-          
-          
+        
+        forget({id:this.loginForm.email,code:''}).then(response=>{
+            this.confirmCode=response.data.code
+
+            console.log(response)
+        })
+        this.Emailloading=false
           
         } else {
           console.log('error submit!!')
@@ -194,7 +200,19 @@ methods: {
 
     },
     handleForget(){
-
+        this.loading = true
+        this.$refs.loginForm.validate(valid => {
+        if (valid) {
+            reset({id:this.loginForm.email,code:this.loginForm.emailConfirm,pwd:this.loginForm.password}).then(response=>{
+                console.log(response)
+                this.$router.push({ path: this.redirect || '/login' })
+            })
+            this.loading = true
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })    
         
 
     }

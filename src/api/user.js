@@ -8,9 +8,18 @@ export function login(data) {
   })
 }
 
-export function emailCode(data){
+export function forget(data){
   return request({
-    
+      url:'/user/forget',
+      method:'post',
+      data
+  })
+}
+export function reset(data){
+  return request({
+    url:'/user/forget',
+    method:'put',
+    data
   })
 }
 
