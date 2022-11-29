@@ -3,7 +3,6 @@ package com.example.backend.service.impl;
 
 import com.example.backend.Tools.JwtUtil;
 import com.example.backend.common.Result;
-import com.example.backend.entity.DTO.UserDTO;
 import com.example.backend.entity.User;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.service.UserService;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.Base64;
-import java.util.Map;
 
 /**
  * @Author hym
