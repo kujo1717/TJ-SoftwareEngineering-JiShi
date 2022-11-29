@@ -106,6 +106,13 @@
             <artifactId>java-jwt</artifactId>
             <version>3.8.2</version>
         </dependency>
+
+<!--        JSON-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.83</version>
+        </dependency>
     </dependencies>
 
     <build>
