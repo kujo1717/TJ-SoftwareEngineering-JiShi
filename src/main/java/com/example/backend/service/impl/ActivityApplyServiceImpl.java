@@ -2,6 +2,7 @@ package com.example.backend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.backend.dto.ActivityUserRole;
+import com.example.backend.entity.Activity;
 import com.example.backend.entity.ActivityApply;
 import com.example.backend.mapper.ActivityApplyMapper;
 import com.example.backend.service.ActivityApplyService;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -58,7 +60,6 @@ public class ActivityApplyServiceImpl implements ActivityApplyService {
 //        System.out.println(activityApplyMapper.selectByMap(map));
         res=activityApplyMapper.deleteByMap(map);
 
-
         return res;
     }
 
@@ -79,4 +80,7 @@ public class ActivityApplyServiceImpl implements ActivityApplyService {
         Integer delete_num=activityApplyMapper.deleteById(activity_id);
         return delete_num;
     }
+
+
+
 }

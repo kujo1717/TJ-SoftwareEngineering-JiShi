@@ -1,7 +1,10 @@
 package com.example.backend.service;
 
+import com.example.backend.entity.Activity;
 import com.example.backend.entity.ActivityParticipate;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @Author: 杨严
@@ -29,4 +32,9 @@ public interface ActivityParticipateService {
      * 删除某活动的所有记录
      * */
     Integer DeleteAct(Long activity_id);
+
+
+
+    /**获取用户的所有参与*/
+//    List<Activity> getUserParticipateList(Long creator_id);
 }

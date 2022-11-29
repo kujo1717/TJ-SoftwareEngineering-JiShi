@@ -1,10 +1,12 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.ActivityUserRole;
+import com.example.backend.entity.Activity;
 import com.example.backend.entity.ActivityApply;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author: 杨严
@@ -27,6 +29,10 @@ public interface ActivityApplyService {
 
     /**删除某活动的所有记录**/
     Integer DeleteAct(Long activity_id);
+
+
+    /**获取活用户的所有报名*/
+//    List<Activity> getUserApplyList(Long creator_id);
 
 
 

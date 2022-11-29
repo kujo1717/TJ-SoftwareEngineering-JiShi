@@ -6,6 +6,7 @@ import com.example.backend.entity.Activity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: 杨严
@@ -19,8 +20,29 @@ public interface ActivityService {
     List<Activity> getAll();
 
 
-    /**获取活动实体的列表，用户创建的*/
-    List<Activity> getUserCreateActList(Long creator_id);
+
+
+
+    /**获取活动实体的列表，用户所有的*/
+    List<Activity> getUserAllActList(Long creator_id);
+
+
+
+    /**获取活用户所有的报名活动*/
+    List<Map<String,Object>> getUserAllApplyActList(Long user_id,Short state);
+
+
+    /**获取活用户所有的参与活动*/
+    List<Map<String,Object>> getUserAllParticipateActList(Long user_id,Short state);
+
+
+
+    /**获取活用户所有的创建的活动*/
+    List<Map<String,Object>> getUserAllCreateActList(Long user_id,Short state);
+
+
+
+
 
     /**获取活动实体的列表，测试用的*/
     List<Activity> getTestActList();

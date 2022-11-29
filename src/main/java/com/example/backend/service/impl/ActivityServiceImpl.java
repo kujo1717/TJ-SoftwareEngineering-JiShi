@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @Author: 杨严
@@ -37,18 +39,44 @@ public class ActivityServiceImpl implements ActivityService{
 
         return list;
     }
+
+    @Override
+    public List<Map<String, Object>> getUserAllCreateActList(Long user_id, Short state) {
+        /**mapper自定义SQL获取所有的活动*/
+        List<Map<String,Object>> list=activityMapper.SelectCreateList(user_id);
+
+        /**state传值非-1，则添加state filter*/
+        list=list.stream().filter(act->{
+            return state==-1?true:state.toString().equals(act.get("state").toString());
+        }).collect(Collectors.toList());
+        return list;
+    }
+
+    @Override
+    public List<Map<String,Object>> getUserAllApplyActList(Long user_id,Short state) {
+        /**mapper自定义SQL获取所有的活动*/
+        List<Map<String,Object>> list=activityMapper.SelectApplyList(user_id);
+
+        /**state传值非-1，则添加state filter*/
+        list=list.stream().filter(act->{
+                return state==-1?true:state.toString().equals(act.get("state").toString());
+        }).collect(Collectors.toList());
+        return list;
+    }
+
     @Override
     @Transactional
-    public List<Activity> getUserCreateActList(Long creator_id){
+    public List<Activity> getUserAllActList(Long creator_id){
 
         QueryWrapper<Activity> queryWrapper=new QueryWrapper<>();
         queryWrapper
                 .eq("creator_id",creator_id);
         List<Activity> list=activityMapper.selectList(queryWrapper);
-        System.out.println(activityMapper.selectList(queryWrapper));
+//        System.out.println(activityMapper.selectList(queryWrapper));
 
         return list;
     }
+
 
     @Override
     @Transactional
@@ -115,4 +143,16 @@ public class ActivityServiceImpl implements ActivityService{
         updateWrapper.eq("activity_id",activity_id).set("state",state_val);
         return activityMapper.update(null,updateWrapper);
     }
+
+    @Override
+    public List<Map<String, Object>> getUserAllParticipateActList(Long user_id,Short state) {
+        List<Map<String,Object>> list=activityMapper.SelectParticipateList(user_id);
+        list=list.stream().filter(act->{
+            return state==-1?true:state.toString().equals(act.get("state").toString());
+        }).collect(Collectors.toList());
+
+        return list;
+    }
+
+
 }

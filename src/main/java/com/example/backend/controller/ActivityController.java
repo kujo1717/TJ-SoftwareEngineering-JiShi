@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,19 +63,82 @@ public class ActivityController {
         }
     }
 
-    @ApiOperation("获取用户创建的所有活动的概要")
-    @GetMapping("/getUserCreateActBrief/{id}")
-    public Result<List<ActivityBriefDto>> getActBrief_UserCreate(
-            @ApiParam(name = "id", value = "用户id", required = true)
-            @PathVariable(name = "id") Long id) {
-        List<Activity> list_act = activityService.getUserCreateActList(id);
-        List<ActivityBriefDto> list_actbrief = list_act.stream().map(act ->
-        {
-            return modelMapper.map(act, ActivityBriefDto.class);
-        }).collect(Collectors.toList());
 
-        return Result.success(list_actbrief);
+    @ApiOperation("获取用户的所有报名的活动")
+        @GetMapping("/getAllApply")
+    public Result<List<Map<String,Object>>> getActList_UserAllApply(
+            @ApiParam(name = "id", value = "用户id", required = true)
+             @RequestParam("user_id") Long user_id,
+            @ApiParam(name = "state", value = "活动状态", required = true)
+            @RequestParam("state") Short state) {
+        List<Map<String,Object>> map=new ArrayList<>();
+        try {
+            map = activityService.getUserAllApplyActList(user_id,state);
+            return Result.success(map);
+        } catch (Exception e) {
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "getAllApply failed");
+        }
     }
+
+
+    @ApiOperation("获取用户的所有参与的活动")
+    @GetMapping("/getAllParticipate")
+    public Result<List<Map<String,Object>>> getActList_UserAllParticipate(
+            @ApiParam(name = "id", value = "用户id", required = true)
+            @RequestParam("user_id") Long user_id,
+            @ApiParam(name = "state", value = "活动状态", required = true)
+            @RequestParam("state") Short state) {
+        List<Map<String,Object>> map=new ArrayList<>();
+        try {
+            map = activityService.getUserAllParticipateActList(user_id,state);
+            return Result.success(map);
+        } catch (Exception e) {
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "getAllParticipate failed");
+        }
+    }
+
+    @ApiOperation("获取用户所有的相关活动，报名、参与")
+    @GetMapping("/getAllActList")
+    public Result<List<Map<String,Object>>> getActList_UserALl(
+            @ApiParam(name = "id", value = "用户id", required = true)
+            @RequestParam("user_id") Long user_id,
+            @ApiParam(name = "state", value = "活动状态", required = true)
+            @RequestParam("state") Short state) {
+        List<Map<String,Object>> map_all=new ArrayList<>();
+        List<Map<String,Object>> map_apply=new ArrayList<>();
+        List<Map<String,Object>> map_participate=new ArrayList<>();
+        try {
+            map_participate = activityService.getUserAllParticipateActList(user_id,state);
+            map_apply = activityService.getUserAllApplyActList(user_id,state);
+            map_all.addAll(map_apply);
+            map_all.addAll(map_participate);
+            return Result.success(map_all);
+        } catch (Exception e) {
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "getAll failed");
+        }
+    }
+
+
+
+
+
+
+    @ApiOperation("获取用户的所有创建的活动")
+    @GetMapping("/getAllCreate")
+    public Result<List<Map<String,Object>>> getActList_UserAlleCreate(
+            @ApiParam(name = "id", value = "用户id", required = true)
+            @RequestParam("user_id") Long user_id,
+            @ApiParam(name = "state", value = "活动状态", required = true)
+            @RequestParam("state") Short state) {
+        List<Map<String,Object>> map=new ArrayList<>();
+        try {
+            map = activityService.getUserAllCreateActList(user_id,state);
+            return Result.success(map);
+        } catch (Exception e) {
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "getAllCreate failed");
+        }
+    }
+
 
     @ApiOperation("获取测试用的活动概要")
     @GetMapping("/getActBriefTest/{id}")
