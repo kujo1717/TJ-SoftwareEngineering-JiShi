@@ -64,8 +64,8 @@ export default {
   },
   methods: {
     test() {
-      console.log("activity_rate_val", this.activity_rate_val);
-      console.log("showVal", this.showVal);
+      // console.log("activity_rate_val", this.activity_rate_val);
+      // console.log("showVal", this.showVal);
     },
     ClickPostMark() {
       //弹窗确认
@@ -134,7 +134,7 @@ export default {
   mounted() {},
   created() {
     this.activity_rate_val = this.showVal;
-    this.test();
+    // this.test();
   },
 };
 </script>

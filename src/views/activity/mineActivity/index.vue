@@ -1,6 +1,5 @@
 <template>
   <div class="ma_view">
-    <el-button @click="TestAPI_static">test API</el-button>
     <el-radio-group
       class="ma_view_redios"
       v-model="ActivityOrTemplate"
@@ -13,18 +12,14 @@
     <div class="ma_activity_page" v-if="ActivityOrTemplate === 'activity'">
       <div class="ma_sort_find_box">
         <el-select
-          v-model="select_value"
+          v-model="state_select_val"
           placeholder="请选择"
-          @change="select_change"
+          @change="select_state_change"
         >
-          <el-option key="done_time" label="按截至时间倒序" value="done_time">
-          </el-option>
-          <el-option
-            key="create_time"
-            label="按创建时间倒序"
-            value="create_time"
-          >
-          </el-option>
+          <el-option key="all" label="全部" :value="-1"> </el-option>
+          <el-option key="applying" label="正在报名" :value="0"> </el-option>
+          <el-option key="doing" label="正在进行" :value="1"> </el-option>
+          <el-option key="done" label="已结束" :value="2"> </el-option>
         </el-select>
         <el-button type="primary" @click="ClickCreateNewAct"
           >新建活动</el-button
@@ -34,22 +29,6 @@
         v-model="activity_tab"
         @tab-click="(tab) => ActivityTabsClick(tab.name)"
       >
-        <el-tab-pane label="测试用活动" name="test">
-          <el-col
-            :span="6"
-            v-for="(act, act_i) in activity_data_test"
-            :key="act_i"
-            class="ma_act_col"
-          >
-            <el-card @click.native="ClickActDetail(act)">
-              <span class="ma_act_page_card">
-                <div class="user-select-none">{{ act.name }}</div>
-                <el-image style="width: 100%" :src="act.img"></el-image>
-              </span>
-            </el-card>
-          </el-col>
-        </el-tab-pane>
-
         <el-tab-pane label="所有活动" name="all">
           <el-col
             :span="6"
@@ -61,6 +40,9 @@
               <span class="ma_act_page_card">
                 <div class="user-select-none">{{ act.name }}</div>
                 <el-image style="width: 100%" :src="act.img"></el-image>
+                <el-tag :type="ActicityState_TagType(act.state)">{{
+                  ActicityState_TagLabel(act.state)
+                }}</el-tag>
               </span>
             </el-card>
           </el-col>
@@ -76,6 +58,9 @@
               <span class="ma_act_page_card">
                 <div class="user-select-none">{{ act.name }}</div>
                 <el-image style="width: 100%" :src="act.img"></el-image>
+                <el-tag :type="ActicityState_TagType(act.state)">{{
+                  ActicityState_TagLabel(act.state)
+                }}</el-tag>
               </span>
             </el-card>
           </el-col>
@@ -91,6 +76,9 @@
               <span class="ma_act_page_card">
                 <div class="user-select-none">{{ act.name }}</div>
                 <el-image style="width: 100%" :src="act.img"></el-image>
+                <el-tag :type="ActicityState_TagType(act.state)">{{
+                  ActicityState_TagLabel(act.state)
+                }}</el-tag>
               </span>
             </el-card>
           </el-col>
@@ -106,36 +94,9 @@
               <span class="ma_act_page_card">
                 <div class="user-select-none">{{ act.name }}</div>
                 <el-image style="width: 100%" :src="act.img"></el-image>
-              </span>
-            </el-card>
-          </el-col>
-        </el-tab-pane>
-        <el-tab-pane label="正在进行" name="doing">
-          <el-col
-            :span="6"
-            v-for="(act, act_i) in activity_data_doing"
-            :key="act_i"
-            class="ma_act_col"
-          >
-            <el-card @click.native="ClickActDetail(act)">
-              <span class="ma_act_page_card">
-                <div class="user-select-none">{{ act.name }}</div>
-                <el-image style="width: 100%" :src="act.img"></el-image>
-              </span>
-            </el-card>
-          </el-col>
-        </el-tab-pane>
-        <el-tab-pane label="已经完成" name="done">
-          <el-col
-            :span="6"
-            v-for="(act, act_i) in activity_data_done"
-            :key="act_i"
-            class="ma_act_col"
-          >
-            <el-card @click.native="ClickActDetail(act)">
-              <span class="ma_act_page_card">
-                <div class="user-select-none">{{ act.name }}</div>
-                <el-image style="width: 100%" :src="act.img"></el-image>
+                <el-tag :type="ActicityState_TagType(act.state)">{{
+                  ActicityState_TagLabel(act.state)
+                }}</el-tag>
               </span>
             </el-card>
           </el-col>
@@ -177,19 +138,19 @@
 <script>
 import { HelloID } from "@/api/user";
 import {
-  getActBrief_UserCreate,
-  postAct,
-  getActBrief_Test,
+  getActList_All,
+  getActList_Create,
+  getActList_Apply,
+  getActList_Participate,
 } from "@/api/activity";
 import CreateActivity from "../components/createAct.vue";
+import { mapGetters } from "vuex";
+
 export default {
   name: "MyActivity",
   components: { CreateActivity },
   data() {
     return {
-      /**用户信息 */
-      user_id: 1145,
-      user_name: "用户名-静态测试",
       //tab 值
       ActivityOrTemplate: "",
       activity_tab: "create",
@@ -200,12 +161,8 @@ export default {
       activity_data_involve: [],
       activity_data_apply: [],
 
-      activity_data_doing: [],
-      activity_data_done: [],
-      activity_data_test: [],
-
       // act单选框，筛选
-      select_value: "",
+      state_select_val: -1,
 
       //模板data
       template_data: [],
@@ -214,78 +171,61 @@ export default {
       isShow_dialog_createNewAct: false,
     };
   },
-  methods: {
-    /*测试后端接口 */
-    TestAPI_static() {
-      postAct({
-        activity_id: 9009,
-        title_name: "9009_title_name",
-      })
-        .then((res) => {
-          console.log("res", res);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+  computed: {
+    user_id: {
+      get: function () {
+        return this.$store.getters.id;
+      },
+      set: function (newVal) {},
     },
+    user_name: {
+      get: function () {
+        return this.$store.getters.name;
+      },
+      set: function (newVal) {},
+    },
+  },
+  methods: {
     /*
     获取活动列表data
      */
-    async GetActivityData_Test() {
-      let activity_data_test = [];
+
+    async GetActivityData_All() {
+      let activity_data_all = [];
       let img_url =
         "https://ts1.cn.mm.bing.net/th/id/R-C.f4470ef67e6e8803479dc44bb3c66574?rik=FXJkAJS%2fLCy9vg&riu=http%3a%2f%2fwww.szshequ.org%2fuserfiles%2fmanagers%2fdachong%2fimage%2f20191028%2f20191028193129_387.jpg&ehk=8FRYXacd0vDrnp2VfQlyA2xK1jIEETABsKgITDdCJXs%3d&risl=&pid=ImgRaw&r=0";
       // img_url = "";
-      await getActBrief_Test(this.user_id)
+      await getActList_All(this.user_id, this.state_select_val)
         .then((res) => {
-          console.log("user_id:", this.user_id, "getActBrief_Test:", res);
+          console.log("user_id:", this.user_id, "getActList_All:", res);
           res.data.forEach((ele) => {
-            activity_data_test.push({
+            activity_data_all.push({
               id: ele.activity_id,
               name: ele.title_name,
               img: img_url,
+              state: ele.state,
             });
           });
-          this.activity_data_test = activity_data_test;
+          this.activity_data_all = activity_data_all;
         })
         .catch((err) => {
           console.log(err);
         });
-    },
-    async GetActivityData_All() {
-      // let activity_data_all = [];
-      // let img_url =
-      //   "https://ts1.cn.mm.bing.net/th/id/R-C.f4470ef67e6e8803479dc44bb3c66574?rik=FXJkAJS%2fLCy9vg&riu=http%3a%2f%2fwww.szshequ.org%2fuserfiles%2fmanagers%2fdachong%2fimage%2f20191028%2f20191028193129_387.jpg&ehk=8FRYXacd0vDrnp2VfQlyA2xK1jIEETABsKgITDdCJXs%3d&risl=&pid=ImgRaw&r=0";
-      // // img_url = "";
-      // await getActBrief_UserCreate(this.user_id)
-      //   .then((res) => {
-      //     console.log("user_id:", this.user_id, "getByCreatorID:", res);
-      //     res.data.forEach((ele) => {
-      //       activity_data_all.push({
-      //         id: ele.activity_id,
-      //         name: ele.title_name,
-      //         img: img_url,
-      //       });
-      //     });
-      //     this.activity_data_all = activity_data_all;
-      //   })
-      //   .catch((err) => {
-      //     console.log(err);
-      //   });
     },
     async GetActivityData_Create() {
       let activity_data_create = [];
       let img_url =
         "https://ts1.cn.mm.bing.net/th/id/R-C.f4470ef67e6e8803479dc44bb3c66574?rik=FXJkAJS%2fLCy9vg&riu=http%3a%2f%2fwww.szshequ.org%2fuserfiles%2fmanagers%2fdachong%2fimage%2f20191028%2f20191028193129_387.jpg&ehk=8FRYXacd0vDrnp2VfQlyA2xK1jIEETABsKgITDdCJXs%3d&risl=&pid=ImgRaw&r=0";
       // img_url = "";
-      await getActBrief_UserCreate(this.user_id)
+      await getActList_Create(this.user_id, this.state_select_val)
         .then((res) => {
-          console.log("user_id:", this.user_id, "getByCreatorID:", res);
+          console.log("user_id:", this.user_id, "getActList_Create:", res);
           res.data.forEach((ele) => {
             activity_data_create.push({
               id: ele.activity_id,
               name: ele.title_name,
               img: img_url,
+              state: ele.state,
             });
           });
           this.activity_data_create = activity_data_create;
@@ -294,66 +234,51 @@ export default {
           console.log(err);
         });
     },
-    GetActivityData_Apply() {
-      let prefix = "apply";
-      let tmp = [];
+    async GetActivityData_Apply() {
+      let activity_data_apply = [];
       let img_url =
         "https://ts1.cn.mm.bing.net/th/id/R-C.f4470ef67e6e8803479dc44bb3c66574?rik=FXJkAJS%2fLCy9vg&riu=http%3a%2f%2fwww.szshequ.org%2fuserfiles%2fmanagers%2fdachong%2fimage%2f20191028%2f20191028193129_387.jpg&ehk=8FRYXacd0vDrnp2VfQlyA2xK1jIEETABsKgITDdCJXs%3d&risl=&pid=ImgRaw&r=0";
-
-      for (let i = 0; i < 6; i++) {
-        tmp.push({
-          id: prefix + "_" + "id" + "_" + i.toString(),
-          name: prefix + "_" + "name" + "_" + i.toString(),
-          img: img_url,
+      // img_url = "";
+      await getActList_Apply(this.user_id, this.state_select_val)
+        .then((res) => {
+          console.log("user_id:", this.user_id, "getActList_Apply:", res);
+          res.data.forEach((ele) => {
+            activity_data_apply.push({
+              id: ele.activity_id,
+              name: ele.title_name,
+              img: img_url,
+              state: ele.state,
+            });
+          });
+          this.activity_data_apply = activity_data_apply;
+        })
+        .catch((err) => {
+          console.log(err);
         });
-      }
-      this.activity_data_apply = tmp;
     },
-    GetActivityData_Involve() {
-      let prefix = "involve";
-      let tmp = [];
+    async GetActivityData_Involve() {
+      let activity_data_involve = [];
       let img_url =
         "https://ts1.cn.mm.bing.net/th/id/R-C.f4470ef67e6e8803479dc44bb3c66574?rik=FXJkAJS%2fLCy9vg&riu=http%3a%2f%2fwww.szshequ.org%2fuserfiles%2fmanagers%2fdachong%2fimage%2f20191028%2f20191028193129_387.jpg&ehk=8FRYXacd0vDrnp2VfQlyA2xK1jIEETABsKgITDdCJXs%3d&risl=&pid=ImgRaw&r=0";
-
-      for (let i = 0; i < 6; i++) {
-        tmp.push({
-          id: prefix + "_" + "id" + "_" + i.toString(),
-          name: prefix + "_" + "name" + "_" + i.toString(),
-          img: img_url,
+      // img_url = "";
+      await getActList_Participate(this.user_id, this.state_select_val)
+        .then((res) => {
+          console.log("user_id:", this.user_id, "getActList_Participate:", res);
+          res.data.forEach((ele) => {
+            activity_data_involve.push({
+              id: ele.activity_id,
+              name: ele.title_name,
+              img: img_url,
+              state: ele.state,
+            });
+          });
+          this.activity_data_involve = activity_data_involve;
+        })
+        .catch((err) => {
+          console.log(err);
         });
-      }
-      this.activity_data_involve = tmp;
     },
-    GetActivityData_Doing() {
-      let prefix = "doing";
-      let tmp = [];
-      let img_url =
-        "https://ts1.cn.mm.bing.net/th/id/R-C.f4470ef67e6e8803479dc44bb3c66574?rik=FXJkAJS%2fLCy9vg&riu=http%3a%2f%2fwww.szshequ.org%2fuserfiles%2fmanagers%2fdachong%2fimage%2f20191028%2f20191028193129_387.jpg&ehk=8FRYXacd0vDrnp2VfQlyA2xK1jIEETABsKgITDdCJXs%3d&risl=&pid=ImgRaw&r=0";
 
-      for (let i = 0; i < 6; i++) {
-        tmp.push({
-          id: prefix + "_" + "id" + "_" + i.toString(),
-          name: prefix + "_" + "name" + "_" + i.toString(),
-          img: img_url,
-        });
-      }
-      this.activity_data_doing = tmp;
-    },
-    GetActivityData_Done() {
-      let prefix = "done";
-      let tmp = [];
-      let img_url =
-        "https://ts1.cn.mm.bing.net/th/id/R-C.f4470ef67e6e8803479dc44bb3c66574?rik=FXJkAJS%2fLCy9vg&riu=http%3a%2f%2fwww.szshequ.org%2fuserfiles%2fmanagers%2fdachong%2fimage%2f20191028%2f20191028193129_387.jpg&ehk=8FRYXacd0vDrnp2VfQlyA2xK1jIEETABsKgITDdCJXs%3d&risl=&pid=ImgRaw&r=0";
-
-      for (let i = 0; i < 6; i++) {
-        tmp.push({
-          id: prefix + "_" + "id" + "_" + i.toString(),
-          name: prefix + "_" + "name" + "_" + i.toString(),
-          img: img_url,
-        });
-      }
-      this.activity_data_done = tmp;
-    },
     //获取模板data
     GetTemplateData() {
       let prefix = "template";
@@ -370,9 +295,10 @@ export default {
       }
       this.template_data = tmp;
     },
-    //单选框点击事件
-    select_change(val) {
-      console.log(val);
+    //状态筛选改变
+    select_state_change(val) {
+      this.ActivityTabsClick(this.activity_tab);
+      // console.log(val);
     },
     radio_input_change(val) {
       switch (val) {
@@ -387,9 +313,6 @@ export default {
     //Act tabs click
     ActivityTabsClick(name) {
       switch (name) {
-        case "test":
-          this.GetActivityData_Test();
-          break;
         case "all":
           this.GetActivityData_All();
           break;
@@ -401,12 +324,6 @@ export default {
           break;
         case "involve":
           this.GetActivityData_Involve();
-          break;
-        case "doing":
-          this.GetActivityData_Doing();
-          break;
-        case "done":
-          this.GetActivityData_Done();
           break;
       }
     },
@@ -489,6 +406,26 @@ export default {
       this.ActivityTabsClick(this.activity_tab);
 
       this.isShow_dialog_createNewAct = val;
+    },
+    //活动状态的label
+    ActicityState_TagType(state_val) {
+      if (state_val == 0) {
+        return "";
+      } else if (state_val == 1) {
+        return "danger";
+      } else if (state_val == 2) {
+        return "warning";
+      }
+    },
+
+    ActicityState_TagLabel(state_val) {
+      if (state_val == 0) {
+        return "正在报名";
+      } else if (state_val == 1) {
+        return "正在进行";
+      } else if (state_val == 2) {
+        return "已结束";
+      }
     },
   },
   mounted() {

@@ -96,7 +96,7 @@
         <div class="pmb_members">
           <div
             class="pmb_member_item"
-            v-for="(member, index) in member_datalist"
+            v-for="(member, index) in participant_list"
             :key="index"
           >
             <el-popover
@@ -164,9 +164,11 @@
             >
           </div>
 
+
+          <el-divider></el-divider>
           <div
             class="icca_memberline"
-            v-for="(mem, index) in member_datalist"
+            v-for="(mem, index) in participant_list"
             :key="index"
           >
             <el-avatar
@@ -265,7 +267,8 @@
 
     <!-- 评价的卡片 -->
     <ActivityMarkCard
-      v-if="rate_val != -1"
+      style="margin-left: 1em"
+      v-if="rate_val != -1 && state_val == 2"
       :activity_id="activity_id"
       :user_id="user_id"
       :hadrate="rated"
@@ -593,7 +596,10 @@ import {
   patchActStopApply,
   deleteActivity,
   patchActFinish,
+  getActApplicantList,
 } from "@/api/activity";
+
+import { getInfo } from "@/api/user";
 export default {
   name: "ActivityPageOverView",
   components: { VuePoll, ActivityMarkCard },
@@ -603,7 +609,6 @@ export default {
        * 用户个人信息
        */
       //creator,member
-      user_id: 1145,
       UserIdentity: "",
       is_creator: false,
       is_applicant: false,
@@ -643,11 +648,12 @@ export default {
 
       //创建人data
       creator_data: {},
+      creator_id: "",
 
       /**
        * 参与人data
        */
-      member_datalist: [],
+      participant_list: [],
       //参与人限制
       participate_limit: "",
       participant_num: "",
@@ -958,7 +964,7 @@ export default {
       //api
       //根据活动id，获取详情
       await getActDetail(activity_id, this.user_id)
-        .then((res) => {
+        .then(async (res) => {
           console.log("api请求活动详情：", res);
           const act_detail = res.data.activity_detail;
           const activity_mark = res.data.activity_mark;
@@ -987,7 +993,7 @@ export default {
           this.act_introText = act_detail.detail_text;
           this.title_name = act_detail.title_name;
           this.summary = act_detail.summary;
-
+          this.creator_id = act_detail.creator_id;
           this.limit_capacity = act_detail.limit_capacity;
           this.state_val = act_detail.state;
           this.create_time_date = act_detail.create_time;
@@ -1058,21 +1064,31 @@ export default {
 
           this.VoteOptions = this.getActVote(this.activity_id);
 
-          //活动参与人员的信息
-          this.creator_data = {
-            id: "p1_creator_ID",
-            name: "p1_creator_NAME",
-            avatar: "https://s1.ax1x.com/2022/11/13/zF8nrd.jpg",
-            role: "creator",
-          };
-          this.member_datalist = [
-            {
-              id: "p1_member1_ID",
-              name: "p1_member1_NAME",
-              avatar: "https://s1.ax1x.com/2022/11/13/zF8nrd.jpg",
-              role: "member",
-            },
-          ];
+          //创建者具体信息
+          await getInfo(this.creator_id)
+            .then((res) => {
+              console.log("creator_info:res:", res);
+              this.creator_data = res.data;
+            })
+            .catch((err) => {
+              console.log("creator_info:err:", err);
+            });
+          // this.creator_data = {
+          //   id: "p1_creator_ID",
+          //   name: "p1_creator_NAME",
+          //   avatar: "https://s1.ax1x.com/2022/11/13/zF8nrd.jpg",
+          //   role: "creator",
+          // };
+          //所有参与人员信息
+          await getActApplicantList(this.activity_id)
+            .then((res) => {
+              console.log("getActApplicantList:res:", res);
+
+              this.participant_list = res.data;
+            })
+            .catch((err) => {
+              console.log("getActApplicantList:err:", err);
+            });
         })
         .catch((err) => {
           console.log(err);
@@ -1228,7 +1244,7 @@ export default {
           this.edit_confirm_loading = true;
 
           //全局loading模板
-          let thidisContent = this;
+          let thisContent = this;
           let edit_loading = thisContent.$loading({
             lock: true,
             text: "修改中，请稍候...",
@@ -1618,6 +1634,21 @@ export default {
         }
         // return "123";
       },
+    },
+    /**
+     * 用户个人信息
+     */
+    user_id: {
+      get: function () {
+        return this.$store.getters.id;
+      },
+      set: function (newVal) {},
+    },
+    user_name: {
+      get: function () {
+        return this.$store.getters.name;
+      },
+      set: function (newVal) {},
     },
   },
   mounted() {

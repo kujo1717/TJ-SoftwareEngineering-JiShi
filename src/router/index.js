@@ -182,6 +182,7 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/projects/project1',
     name: 'Projects',
+    hidden:true,
     meta: {
       title: '项目#待删除',
       icon: 'nested'

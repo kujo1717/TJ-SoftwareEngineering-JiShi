@@ -1,21 +1,29 @@
 import request from '@/utils/request'
 
 
-//获取全部活动
-export function getAll() {
+
+//获取活动列表,用户所有的，即参与的+报名的
+export function getActList_All(user_id, state) {
     return request({
-        url: '/api/activity/getAll',
+        url: '/api/activity/getAllActList',
         method: 'get',
-        params: {}
+        params: {
+            user_id: user_id,
+            state: state
+        }
     })
 }
 
-//活动brief的列表，用户创建的
-export function getActBrief_UserCreate(id) {
+
+//获取活动列表,用户创建的
+export function getActList_Create(user_id, state) {
     return request({
-        url: '/api/activity/getUserCreateActBrief/' + id.toString(),
+        url: '/api/activity/getAllCreate',
         method: 'get',
-        params: {}
+        params: {
+            user_id: user_id,
+            state: state
+        }
     })
 }
 
@@ -28,10 +36,35 @@ export function getActBrief_Test(id) {
     })
 }
 
-//根据活动id，获取活动详细内容
-export function getActDetail(activity_id,user_id) {
+//获取用户 报名的所有活动
+export function getActList_Apply(user_id, state) {
     return request({
-        url: '/api/activity/getActDetail/' + activity_id.toString()+'/'+user_id.toString(),
+        url: '/api/activity/getAllApply',
+        method: 'get',
+        params: {
+            user_id: user_id,
+            state: state
+        }
+    })
+}
+
+//获取用户 参与的所有活动
+export function getActList_Participate(user_id, state) {
+    return request({
+        url: '/api/activity/getAllParticipate',
+        method: 'get',
+        params: {
+            user_id: user_id,
+            state: state
+        }
+    })
+}
+
+
+//根据活动id，获取活动详细内容
+export function getActDetail(activity_id, user_id) {
+    return request({
+        url: '/api/activity/getActDetail/' + activity_id.toString() + '/' + user_id.toString(),
         method: 'get',
 
     })
@@ -151,7 +184,7 @@ export function deleteActivity(user_id, activity_id) {
         url: '/api/activity/deleteAct',
         method: 'delete',
         params: {
-            user_id: user_id,   
+            user_id: user_id,
             activity_id: activity_id
         },
         headers: {
@@ -160,3 +193,16 @@ export function deleteActivity(user_id, activity_id) {
     })
 }
 
+
+
+
+//获取参与某活动的所有用户列表
+export function getActApplicantList(activity_id) {
+    return request({
+        url: '/api/activity/getActApplicantList',
+        method: 'get',
+        params: {
+            activity_id: activity_id
+        },
+    })
+}

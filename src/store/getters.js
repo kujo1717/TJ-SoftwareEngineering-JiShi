@@ -5,6 +5,7 @@ const getters = {
   avatar: state => state.user.avatar,
   name: state => state.user.name,
   age:state=>state.user.age,
-  introduce:state=>state.user.introduce
+  introduce:state=>state.user.introduce,
+  id:state=>1145
 }
 export default getters

@@ -370,6 +370,8 @@ export default {
                   capacity: this.newact_form.capacity,
                   current_people: 1,
                   state: 0,
+                  participant_num:1,
+                  applicant_num:0,
 
                   //前端repeat_interval undefined，后端null空，返回实体不含前端repeat_interval
                   repeat_interval: this.newact_form.repeat

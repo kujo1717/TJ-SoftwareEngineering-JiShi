@@ -41,67 +41,62 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from "vuex";
 
 export default {
-  name: 'Dashboard',
+  name: "Dashboard",
   computed: {
-    ...mapGetters([
-      'name'
-    ]),
-    welcome:function(){
-      var time=new Date().getHours();
-      if(time>=6 && time<12)
-        return "早上好"
-      else if(time>=12 && time<17)
-        return "下午好"
-      else
-        return "晚上好"
+    ...mapGetters(["name"]),
+    welcome: function () {
+      var time = new Date().getHours();
+      if (time >= 6 && time < 12) return "早上好";
+      else if (time >= 12 && time < 17) return "下午好";
+      else return "晚上好";
     },
-    date:function(){
+    date: function () {
       return new Date().toLocaleDateString();
-    }
+    },
   },
   methods: {
-    userForm(){
-      console.log(1)
-      this.$router.push({ path: this.redirect || '/user/index' })
-      this.loading = false
-    }
+    userForm() {
+      console.log(1);
+      this.$router.push({ path: this.redirect || "/user/index" });
+      this.loading = false;
+    },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
 .dashboard {
-  
   &-container {
     margin: 30px;
     display: flex;
     flex-direction: row;
-    flex-wrap:wrap
+    flex-wrap: wrap;
   }
   &-text {
     font-size: 30px;
     line-height: 46px;
   }
-  &-box{
-    border-style:groove;
+  &-box {
+    border-style: groove;
     height: auto;
     margin-top: 20px;
     padding: 20px;
   }
-  &-boxinsidehor{
+  &-boxinsidehor {
     display: flex;
     justify-content: space-around;
     flex-direction: row;
   }
-  &-boxinsidever{
-    margin-top:50px;
-    font-size:20px;font-weight: bold;
+  &-boxinsidever {
+    margin-top: 50px;
+    font-size: 20px;
+    font-weight: bold;
     display: flex;
     flex-direction: column;
-    justify-content:space-around;
+    justify-content: space-around;
   }
 }
 </style>
