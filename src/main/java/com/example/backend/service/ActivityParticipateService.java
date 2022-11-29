@@ -5,6 +5,7 @@ import com.example.backend.entity.ActivityParticipate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: 杨严
@@ -37,4 +38,7 @@ public interface ActivityParticipateService {
 
     /**获取用户的所有参与*/
 //    List<Activity> getUserParticipateList(Long creator_id);
+
+    /**获取活动的所有参与者的用户列表信息*/
+    List<Map<String,Object>> SelectActApplicantList(Long activity_id);
 }

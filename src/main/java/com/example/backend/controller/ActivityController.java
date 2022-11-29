@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.Tools.DateTimeUtil;
 import com.example.backend.common.Result;
 import com.example.backend.dto.ActivityUserRole;
 import com.example.backend.dto.ActivityBriefDto;
@@ -20,10 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -330,13 +328,38 @@ public class ActivityController {
             @RequestParam("activity_id") Long activity_id) {
 //        System.out.println("activity_id"+activity_id);
         try {
+            //修改活动状态
             Integer res = activityService.SetActivityState(activity_id, 1);
+            //取所有报名者
+            List<ActivityApply> applyList=activityApplyService.GetAllApplicantList(activity_id);
+            //取得活动信息
+            Activity activity=activityService.getAct(activity_id);
+            Integer capacity=activity.getCapacity();
+            Integer participatant_num=activity.getParticipant_num();
+            //按时间排序，最早在前
+            List<ActivityApply> applyList_sort=applyList.stream().sorted
+                    (Comparator.comparingLong(a -> a.getApply_time().getTime())).collect(Collectors.toList());
+//            System.out.println("applyList_sort:"+applyList_sort.toString());
+
+            //删除所有报名人
+            activityApplyService.DeleteAct(activity_id);
+            //按剩余空位，报名人依次进入参与名单
+            for (int i=0;i<capacity-participatant_num;i++){
+                ActivityParticipate participate=new ActivityParticipate();
+                participate.setActivity_id(activity_id);
+                participate.setUser_id(applyList_sort.get(i).getUser_id());
+                activityParticipateService.AddParticipant(participate);
+            }
+
+
             return Result.success("creatorStopApply SUCCESS");
         } catch (Exception e) {
             return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "creatorStopApply FAILED");
 
         }
     }
+
+
 
     /**
      * 活动创建人，活动结束，即进行中-》活动结束
@@ -393,6 +416,25 @@ public class ActivityController {
     }
 
     /**
+     * 获取参与某活动的所有用户列表
+     */
+    @ApiOperation("获取参与某活动的所有用户列表")
+    @GetMapping("/getActApplicantList")
+    public Result<List<Map<String,Object>>>GetActApplicantList(
+            @ApiParam(name = "activity_id", value = "活动id", required = true)
+            @RequestParam("activity_id") Long activity_id) {
+        try {
+            List<Map<String,Object>> list=new ArrayList<>();
+            list=activityParticipateService.SelectActApplicantList(activity_id);
+            return Result.success(list);
+        } catch (Exception e) {
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "GetActApplicantList FAILED");
+        }
+    }
+
+
+
+    /**
      * 创建人删除活动
      * 同时删除其他所有表的相关记录
      * */
@@ -410,7 +452,8 @@ public class ActivityController {
         try{
             /**删除活动本身*/
            delete_act=activityService.DeleteAct(activity_id);
-           if (delete_act==0){
+           System.out.println("delete_act:"+delete_act);
+           if (delete_act==1){
                /**act本体删除成功，删除相关的表记录*/
                activityApplyService.DeleteAct(activity_id);
                activityParticipateService.DeleteAct(activity_id);

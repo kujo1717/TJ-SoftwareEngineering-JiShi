@@ -77,10 +77,18 @@ public class ActivityApplyServiceImpl implements ActivityApplyService {
 
     @Override
     public Integer DeleteAct(Long activity_id) {
-        Integer delete_num=activityApplyMapper.deleteById(activity_id);
+        Integer delete_num= 0;
+        delete_num=activityApplyMapper.DeleteAct(activity_id);
+        System.out.println("DeleteAct"+delete_num);
         return delete_num;
     }
 
 
-
+    @Override
+    public List<ActivityApply> GetAllApplicantList(Long activity_id) {
+        QueryWrapper<ActivityApply> queryWrapper=new QueryWrapper<>();
+        queryWrapper.eq("activity_id",activity_id);
+        List<ActivityApply> list=activityApplyMapper.selectList(queryWrapper);
+        return list;
+    }
 }

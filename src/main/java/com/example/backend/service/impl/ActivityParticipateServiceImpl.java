@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serial;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,7 +54,15 @@ public class ActivityParticipateServiceImpl implements ActivityParticipateServic
 
     @Override
     public Integer DeleteAct(Long activity_id) {
-        Integer delete_num=activityParticipateMapper.deleteById(activity_id);
+        Integer delete_num= 0;
+        delete_num=activityParticipateMapper.DeleteAct(activity_id);;
         return delete_num;
+    }
+
+    @Override
+    public List<Map<String, Object>> SelectActApplicantList(Long activity_id) {
+        List<Map<String,Object>> list=new ArrayList<>();
+        list=activityParticipateMapper.SelectActApplicantList(activity_id);
+        return list;
     }
 }

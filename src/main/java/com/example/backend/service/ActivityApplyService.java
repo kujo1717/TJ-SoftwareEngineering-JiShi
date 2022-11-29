@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: 杨严
@@ -27,11 +28,16 @@ public interface ActivityApplyService {
     /**活动有多少人报名*/
     Integer CountApplicantNum(Long activity_id);
 
+    /**获取活动的所有报名用户,列表*/
+    List<ActivityApply> GetAllApplicantList(Long activity_id);
+
+
+
     /**删除某活动的所有记录**/
     Integer DeleteAct(Long activity_id);
 
 
-    /**获取活用户的所有报名*/
+    /**获取用户的所有报名*/
 //    List<Activity> getUserApplyList(Long creator_id);
 
 

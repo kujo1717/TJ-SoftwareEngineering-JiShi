@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 29/11/2022 15:40:33
+ Date: 29/11/2022 20:53:50
 */
 
 SET NAMES utf8mb4;
@@ -46,17 +46,7 @@ CREATE TABLE `activity`  (
 -- ----------------------------
 -- Records of activity
 -- ----------------------------
-INSERT INTO `activity` VALUES (1, '1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL);
-INSERT INTO `activity` VALUES (2, '2', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL);
-INSERT INTO `activity` VALUES (3, '3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL);
-INSERT INTO `activity` VALUES (4, '4', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL);
-INSERT INTO `activity` VALUES (5, '5', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL);
-INSERT INTO `activity` VALUES (6, '6', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL);
-INSERT INTO `activity` VALUES (7, '7', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL);
-INSERT INTO `activity` VALUES (8, '8', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL);
-INSERT INTO `activity` VALUES (11, '1145创建的11', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1145, 1, NULL, NULL);
-INSERT INTO `activity` VALUES (22, '1145创建的22', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1145, 0, NULL, NULL);
-INSERT INTO `activity` VALUES (33, '1145创建的33', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1145, 0, NULL, NULL);
+INSERT INTO `activity` VALUES (1597567450432405506, '6 create', '6 create', '6 create', '2022-11-17 00:00:00', NULL, '2022-11-29 20:25:36', '6 create', NULL, 0, 1, 2, 1, NULL, 6, 2, NULL, 0);
 
 -- ----------------------------
 -- Table structure for activity_apply
@@ -72,8 +62,6 @@ CREATE TABLE `activity_apply`  (
 -- ----------------------------
 -- Records of activity_apply
 -- ----------------------------
-INSERT INTO `activity_apply` VALUES (5, 1145, NULL);
-INSERT INTO `activity_apply` VALUES (6, 1145, NULL);
 
 -- ----------------------------
 -- Table structure for activity_invite
@@ -107,8 +95,8 @@ CREATE TABLE `activity_mark`  (
 -- ----------------------------
 -- Records of activity_mark
 -- ----------------------------
-INSERT INTO `activity_mark` VALUES (1597045861131485185, 1596863166690742274, 1145, 4, '2022-11-28 09:52:59');
-INSERT INTO `activity_mark` VALUES (1597485730190397442, 11, 1145, 3, '2022-11-29 15:00:52');
+INSERT INTO `activity_mark` VALUES (1597568588397412354, 1597567450432405506, 6, 4, '2022-11-29 20:30:07');
+INSERT INTO `activity_mark` VALUES (1597568605615030273, 1597567450432405506, 1146, 2, '2022-11-29 20:30:11');
 
 -- ----------------------------
 -- Table structure for activity_participate
@@ -116,19 +104,16 @@ INSERT INTO `activity_mark` VALUES (1597485730190397442, 11, 1145, 3, '2022-11-2
 DROP TABLE IF EXISTS `activity_participate`;
 CREATE TABLE `activity_participate`  (
   `activity_id` bigint(0) NOT NULL,
-  `user_id` bigint(0) NULL DEFAULT NULL,
-  PRIMARY KEY (`activity_id`) USING BTREE
+  `user_id` bigint(0) NOT NULL,
+  PRIMARY KEY (`activity_id`, `user_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of activity_participate
 -- ----------------------------
-INSERT INTO `activity_participate` VALUES (1, 1145);
-INSERT INTO `activity_participate` VALUES (2, 1145);
-INSERT INTO `activity_participate` VALUES (3, 1145);
-INSERT INTO `activity_participate` VALUES (11, 1145);
-INSERT INTO `activity_participate` VALUES (22, 1145);
-INSERT INTO `activity_participate` VALUES (33, 1145);
+INSERT INTO `activity_participate` VALUES (1597566700876726274, 1145);
+INSERT INTO `activity_participate` VALUES (1597567450432405506, 6);
+INSERT INTO `activity_participate` VALUES (1597567450432405506, 1146);
 
 -- ----------------------------
 -- Table structure for activity_tag
@@ -208,6 +193,10 @@ CREATE TABLE `user`  (
 -- Records of user
 -- ----------------------------
 INSERT INTO `user` VALUES (6, 'yy', 'yy657826', '657826973@qq.com', NULL, NULL, 'http://localhost:8081/api/static/th.jpg');
+INSERT INTO `user` VALUES (111, '111N', '111', '111', NULL, NULL, 'http://localhost:8081/api/static/th.jpg');
+INSERT INTO `user` VALUES (222, '222N', '222', '222', NULL, NULL, 'http://localhost:8081/api/static/th.jpg');
+INSERT INTO `user` VALUES (1145, '1145N', '1145', '1145', NULL, NULL, 'http://localhost:8081/api/static/th.jpg');
+INSERT INTO `user` VALUES (1146, 'yy2', 'yy657826', 'm13958790203@163.com', NULL, NULL, 'http://localhost:8081/api/static/th.jpg');
 
 -- ----------------------------
 -- Table structure for user_mark
