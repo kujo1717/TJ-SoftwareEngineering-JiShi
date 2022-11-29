@@ -1,0 +1,18 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /api
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+#    url: jdbc:mysql://42.192.45.95:3306/jishi
+    url: jdbc:mysql://localhost:3306/jishi?serverTimezone=UTC
+    username: root
+    password: 825430Li..
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    驼峰命名问题
+    map-underscore-to-camel-case: false
