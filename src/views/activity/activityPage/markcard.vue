@@ -34,7 +34,7 @@ export default {
      * 用户个人信息
      */
     user_id: {
-      type: Number,
+      type: String,
       required: true,
       default: () => {
         return -1;

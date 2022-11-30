@@ -221,7 +221,7 @@
       <el-button @click="getPoll">查看本活动投票</el-button>
       <el-card>
         <div v-for="(poll,index) in Polls" :key="index">
-          <vue-poll :key="index" v-bind="poll.options" @addvote="addVote" />
+          <vue-poll :key="index" v-bind="poll.option" @addvote="addVote" />
           <span>
             <el-button type="primary" @click="confirmVote">确认</el-button>
             <el-button @click="cancelVote">取消</el-button>
@@ -254,14 +254,14 @@
           </el-date-picker>
         </el-form-item>
         <el-row>
-          <el-form-item :label="'选项' + (option_i + 1)" v-for="(option, option_i) in newVoteFrom.options" :key="option_i" :prop="'options.' + option_i + '.option'" :rules="[
+          <el-form-item :label="'选项' + (option_i + 1)" v-for="(option, option_i) in newVoteFrom.option" :key="option_i" :prop="'option.' + option_i + '.option'" :rules="[
               {
                 required: true,
                 message: '请输入选项内容',
                 trigger: 'blur',
               },
             ]">
-            <el-input v-model="newVoteFrom.options[option_i].option" :placeholder="'请输入选项' + (option_i + 1)" clearable :style="{ width: '80%' }">
+            <el-input v-model="newVoteFrom.option[option_i].option" :placeholder="'请输入选项' + (option_i + 1)" clearable :style="{ width: '80%' }">
             </el-input>
 
             <el-popconfirm title="这是一段内容确定删除吗？" @onConfirm="createVote_removeOption(option_i)">
@@ -489,8 +489,8 @@ export default {
       /* 新建投票的表单 */
       newVoteFrom: {
         topic_text: undefined,
-        deadline_time: null,
-        options: [{ option: '' }, { option: '' }],
+        deadline: null,
+        option: [{ option: '' }, { option: '' }],
         multiple_choice: 1,
         activity_id: this.activity_id
       },
@@ -647,13 +647,13 @@ export default {
                   votes: ele.vote_num
                 })
               })
-              const options = []
-              options.push({ question: ele.topic_text, answers: answers })
+              const option = []
+              option.push({ question: ele.topic_text, answers: answers })
               polls.push({
                 poll_id: ele.poll_id,
                 deadline: ele.deadline,
                 multiple_choice: ele.multiple_choice,
-                options: options,
+                option: option,
                 activity_id: this.activity_id_test
               })
             })
@@ -742,11 +742,11 @@ export default {
     },
     // 新增选项
     createVote_addOption() {
-      this.newVoteFrom.options.push({ option: '' })
+      this.newVoteFrom.option.push({ option: '' })
     },
     // 删除选项
     createVote_removeOption(option_i) {
-      this.newVoteFrom.options.splice(option_i, 1)
+      this.newVoteFrom.option.splice(option_i, 1)
     },
 
     // 确认新建投票
@@ -755,7 +755,7 @@ export default {
       // 创建新的投票
       this.newVoteFrom.activity_id = this.activity_id_test
       const post_data = this.newVoteFrom
-      console.log(post_data)
+      console.log("post_data:",post_data)
       postPoll(post_data)
         .then((res) => {
           console.log('postPoll:res:', res),
@@ -1493,13 +1493,13 @@ export default {
       get: function () {
         return this.$store.getters.id;
       },
-      set: function (newVal) {},
+
     },
     user_name: {
       get: function () {
         return this.$store.getters.name;
       },
-      set: function (newVal) {},
+
     },
   },
   mounted() {
