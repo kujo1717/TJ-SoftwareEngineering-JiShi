@@ -36,19 +36,23 @@ public class PollController {
   @PostMapping("/postPoll")
   public Result<String> insertOneNewPoll(@RequestBody Map<String,Object> pollWithOption)
   {
+    try {
+      DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+      String topic_text = JSON.toJSONString(pollWithOption.get("topic_text"));
 
-    DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    String topic_text = JSON.toJSONString(pollWithOption.get("topic_text"));
-
-    Long activity_id = Long.parseLong(JSON.toJSONString(pollWithOption.get("activity_id")));
-    boolean multiple_choice=Boolean.parseBoolean(JSON.toJSONString(pollWithOption.get("multiple_choice")));
-    List<options> voteoptions = JSON.parseArray(JSON.toJSONString(pollWithOption.get("option")), options.class);
-    LocalDateTime deadline=LocalDateTime.now();
-    if(JSON.toJSONString(pollWithOption.get("deadline")).length()>2) {
-      deadline = LocalDateTime.parse(JSON.toJSONString(pollWithOption.get("deadline")),df);
+      Long activity_id = Long.parseLong(JSON.toJSONString(pollWithOption.get("activity_id")));
+      boolean multiple_choice = Boolean.parseBoolean(JSON.toJSONString(pollWithOption.get("multiple_choice")));
+      List<options> voteoptions = JSON.parseArray(JSON.toJSONString(pollWithOption.get("option")), options.class);
+      LocalDateTime deadline = LocalDateTime.now();
+      if (JSON.toJSONString(pollWithOption.get("deadline")).length() > 2) {
+        deadline = LocalDateTime.parse(JSON.toJSONString(pollWithOption.get("deadline")), df);
+      }
+      Long poll_id = pollService.createPoll(activity_id, topic_text, deadline, multiple_choice);
+      return voteOptionService.createVoteOptions(voteoptions, poll_id);
     }
-    Long poll_id=pollService.createPoll(activity_id,topic_text,deadline,multiple_choice);
-    return voteOptionService.createVoteOptions(voteoptions,poll_id);
+    catch(Exception e){
+      return Result.fail(10001,"验证失败");
+    }
   }
 
   @ApiOperation("获取投票")

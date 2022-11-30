@@ -21,15 +21,19 @@ public class PollServiceImpl implements PollService {
   @Transactional
   public Long createPoll(Long activity_id, String topic_text, LocalDateTime deadline, boolean multiple_choice) {
     Poll poll=new Poll();
-    poll.setActivity_id(activity_id);
-    poll.setDeadline( deadline);
-    poll.setMultiple_choice(multiple_choice);
-    poll.setTopic_text(topic_text);
-    int newID=pollMapper.insert(poll);
-    if(newID == Integer.MIN_VALUE + 1001) {
+    try{poll.setActivity_id(activity_id);
+      poll.setDeadline( deadline);
+      poll.setMultiple_choice(multiple_choice);
+      poll.setTopic_text(topic_text);
+      int newID=pollMapper.insert(poll);
+      if(newID == Integer.MIN_VALUE + 1001) {
+        return Long.valueOf(0);
+      }
+      return Long.valueOf(poll.getPoll_id());
+    }
+    catch(Exception e){
       return Long.valueOf(0);
     }
-    return Long.valueOf(newID);
   }
   public List<Poll> findPoll(Long activity_id){
 

@@ -28,11 +28,8 @@ public class VoteOptionsImpl implements VoteOptionService{
     return list;
   }
   public int UpdateVotes(Long option_id){
-    UpdateWrapper<VoteOption> updateWrapper = new UpdateWrapper<>();
-    VoteOption voteOption = new VoteOption();
-    voteOption.setOption_id(option_id);
-    updateWrapper.setSql("vote_num = vote_num +1");
-    voteOptionMapper.update(voteOption,updateWrapper);
+    VoteOption voteOption =  voteOptionMapper.selectById(option_id);
+    voteOptionMapper.updateById(voteOption);
     return 1;
   }
   public Result<String> createVoteOptions(List<options> voteOptions,Long poll_id){

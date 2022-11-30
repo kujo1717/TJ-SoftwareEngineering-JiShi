@@ -62,6 +62,12 @@ public class ActivityController {
     }
 
 
+    @ApiOperation("获取所有活动")
+    @GetMapping("/HelloWorld")
+    public Result<String> HelloWorld() {
+        return Result.success("hello world!");
+    }
+
     @ApiOperation("获取用户的所有报名的活动")
         @GetMapping("/getAllApply")
     public Result<List<Map<String,Object>>> getActList_UserAllApply(

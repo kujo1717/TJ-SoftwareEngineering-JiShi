@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 29/11/2022 20:53:50
+ Date: 30/11/2022 20:15:37
 */
 
 SET NAMES utf8mb4;
@@ -40,13 +40,16 @@ CREATE TABLE `activity`  (
   `state` tinyint(0) NULL DEFAULT 0,
   `mark` int(0) NULL DEFAULT NULL,
   `applicant_num` int(0) NULL DEFAULT NULL,
+  `address_id` bigint(0) NULL DEFAULT NULL,
   PRIMARY KEY (`activity_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of activity
 -- ----------------------------
-INSERT INTO `activity` VALUES (1597567450432405506, '6 create', '6 create', '6 create', '2022-11-17 00:00:00', NULL, '2022-11-29 20:25:36', '6 create', NULL, 0, 1, 2, 1, NULL, 6, 2, NULL, 0);
+INSERT INTO `activity` VALUES (1597567450432405506, '6 create', '6 create', '6 create', '2022-11-17 00:00:00', NULL, '2022-11-29 20:25:36', '6 create', NULL, 0, 1, 2, 1, NULL, 6, 2, NULL, 0, NULL);
+INSERT INTO `activity` VALUES (1597817835638226946, '地图测试', '地图测试', '地图测试', '2022-11-17 00:00:00', NULL, '2022-11-30 13:00:32', '上海市静安区南京西路街道南京西路1204号', NULL, 0, 1, 2, 1, NULL, 6, 0, NULL, 0, NULL);
+INSERT INTO `activity` VALUES (1597921460213526529, '12312', NULL, '1231', '2022-11-17 00:00:00', NULL, '2022-11-30 19:52:18', '1231', NULL, 0, 1, 2, 1, NULL, 6, 0, NULL, 0, NULL);
 
 -- ----------------------------
 -- Table structure for activity_apply
@@ -97,6 +100,8 @@ CREATE TABLE `activity_mark`  (
 -- ----------------------------
 INSERT INTO `activity_mark` VALUES (1597568588397412354, 1597567450432405506, 6, 4, '2022-11-29 20:30:07');
 INSERT INTO `activity_mark` VALUES (1597568605615030273, 1597567450432405506, 1146, 2, '2022-11-29 20:30:11');
+INSERT INTO `activity_mark` VALUES (1597907267590660098, 1597906550960267266, 1146, 4, '2022-11-30 18:55:54');
+INSERT INTO `activity_mark` VALUES (1597907363573112833, 1597906550960267266, 6, 3, '2022-11-30 18:56:17');
 
 -- ----------------------------
 -- Table structure for activity_participate
@@ -114,6 +119,8 @@ CREATE TABLE `activity_participate`  (
 INSERT INTO `activity_participate` VALUES (1597566700876726274, 1145);
 INSERT INTO `activity_participate` VALUES (1597567450432405506, 6);
 INSERT INTO `activity_participate` VALUES (1597567450432405506, 1146);
+INSERT INTO `activity_participate` VALUES (1597817835638226946, 6);
+INSERT INTO `activity_participate` VALUES (1597921460213526529, 6);
 
 -- ----------------------------
 -- Table structure for activity_tag
@@ -141,6 +148,27 @@ CREATE TABLE `activity_work`  (
 
 -- ----------------------------
 -- Records of activity_work
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for address
+-- ----------------------------
+DROP TABLE IF EXISTS `address`;
+CREATE TABLE `address`  (
+  `address_id` bigint(20) UNSIGNED ZEROFILL NOT NULL,
+  `address_formatted` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `address_name` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `longitude` double NULL DEFAULT NULL,
+  `latitude` double NULL DEFAULT NULL,
+  `province` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `district` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `township` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `street` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  PRIMARY KEY (`address_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of address
 -- ----------------------------
 
 -- ----------------------------
@@ -187,7 +215,7 @@ CREATE TABLE `user`  (
   `introduce` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   `avatar` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'http://localhost:8081/api/static/th.jpg' COMMENT '头像',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1146 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user
@@ -224,7 +252,7 @@ CREATE TABLE `vote_option`  (
   `option_id` bigint(0) NOT NULL,
   `option_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `poll_id` bigint(0) NULL DEFAULT NULL,
-  `num` int(0) NULL DEFAULT NULL,
+  `vote_num` int(0) NULL DEFAULT NULL,
   PRIMARY KEY (`option_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
