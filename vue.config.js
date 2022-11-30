@@ -15,6 +15,8 @@ const name = defaultSettings.title || 'vue Admin Template' // page title
 // port = 9528 npm run dev OR npm run dev --port = 9528
 const port = process.env.port || process.env.npm_config_port || 9528 // dev port
 
+var webpack = require('webpack')
+
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
   /**
@@ -36,7 +38,19 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    before: require('./mock/mock-server.js')
+    //跨域配置
+    proxy: {
+      "/api": {
+        target: "http://localhost:8081/", // 目标代理接口地址
+        secure: false,
+        changeOrigin: true, // 开启代理，在本地创建一个虚拟服务端
+        //ws: true, // 是否启用websockets
+        pathRewrite: {
+          "^/api": '/api'
+        }
+      }
+    },
+    //before: require('./mock/mock-server.js')
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
@@ -46,7 +60,13 @@ module.exports = {
       alias: {
         '@': resolve('src')
       }
-    }
+    },
+    plugins: [
+      new webpack.ProvidePlugin({
+          $: "jquery",
+          jQuery: "jquery",
+      })
+  ]
   },
   chainWebpack(config) {
     // it can improve the speed of the first screen, it is recommended to turn on preload
