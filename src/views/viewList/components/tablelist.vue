@@ -1,9 +1,19 @@
 <template>
   <div class="viewList_view">
+    <!--事项详情组件-->
+    <TaskBox
+      :taskBoxDialogVisible="taskBoxDialogVisible"
+      :taskId="chosen_taskId"
+      :key="new Date().toString()"
+      @resetDialogVisible="resetDialogVisible()"
+    />
+
     <!-- 顶部工具栏 -->
     <div class="drop_down_box">
       <div class="left_box">
-        <!-- 左边的下拉框，可快捷筛选，即为表格的筛选器赋值 -->
+        <!--导出按钮-->
+        <ExportButton :taskList="contents_data" />
+        <!-- 左边的下拉框，可快捷筛选，即为表格的筛选器赋值
         <el-select
           @change="TopSelectValChange"
           v-model="select_allTasks_Option"
@@ -16,23 +26,52 @@
             :value="item.value"
           >
           </el-option>
-        </el-select>
+        </el-select> -->
+        <!--复选框-->
+        <el-checkbox
+          label="未开始"
+          v-model="bool_showNoStart"
+          @change="postKeyAndFetch()"
+        ></el-checkbox>
+        <el-checkbox
+          label="已完成"
+          v-model="bool_showFinished"
+          @change="postKeyAndFetch()"
+        ></el-checkbox>
+        <el-checkbox
+          label="进行中"
+          v-model="bool_showDoing"
+          @change="postKeyAndFetch()"
+        ></el-checkbox>
+        <el-checkbox
+          label="延期中"
+          v-model="bool_showDelaying"
+          @change="postKeyAndFetch()"
+        ></el-checkbox>
+        <el-checkbox
+          label="延期完成"
+          v-model="bool_showDelayedFinished"
+          @change="postKeyAndFetch()"
+        ></el-checkbox>
+
       </div>
       <div class="right_box">
+        <!--搜索框-->
         <div class="search_allTasks">
           <el-autocomplete
             class="inline-input"
             v-model="searchText"
             style="width: 300px; float: right"
+            size="mini"
             :fetch-suggestions="SearchTaskByKeyWord"
             placeholder="请输入事项关键词"
             @select="SelectTaskSearchSuggestion"
           ></el-autocomplete>
         </div>
         <!-- 表头设置 -->
-        <el-card
+        <div
           shadow="hover"
-          style="display: flex; justify-content: center; align-items: center"
+          style="display: flex;"
           body-style="padding:0;margin:0 .3em 0 .3em;"
           class="arrange_head"
         >
@@ -46,7 +85,10 @@
           >
             <!-- 可拖拽内容 -->
             <div class="headset_list">
-              <draggable v-model="HeadSetData" filter=".undraggable">
+              <draggable
+                v-model="HeadSetData"
+                filter=".undraggable"
+              >
                 <transition-group>
                   <div
                     v-for="element in HeadSetData"
@@ -65,24 +107,37 @@
                       @click.native.prevent="
                         (event) => HeadSetClickRadio(event, element)
                       "
-                      ><span> </span
-                    ></el-radio>
+                    ><span> </span></el-radio>
                   </div>
                 </transition-group>
               </draggable>
             </div>
             <!-- poper的底部按钮 -->
-            <div style="" class="buttom_buttons">
-              <el-button size="mini" type="text" @click="HeadSetPopCancel">
+            <div
+              style=""
+              class="buttom_buttons"
+            >
+              <el-button
+                size="mini"
+                type="text"
+                @click="HeadSetPopCancel"
+              >
                 取消
               </el-button>
-              <el-button type="primary" size="mini" @click="HeadSetPopConfirm">
+              <el-button
+                type="primary"
+                size="mini"
+                @click="HeadSetPopConfirm"
+              >
                 确定
               </el-button>
             </div>
-            <span slot="reference">表头设置</span>
+            <el-button
+              slot="reference"
+              size="mini"
+            >表头设置</el-button>
           </el-popover>
-        </el-card>
+        </div>
       </div>
     </div>
 
@@ -104,8 +159,8 @@
         lazy
         :load="getTaskChildrenByID"
         :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
-        row-key="id"
       >
+        <!-- row-key="taskId" -->
         <!-- 列排序，每次表头顺序修改都重新渲染 -->
         <span
           v-for="(head_item, head_index) in head_data_common"
@@ -128,97 +183,45 @@
               <!-- isDone的勾选 -->
               <el-radio
                 class="isDone_radio"
-                v-model="props.row.isDone"
+                v-model="props.row.isdone"
                 :label="true"
                 @click.native.prevent="onTaskDoneRadioChange(props.row)"
-                ><span></span>
+              ><span></span>
               </el-radio>
 
               <span>{{ props.row.name }}</span>
             </template>
           </el-table-column>
 
-          <!-- 事项时间Col,task_time -->
+          <!-- 事项开始时间Col,startTime -->
           <el-table-column
-            :label="head_data_common_dict['task_time'].label"
+            :label="head_data_common_dict['startTime'].label"
             class-name="task_time_col"
-            :width="head_data_common_dict['task_time'].width"
+            :width="head_data_common_dict['startTime'].width"
             v-if="
-              head_item.key == 'task_time' &&
-              head_data_common_dict['task_time'].isShow
+              head_item.key == 'startTime' &&
+              head_data_common_dict['startTime'].isShow
             "
-            :key="head_data_common_dict['task_time'].prio"
+            :key="head_data_common_dict['startTime'].prio"
           >
             <template slot-scope="props">
-              <el-dialog
-                :title="props.row.rowIndex + '行 事项的日期和时间选择器'"
-                v-if="
-                  props.row.rowIndex === cellSgRowIndex &&
-                  'task_time_col' == cellSgColClass
-                "
-                :before-close="HandleCloseTaskTimeDialog"
-                :visible.sync="TaskTimePickerBlur"
-                :modal="false"
-                custom-class="el_dialog"
-              >
-                <!-- 月日的选择器 -->
+              <span>{{ props.row.startTime }}</span>
+            </template>
+          </el-table-column>
 
-                <el-date-picker
-                  class="TaskDatePicker"
-                  v-model="props.row.task_time.date"
-                  type="daterange"
-                  align="right"
-                  unlink-panels
-                  range-separator="至"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  @change="(val) => HandleTaskTimeDateChange(val, props.row)"
-                  :picker-options="TaskTimeDatePickerOptions"
-                >
-                </el-date-picker>
-
-                <span class="TaskTimePickers">
-                  <!-- 时间的选择器,分为开始和结束2个 -->
-                  <el-time-picker
-                    v-model="props.row.task_time.time.start"
-                    format="HH:mm"
-                    placeholder="添加起始时间"
-                    :picker-options="{}"
-                    @change="
-                      (val) => HandleTaskTimeStartTimeChange(val, props.row)
-                    "
-                    class="TaskTimePicker"
-                  >
-                  </el-time-picker>
-
-                  <el-time-picker
-                    v-model="props.row.task_time.time.end"
-                    format="HH:mm"
-                    placeholder="添加结束时间"
-                    :picker-options="{
-                      selectableRange: `${
-                        props.row.task_time.time.start
-                          ? props.row.task_time.time.start + ':00'
-                          : '00:00:00'
-                      }-23:59:00`,
-                    }"
-                    @change="
-                      (val) => HandleTaskTimeEndTimeChange(val, props.row)
-                    "
-                    class="TaskTimePicker"
-                  >
-                  </el-time-picker>
-                </span>
-              </el-dialog>
-              <span>
-                <span>{{
-                  FormatTaskTime_Date(props.row.task_time_label)
-                }}</span>
-                <br />
-                <span>{{
-                  FormatTaskTime_Time(props.row.task_time_label)
-                }}</span>
-              </span>
+          <!-- 事项完成时间Col,endTime -->
+          <el-table-column
+            :label="head_data_common_dict['endTime'].label"
+            class-name="taskDoneTime_col"
+            :width="head_data_common_dict['endTime'].width"
+            v-if="
+              head_item.key == 'endTime' &&
+              head_data_common_dict['endTime'].isShow
+            "
+            :key="head_data_common_dict['endTime'].prio"
+          >
+            <template slot-scope="props">
+              <span>{{ props.row.endTime }}</span>
             </template>
           </el-table-column>
 
@@ -237,7 +240,35 @@
             </template>
           </el-table-column>
 
+          <!-- 分组Col,group -->
+          <el-table-column
+            :label="head_data_common_dict['tag'].label"
+            class-name="tag_col"
+            :width="head_data_common_dict['tag'].width"
+            v-if="
+              head_item.key == 'tag' && head_data_common_dict['tag'].isShow
+            "
+            :key="head_data_common_dict['tag'].prio"
+          >
+            <template slot-scope="props">
+              <span>{{ props.row.tag }}</span>
+            </template>
+          </el-table-column>
 
+          <!-- 优先级Col,priority -->
+          <el-table-column
+            :label="head_data_common_dict['priority'].label"
+            class-name="priority_col"
+            :width="head_data_common_dict['priority'].width"
+            v-if="
+              head_item.key == 'priority' && head_data_common_dict['priority'].isShow
+            "
+            :key="head_data_common_dict['priority'].prio"
+          >
+            <template slot-scope="props">
+              <span>{{ props.row.priority }}</span>
+            </template>
+          </el-table-column>
 
           <!-- 事项状态Col,state_label -->
           <el-table-column
@@ -265,127 +296,86 @@
             </template>
           </el-table-column>
 
-
-
-          <!-- 总结Col,conclusion -->
+          <!-- 我的完成时间Col,realFinishTime -->
           <el-table-column
-            :label="head_data_common_dict['conclusion'].label"
-            class-name="conclusion_col"
-            :width="head_data_common_dict['conclusion'].width"
-            v-if="
-              head_item.key == 'conclusion' &&
-              head_data_common_dict['conclusion'].isShow
-            "
-            :key="head_data_common_dict['conclusion'].prio"
-          >
-            <template slot-scope="props">
-              <span>{{ props.row.conclusion }}</span>
-            </template>
-          </el-table-column>
-
-          <!-- 日程隐藏Col,hidden -->
-          <el-table-column
-            :label="head_data_common_dict['hidden'].label"
-            class-name="hidden_col"
-            :width="head_data_common_dict['hidden'].width"
-            v-if="
-              head_item.key == 'hidden' &&
-              head_data_common_dict['hidden'].isShow
-            "
-            :key="head_data_common_dict['hidden'].prio"
-          >
-            <template slot-scope="props">
-              <span>
-                <el-switch v-model="props.row['hidden']"> </el-switch>
-                <span>{{ props.row["hidden"] ? "显示" : "隐藏" }}</span>
-              </span>
-            </template>
-          </el-table-column>
-
-          <!-- 事项完成时间Col,taskDoneTime -->
-          <el-table-column
-            :label="head_data_common_dict['taskDoneTime'].label"
-            class-name="taskDoneTime_col"
-            :width="head_data_common_dict['taskDoneTime'].width"
-            v-if="
-              head_item.key == 'taskDoneTime' &&
-              head_data_common_dict['taskDoneTime'].isShow
-            "
-            :key="head_data_common_dict['taskDoneTime'].prio"
-          >
-            <template slot-scope="props">
-              <span>{{ props.row.taskDoneTime }}</span>
-            </template>
-          </el-table-column>
-
-          <!-- 我的完成时间Col,taskDoneMyTime -->
-          <el-table-column
-            :label="head_data_common_dict['taskDoneMyTime'].label"
+            :label="head_data_common_dict['realFinishTime'].label"
             class-name="taskDoneMyTime_col"
-            :width="head_data_common_dict['taskDoneMyTime'].width"
+            :width="head_data_common_dict['realFinishTime'].width"
             v-if="
-              head_item.key == 'taskDoneMyTime' &&
-              head_data_common_dict['taskDoneMyTime'].isShow
+              head_item.key == 'realFinishTime' &&
+              head_data_common_dict['realFinishTime'].isShow
             "
-            :key="head_data_common_dict['taskDoneMyTime'].prio"
+            :key="head_data_common_dict['realFinishTime'].prio"
           >
             <template slot-scope="props">
-              <span>{{ props.row.taskDoneMyTime }}</span>
+              <span>{{ props.row.realFinishTime }}</span>
             </template>
           </el-table-column>
 
-
-
-          <!-- 完成情况Col,taskAchievement -->
+          <!-- 查看详情 -->
           <el-table-column
-            :label="head_data_common_dict['taskAchievement'].label"
-            class-name="taskAchievement_col"
-            :width="head_data_common_dict['taskAchievement'].width"
+            label="操作"
+            class-name="taskDoneMyTime_col"
+            :width="head_data_common_dict['operation'].width"
             v-if="
-              head_item.key == 'taskAchievement' &&
-              head_data_common_dict['taskAchievement'].isShow
+              head_item.key == 'operation' &&
+              head_data_common_dict['operation'].isShow
             "
-            :key="head_data_common_dict['taskAchievement'].prio"
           >
             <template slot-scope="props">
-              <span>{{ props.row.taskAchievement }}</span>
+              <el-button
+                @click="handleClickDetail(props.row)"
+                type="text"
+                size="small"
+              >查看</el-button>
             </template>
           </el-table-column>
 
-
-
-          <!-- 更新时间Col,updateTime -->
-          <el-table-column
-            :label="head_data_common_dict['updateTime'].label"
-            class-name="updateTime_col"
-            :width="head_data_common_dict['updateTime'].width"
-            v-if="
-              head_item.key == 'updateTime' &&
-              head_data_common_dict['updateTime'].isShow
-            "
-            :key="head_data_common_dict['updateTime'].prio"
-          >
-            <template slot-scope="props">
-              <span>{{ props.row.updateTime }}</span>
-            </template>
-          </el-table-column>
         </span>
       </el-table>
     </div>
+
+    
   </div>
 </template>
 
 <script>
+import { getAllTaskAndRelative, patchOneTask } from '@/api/task.js'
+import TaskBox from '@/components/TaskBox'
+import ExportButton from './ExportButton'
 import draggable from "vuedraggable";
 export default {
   name: "tablelist",
-  components: {  draggable },
-  data() {
+  components: { draggable, TaskBox, ExportButton },
+  data () {
     return {
+      userId: 1,
+      taskBoxDialogVisible: false,
+      chosen_taskObj: {},
+      chosen_taskId: 0,
+      backendData: [],
+      commonTaskList: [],
+
+      
+
+      //复选框筛选
+      bool_showNoStart: true,
+      bool_showFinished: true,
+      bool_showDoing: true,
+      bool_showDelaying: true,
+      bool_showDelayedFinished: true,
+
+      //excel的数据
+      filename: '',
+      autoWidth: true,
+      bookType: 'xlsx',
+      
+
       /**
        * 表格数据
        */
       contents_data: [],
+      init_data: [],
 
       //表格真正使用的表头数据
       head_data_common: [
@@ -397,13 +387,21 @@ export default {
           label: "名称",
           prio: 0,
         },
-        //事项时间
+        //事项开始时间
         {
-          key: "task_time",
+          key: "startTime",
           width: "150rem",
           isShow: true,
-          label: "事项时间",
+          label: "事项开始时间",
           prio: 1,
+        },
+        //事项结束时间
+        {
+          key: "endTime",
+          width: "150rem",
+          isShow: true,
+          label: "事项结束时间",
+          prio: 9,
         },
         //分组
         {
@@ -412,6 +410,22 @@ export default {
           isShow: true,
           label: "分组",
           prio: 2,
+        },
+        //标签
+        {
+          key: "tag",
+          width: "150rem",
+          isShow: true,
+          label: "标签",
+          prio: 20,
+        },
+        //优先级
+        {
+          key: "priority",
+          width: "150rem",
+          isShow: true,
+          label: "优先级",
+          prio: 67,
         },
 
         //事项状态
@@ -423,56 +437,24 @@ export default {
           prio: 4,
         },
 
-        //总结
-        {
-          key: "conclusion",
-          width: "300rem",
-          isShow: true,
-          label: "总结",
-          prio: 6,
-        },
-
-        //日程隐藏
-        {
-          key: "hidden",
-          width: "120rem",
-          isShow: true,
-          label: "日程隐藏",
-          prio: 8,
-        },
-        //事项完成时间
-        {
-          key: "taskDoneTime",
-          width: "150rem",
-          isShow: true,
-          label: "事项完成时间",
-          prio: 9,
-        },
         //我的完成时间
         {
-          key: "taskDoneMyTime",
+          key: "realFinishTime",
           width: "150rem",
           isShow: true,
           label: "我的完成时间",
           prio: 10,
         },
-        //完成情况
+
+        //我的完成时间
         {
-          key: "taskAchievement",
+          key: "operation",
           width: "150rem",
           isShow: true,
-          label: "完成情况",
-          prio: 12,
+          label: "操作",
+          prio: 10,
         },
 
-        //更新时间
-        {
-          key: "updateTime",
-          width: "150rem",
-          isShow: true,
-          label: "更新时间",
-          prio: 14,
-        },
       ],
 
       /**
@@ -510,21 +492,21 @@ export default {
        */
       ShowHeadSet: false,
       HeadSetData: [
-        //名称
-        // {
-        //   key: "name",
-        //   width: "200rem",
-        //   isShow: true,
-        //   label: "名称",
-        //   prio: 0,
-        // },
-        //事项时间
+        //事项开始时间
         {
-          key: "task_time",
+          key: "startTime",
           width: "150rem",
           isShow: true,
           label: "事项时间",
           prio: 1,
+        },
+        //事项结束时间
+        {
+          key: "endTime",
+          width: "150rem",
+          isShow: true,
+          label: "事项结束时间",
+          prio: 9,
         },
         //分组
         {
@@ -533,6 +515,22 @@ export default {
           isShow: true,
           label: "分组",
           prio: 2,
+        },
+        //标签
+        {
+          key: "tag",
+          width: "150rem",
+          isShow: true,
+          label: "标签",
+          prio: 20,
+        },
+        //优先级 
+        {
+          key: "priority",
+          width: "150rem",
+          isShow: true,
+          label: "优先级",
+          prio: 67,
         },
 
         //事项状态
@@ -544,56 +542,25 @@ export default {
           prio: 4,
         },
 
-        //总结
-        {
-          key: "conclusion",
-          width: "300rem",
-          isShow: true,
-          label: "总结",
-          prio: 6,
-        },
-        //日程隐藏
-        {
-          key: "hidden",
-          width: "120rem",
-          isShow: true,
-          label: "日程隐藏",
-          prio: 8,
-        },
-        //事项完成时间
-        {
-          key: "taskDoneTime",
-          width: "150rem",
-          isShow: true,
-          label: "事项完成时间",
-          prio: 9,
-        },
         //我的完成时间
         {
-          key: "taskDoneMyTime",
+          key: "realFinishTime",
           width: "150rem",
           isShow: true,
           label: "我的完成时间",
           prio: 10,
         },
 
-        //完成情况
+        //操作
         {
-          key: "taskAchievement",
+          key: "operation",
           width: "150rem",
           isShow: true,
-          label: "完成情况",
-          prio: 12,
+          label: "操作",
+          prio: 19,
         },
 
-        //更新时间
-        {
-          key: "updateTime",
-          width: "150rem",
-          isShow: true,
-          label: "更新时间",
-          prio: 14,
-        },
+
       ],
       /**
        * 搜索框
@@ -636,7 +603,7 @@ export default {
         shortcuts: [
           {
             text: "最近一周",
-            onClick(picker) {
+            onClick (picker) {
               const start = new Date();
               const end = new Date();
               end.setTime(end.getTime() + 3600 * 1000 * 24 * 7);
@@ -645,7 +612,7 @@ export default {
           },
           {
             text: "最近一个月",
-            onClick(picker) {
+            onClick (picker) {
               const end = new Date();
               const start = new Date();
               end.setTime(end.getTime() + 3600 * 1000 * 24 * 30);
@@ -654,7 +621,7 @@ export default {
           },
           {
             text: "最近三个月",
-            onClick(picker) {
+            onClick (picker) {
               const end = new Date();
               const start = new Date();
               end.setTime(end.getTime() + 3600 * 1000 * 24 * 90);
@@ -671,9 +638,12 @@ export default {
       MyProjects: -1,
       //项目下拉选择器的显示
       ShowProjectSelect: false,
+
+     
+      
     };
   },
-  mounted() {
+  mounted () {
     this.$nextTick(() => {
       //contents data 初始化
       this.SetContentsData();
@@ -691,18 +661,18 @@ export default {
       },
     },
   },
-  destroyed() {
+  destroyed () {
     //监听事件解绑
   },
   methods: {
-    TestClick() {
+    TestClick () {
       console.log(this.HeadSetData);
     },
     /**
      * 单元格
      */
     //表格的单元格,双击
-    cellDbClick(row, column, cell, event) {
+    cellDbClick (row, column, cell, event) {
       // console.group("cellDbClick");
       //点击cell，记录下行列信息
 
@@ -713,7 +683,7 @@ export default {
       // console.groupEnd("cellDbClick");
     },
     //表格的单元格，单击事件
-    cellClick(row, column, cell, event) {
+    cellClick (row, column, cell, event) {
       // console.group("cellClick");
       // console.log(this.cellSgRowIndex);
       // console.log(this.cellSgColClass);
@@ -733,7 +703,7 @@ export default {
     },
 
     //根据每行的childrenNum，返回对应的class
-    GetRowClass(props) {
+    GetRowClass (props) {
       //为每行更新rowIndex
       props.row.rowIndex = props.rowIndex;
       switch (props.row.childrenNum) {
@@ -755,7 +725,7 @@ export default {
 
     //顶部左边的下拉框,值改变时
     //根据下拉框的值，给my筛选器重新赋值
-    async TopSelectValChange(val) {
+    async TopSelectValChange (val) {
       /**
        * 事项状态的filter取值范围
        *    { text: '已完成', value: '0' },
@@ -794,13 +764,13 @@ export default {
      * 表头设置
      */
     //表头设置的click,弃用
-    ClickHeadSet() {
+    ClickHeadSet () {
       this.ShowHeadSet = !this.ShowHeadSet;
       // console.log("ClickHeadSet");
     },
 
     //表头设置pop的关闭事件,包括了所有的情况
-    HeadSetAfterLeave() {
+    HeadSetAfterLeave () {
       // console.log("HeadSetAfterLeave");
 
       //HeadSet检查是否相较于head_data_common变化了
@@ -854,16 +824,16 @@ export default {
       console.log("this.head_data_common", this.head_data_common);
     },
     //表头设置pop的按钮取消
-    HeadSetPopCancel() {
+    HeadSetPopCancel () {
       this.ShowHeadSet = false;
     },
     //表头设置pop的按钮确认
-    HeadSetPopConfirm() {
+    HeadSetPopConfirm () {
       this.ShowHeadSet = false;
     },
 
     //表头元素isShow的勾选
-    HeadSetClickRadio(event, element) {
+    HeadSetClickRadio (event, element) {
       element.isShow = !element.isShow;
       // console.log("this.head_data_common", this.head_data_common);
       // this.$forceUpdate();
@@ -873,7 +843,7 @@ export default {
      * filter筛选
      */
 
-    async MyFilterInit() {
+    async MyFilterInit () {
       //是否需要重新初始化，
       //点击表头cell，获取表头filter元素，获取拥有filter元素的列
       if (this.HeadCellNeddClick) {
@@ -903,7 +873,7 @@ export default {
     //后面需要获取filter cell元素，并且按下它们的confirm按钮即可筛选
     //达到的效果：不用点击表头筛选器也能筛选
     //场景：顶部工具栏，左侧下拉框可快捷筛选，单点下拉框后即可进行筛选
-    async UseMyFilterConfig() {
+    async UseMyFilterConfig () {
       return new Promise((resolve, reject) => {
         //赋值state
         // console.group("UseMyFilterConfig");
@@ -921,7 +891,7 @@ export default {
     },
 
     //点击表头单元格，使得filter元素出现
-    async ClickTableHead() {
+    async ClickTableHead () {
       return new Promise((resolve, reject) => {
         //点击表头的cell，对应的filter才会出现
         let headersHTML = document.getElementsByClassName(
@@ -939,7 +909,7 @@ export default {
       });
     },
     //获取拥有filter的列
-    GetAllFilterColRefs() {
+    GetAllFilterColRefs () {
       //事项状态列
       let state_;
       state_ = this.$refs.state_col_ref;
@@ -954,7 +924,7 @@ export default {
     },
 
     //获取所有filter cell元素，只是为了按click启动筛选
-    async GetAllFilterCell() {
+    async GetAllFilterCell () {
       return new Promise((resolve, reject) => {
         let filters_cell = document.getElementsByClassName("el-table-filter");
         let cellButtons = [];
@@ -994,7 +964,7 @@ export default {
       });
     },
     //按下所有filter cell元素的确定按钮
-    ConfirmFilterCell() {
+    ConfirmFilterCell () {
       // console.log("AllFilterCellsButtons", this.AllFilterCellsButtons);
       this.AllFilterCellsButtons.forEach((ele) => {
         ele.confirm.click();
@@ -1005,7 +975,7 @@ export default {
 
     //事项状态 state的真正filter
     //state按照这个模式来过滤
-    StateFilterHandler(value, row, column) {
+    StateFilterHandler (value, row, column) {
       /**
        *    { text: '已完成', value: '0' },
             { text: '进行中', value: '1' },
@@ -1016,172 +986,215 @@ export default {
 
       return row.state_val == value;
     },
+    //根据后端priority获取优先级的文字
+    getPriorityTitle (priorityId) {
+      switch (priorityId) { case 0: return '无优先级'; case 1: return '低优先级'; case 2: return '中优先级'; case 3: return '高优先级'; }
+    },
+
+    /**
+     * 后端状态转前端状态
+     */
+    getFrontendState (backendState, startTime, endTime) {
+      console.log(new Date(), endTime, startTime)
+      if (backendState == 1)
+        return '已完成';
+      else if (backendState == 2)
+        return '延期完成';
+
+      else {
+        if (new Date() > Date.parse(endTime))
+          return '延期中';
+        else if (new Date() < Date.parse(startTime))
+          return '未开始';
+        else
+          return '进行中';
+      }
+    },
+    //子组件的emit
+    resetDialogVisible () {
+      this.taskBoxDialogVisible = false;
+      this.getFrontendDataByBackendData();
+    },
+    /**
+     * 后端数据转前端数据
+     */
+    getFrontendDataByBackendData (backendData) {
+      let frontendData = [];
+
+      backendData.forEach((value) => {
+        //获取孩子数据
+        let childrenList = []
+
+        if (value.relativeTask != null) {
+          value.relativeTask.forEach((val) => {
+
+            childrenList.push({
+              taskId: val.taskId,
+              name: val.taskTitle,
+              startTime: val.startTime,
+              endTime: val.endTime,
+              group: val.classificationTitle,
+              tag: val.tag,
+              priority: val.priority,
+              state_val: this.getFrontendState(val.taskState),
+              state_label: "",
+              isdone: this.getFrontendState(val.taskState).indexOf("完成") >= 0 ? true : false,
+              childrenNum: 0,
+              showChildren: false,
+            })
+          })
+
+        }
+
+        //获取这个事项的数据
+        frontendData.push({
+          taskId: value.taskId,
+          name: value.taskTitle,
+          startTime: this.GMTToStr(value.startTime),
+          endTime: this.GMTToStr(value.endTime),
+          group: value.classificationTitle,
+          priority: this.getPriorityTitle(value.priority),
+          state_val: this.getFrontendState(value.taskState, value.startTime, value.endTime),
+          state_label: "",
+          isdone: this.getFrontendState(value.taskState).indexOf("完成") >= 0 ? true : false,
+          realFinishTime: this.GMTToStr(value.realFinishTime),
+          childrenNum: value.relativeTask == null ? 0 : value.relativeTask.length,
+          showChildren: false,
+          children: childrenList
+        })
+      })
+
+      this.init_data = frontendData;
+      return frontendData;
+    },
+    //格林威治时间转标准时间戳
+    GMTToStr (time) {
+      if (time == null)
+        return null;
+      let date = new Date(time)
+      let Str = date.getFullYear() + '-' +
+        (date.getMonth() + 1) + '-' +
+        date.getDate() + ' ' +
+        date.getHours() + ':' +
+        date.getMinutes() + ':' +
+        date.getSeconds()
+      return Str
+    },
+
 
     /**
      *
      * 数据初始化与获取
      */
     //表格数据contents data初始化
-    SetContentsData() {
-      this.contents_data = [
-        {
-          id: "t1l1",
-          name: "名称1",
-          task_time: {
-            date: "",
-            time: {
-              start: "",
-              end: "",
-            },
-          },
-          task_time_label: {
-            start_date: { year: "", month: "", day: "" },
-            end_date: { year: "", month: "", day: "" },
-            start_time: { hour: "", minute: "" },
-            end_time: { hour: "", minute: "" },
-          },
-          group: "分组1",
+    SetContentsData () {
+      let backendData = []
+      //从后端获取事项列表
+      getAllTaskAndRelative(this.userId)
+        .then((res) => {
+          console.log("成功获取该用户的后端事项！", res);
+          backendData = res.data;
+          this.backendData = res.data;
+          this.contents_data = this.getFrontendDataByBackendData(this.backendData);
+          this.commonTaskList = this.getcommonTaskList();
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+    },
+    postKeyAndFetch () {
+      console.log("调用postKeyAndFetch！")
+      let new_contents_data = []
+      for (let item of this.init_data) {
+        if (!this.bool_showNoStart && item.state_val == "未开始")
+          continue;
+        if (!this.bool_showDoing && item.state_val == "进行中")
+          continue;
+        if (!this.bool_showFinished && item.state_val == "已完成")
+          continue;
+        if (!this.bool_showDelaying && item.state_val == "延期中")
+          continue;
+        if (!this.bool_showDelayedFinished && item.state_val == "延期完成")
+          continue;
 
-          conclusion: "总结1",
-          state_val: 0,
-          state_label: "",
-          isDone: false,
-          childrenNum: 1,
-          showChildren: false,
-          hidden: true,
-          children: [
-            {
-              id: "t11l2",
-              name: "名称12",
-              task_time: {
-                date: "",
-                time: {
-                  start: "",
-                  end: "",
-                },
-              },
-              task_time_label: {
-                start_date: { year: "", month: "", day: "" },
-                end_date: { year: "", month: "", day: "" },
-                start_time: { hour: "", minute: "" },
-                end_time: { hour: "", minute: "" },
-              },
-              group: "分组1",
-
-              conclusion: "总结1",
-              state_val: 1,
-              state_label: "",
-              isDone: false,
-              childrenNum: 3,
-              showChildren: false,
-              hidden: false,
-              children: null,
-            },
-          ],
-        },
-        {
-          id: "t1l2",
-          name: "名称2",
-          task_time: {
-            date: "",
-            time: {
-              start: "",
-              end: "",
-            },
-          },
-          task_time_label: {
-            start_date: { year: "", month: "", day: "" },
-            end_date: { year: "", month: "", day: "" },
-            start_time: { hour: "", minute: "" },
-            end_time: { hour: "", minute: "" },
-          },
-          group: "分组1",
-
-          conclusion: "总结1",
-          state_val: 1,
-          state_label: "",
-          isDone: false,
-          childrenNum: 3,
-          showChildren: false,
-          hidden: false,
-          children: null,
-        },
-        {
-          id: "t1l3",
-          name: "名称3",
-          task_time: {
-            date: "",
-            time: {
-              start: "",
-              end: "",
-            },
-          },
-          task_time_label: {
-            start_date: { year: "", month: "", day: "" },
-            end_date: { year: "", month: "", day: "" },
-            start_time: { hour: "", minute: "" },
-            end_time: { hour: "", minute: "" },
-          },
-          group: "分组1",
-
-          conclusion: "总结1",
-          state_val: 2,
-          state_label: "",
-          isDone: false,
-          childrenNum: 1,
-          showChildren: false,
-          hidden: false,
-          children: null,
-        },
-        {
-          id: "t1l4",
-          name: "名称4",
-          task_time: {
-            date: "",
-            time: {
-              start: "",
-              end: "",
-            },
-          },
-          task_time_label: {
-            start_date: { year: "", month: "", day: "" },
-            end_date: { year: "", month: "", day: "" },
-            start_time: { hour: "", minute: "" },
-            end_time: { hour: "", minute: "" },
-          },
-          group: "分组1",
-
-          conclusion: "总结1",
-          state_val: 3,
-          state_label: "",
-          isDone: false,
-          childrenNum: 4,
-          showChildren: false,
-          hidden: false,
-          children: null,
-        },
-      ];
+        //没被筛选框筛掉，才放入新的列表中
+        new_contents_data.push(item);
+      }
+      this.contents_data = new_contents_data;
     },
 
     // 请求某id事项的children事项，
-    getTaskChildrenByID(tree, treeNode, resolve) {
+    getTaskChildrenByID (tree, treeNode, resolve) {
       //向后端请求 该id事项的的children
       console.log("tree", tree);
       console.log("treeNode", treeNode);
     },
 
     /**
-     * 事项名字
+     * 改变勾选框勾选状态
      */
-    onTaskDoneRadioChange(model) {
-      model.isDone = !model.isDone;
+    onTaskDoneRadioChange (model) {
+      model.isdone = !model.isdone;
+
+      let _currentBackendState = 0;
+      if (model.isdone == true) {
+        if (new Date() > new Date(model.endTime) && model.endTime != null && model.endTime != "无")
+          _currentBackendState = 2;
+        else
+          _currentBackendState = 1;
+      }
+
+      let backendData = {
+        taskId: model.taskId,
+        taskState: _currentBackendState
+      }
+      //向后端patch
+      patchOneTask(backendData)
+        .then((res) => {
+          console.log(res);
+
+          //改变前端页面
+          //通过isdone来获取state
+          if (model.isdone) {
+            if (new Date() > new Date(model.endTime) && model.endTime != null && model.endTime != "无") {
+              model.state_val = '延期完成';
+              this.$message({
+                message: "延期完成了一个事项，记得下次要准时完成！",
+                type: "warning",
+              });
+            }
+            else {
+              model.state_val = '已完成';
+              this.$message({
+                message: "恭喜你，按时完成了一个事项！请再接再厉！",
+                type: "success",
+              });
+            }
+          }
+          else {
+            if (new Date() > new Date(model.endTime) && model.endTime != null && model.endTime != "无")
+              model.state_val = '延期中';
+            else if (new Date < new Date(model.startTime) && model.startTime != null && model.startTime != "无")
+              model.state_val = '未开始';
+            else
+              model.state_val = '进行中';
+            this.$message({
+              message: "取消事项完成",
+              type: "info",
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+
     },
     /***
      *
      * 事项时间
      */
     //dialog关闭前事件
-    HandleCloseTaskTimeDialog(done) {
+    HandleCloseTaskTimeDialog (done) {
       done();
       this.TaskTimePickerBlur = false;
       this.cellSgColClass = "";
@@ -1189,7 +1202,7 @@ export default {
     },
     //date picker;
     //值改变时,更新task_time_label
-    HandleTaskTimeDateChange(val, model) {
+    HandleTaskTimeDateChange (val, model) {
       model.task_time_label.start_date = {
         year: val[0].getFullYear(),
         month: val[0].getMonth() + 1,
@@ -1203,7 +1216,7 @@ export default {
     },
     //time picker,start time
     //值改变时,更新task_time_label
-    HandleTaskTimeStartTimeChange(val, model) {
+    HandleTaskTimeStartTimeChange (val, model) {
       model.task_time_label.start_time = {
         hour: val.getHours(),
         minute: val.getMinutes(),
@@ -1211,7 +1224,7 @@ export default {
     },
     //time picker,end time
     //值改变时,更新task_time_label
-    HandleTaskTimeEndTimeChange(val, model) {
+    HandleTaskTimeEndTimeChange (val, model) {
       model.task_time_label.end_time = {
         hour: val.getHours(),
         minute: val.getMinutes(),
@@ -1219,7 +1232,7 @@ export default {
       // console.log(model.task_time_label.end_time);
     },
     //事项时间，返回task_time的 月日 的打印字符串
-    FormatTaskTime_Date(model) {
+    FormatTaskTime_Date (model) {
       const m = model;
       let str = "";
       str = `开始:${m.start_date.year}年${m.start_date.month}月${m.start_date.day}日`;
@@ -1230,7 +1243,7 @@ export default {
     },
 
     //事项时间，返回task_time的 时分 的打印字符串
-    FormatTaskTime_Time(model) {
+    FormatTaskTime_Time (model) {
       const m = model;
       let str = "";
       str += `${m.start_time.hour}:${m.start_time.minute}`;
@@ -1245,39 +1258,25 @@ export default {
      */
     //根据事项的状态值state_val，返回对应的type类型
     //同时为每一行的state_label赋值
-    StateTagName(state_val, model) {
+    StateTagName (state_val, model) {
       //tag的类型
       let tag_name;
       switch (state_val) {
-        case 0:
+        case '进行中':
           tag_name = "success";
           break;
-        case 1:
+        case '未开始':
           tag_name = "";
           break;
-        case 2:
+        case '延期中':
           tag_name = "danger";
           break;
-        case 3:
+        case '延期完成':
           tag_name = "warning";
           break;
       }
       //state_label赋值
-      let label;
-      switch (model.state_val) {
-        case 0:
-          label = "已完成";
-          break;
-        case 1:
-          label = "进行中";
-          break;
-        case 2:
-          label = "延期中";
-          break;
-        case 3:
-          label = "延期完成";
-          break;
-      }
+      let label = model.state_val;
       model.state_label = label;
       return tag_name;
     },
@@ -1286,7 +1285,7 @@ export default {
      * 项目
      */
     //项目,返回用户的所有项目简洁数据
-    GetMyProjects() {
+    GetMyProjects () {
       //没有缓存，请求获取
       if (this.MyProjects == -1) {
         let projects = [];
@@ -1294,15 +1293,15 @@ export default {
           projects = [
             {
               name: "项目" + i.toString() + ".1",
-              id: "项目" + i.toString() + ".1-ID",
+              taskId: "项目" + i.toString() + ".1-ID",
             },
             {
               name: "项目" + i.toString() + ".2",
-              id: "项目" + i.toString() + ".2-ID",
+              taskId: "项目" + i.toString() + ".2-ID",
             },
             {
               name: "项目" + i.toString() + ".3",
-              id: "项目" + i.toString() + ".3-ID",
+              taskId: "项目" + i.toString() + ".3-ID",
             },
           ];
         });
@@ -1313,13 +1312,13 @@ export default {
       return this.MyProjects;
     },
     //项目，project;下拉选择器 值变化时
-    HandleProjectChange(prop) {
+    HandleProjectChange (prop) {
       // console.log(prop);
       // //回显后选择强制刷新
       this.$forceUpdate();
     },
     //项目，下拉选择器，判断能否取这个值
-    DisbledProjectSelectOption() {},
+    DisbledProjectSelectOption () { },
 
 
     /**
@@ -1327,19 +1326,82 @@ export default {
      */
     //api
     //根据关键词，搜索匹配的事项
-    SearchTaskByKeyWord(queryString, cb) {
+    SearchTaskByKeyWord (queryString, cb) {
       let results = this.contents_data.map((ele) => {
         return {
           value: ele.name,
-          id: ele.id,
+          taskId: ele.taskId,
         };
       });
       cb(results);
     },
     //点击搜索返回的建议
-    SelectTaskSearchSuggestion(item) {
-      console.log("搜索框点击task,",item);
+    SelectTaskSearchSuggestion (item) {
+      console.log("搜索框点击task,", item);
     },
+    //点击“查看详情”按钮
+    handleClickDetail (row) {
+      this.chosen_taskId = row.taskId;
+      this.taskBoxDialogVisible = true;
+    },
+    getcommonTaskList () {
+      let taskList = []
+      let backendDataList = this.backendData;
+      if (backendDataList == null)
+        return;
+      backendDataList.forEach((value) => {
+        if (value.isInDustbin == '0' || value.isInDustbin == null) {
+          //获取taskState
+          let _taskState = this.getFrontendState(value.taskState, value.startTime, value.endTime);
+
+          //获取isdone
+          let _isdone = _taskState.indexOf("完成") >= 0 ? true : false;
+
+          //获取priority
+          let _priority = '';
+          switch (value.priority) {
+            case 0:
+              _priority = "无优先级";
+              break;
+            case 1:
+              _priority = "低优先级";
+              break;
+            case 2:
+              _priority = "中优先级";
+              break;
+            case 3:
+              _priority = "高优先级";
+              break;
+          }
+
+          let item = {
+            id: value.taskId,
+            taskTitle: value.taskTitle,
+            taskDetail: value.taskDetail,
+            isdone: _isdone,
+            taskState: _taskState,
+            classification: value.classificationTitle,
+            priority: _priority,
+            timeRange: [value.startTime, value.endTime],
+            familyPosition: value.isParent == 1 ? 'parent' : 'child',
+            familyMembers: value.relativeTask,
+            isInDustbin: value.isInDusbin
+          }
+
+          console.log(item)
+          taskList.push(item);
+
+        }//end of if
+
+        this.commonTaskList = taskList;
+        return taskList;
+      })//end of then
+      return taskList;
+    },//end of method 
+
+
+
+   
   },
   computed: {
     //方便直接获取head_data_common的值

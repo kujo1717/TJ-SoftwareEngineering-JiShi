@@ -9,23 +9,7 @@ taskBoxDialogVisible: bool 控制对话框显示
 taskId: Long 事项id
 */
 <template>
-  <div>
-    <!--创建子事项的对话框-->
-    <CreateTaskBox
-      :createTaskBoxDialogVisible="createTaskBoxDialogVisible"
-      :timeRange="taskInfo.timeRange"
-      :parentTaskId="taskInfo.id"
-      :key="new Date().toString()"
-      @resetDialogVisible="resetDialogVisible()"
-    />
-    <!--子事项-->
-    <!--要加递归终止条件-->
-    <SonTaskBox
-      :taskBoxDialogVisible="sonTaskBoxDialogVisible"
-      :taskId="chosen_taskId"
-      :key="(new Date()+1).toString()"
-      @resetDialogVisible="resetDialogVisible()"
-    />
+  <div style="scale:0.8">
     <!--对话框-->
     <el-dialog
       :visible.sync="dialogVisible"
@@ -111,7 +95,7 @@ taskId: Long 事项id
                   </el-option>
                 </el-select>
               </el-form-item>
-              
+
               <!--标签-->
               <el-form-item class="formItem">
                 <i class="el-icon-price-tag"></i>个性化标签：
@@ -182,96 +166,9 @@ taskId: Long 事项id
                   </el-date-picker>
                 </span>
               </el-form-item>
-
-              <el-form-item class="formItem">
-                <i class="iconfont icon-org"></i>
-                <span v-if="taskInfo.familyPosition=='child'">父事项：</span>
-
-                <span v-else-if="taskInfo.familyPosition=='parent'">子事项：
-                  <!--添加子事项的按钮-->
-                  <el-button
-                    type="success"
-                    size="mini"
-                    @click="addOneSonTask()"
-                  ><i class="el-icon-circle-plus" /></el-button>
-                </span>
-
-                <!--子事项列表-->
-                <el-table
-                  ref="multipleTable"
-                  :data="taskInfo.familyMembers"
-                  tooltip-effect="dark"
-                  style="width: 100%"
-                >
-                  <el-table-column
-                    type="selection"
-                    width="55"
-                  >
-                    <template slot-scope="props">
-                      <!-- isDone的勾选 -->
-                      <el-radio
-                        class="isDone_radio"
-                        v-model="props.row.isdone"
-                        :label="true"
-                        @click.native.prevent="onTaskDoneRadioChange(props.row)"
-                      ><span></span>
-                      </el-radio>
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    label="名称"
-                    prop="taskTitle"
-                    width="120"
-                  >
-                  </el-table-column>
-                  <el-table-column
-                    label="状态"
-                    prop="taskState"
-                    width="120"
-                  >
-                  </el-table-column>
-                  <el-table-column
-                    label="时间段"
-                    prop="timeRange"
-                    width="420"
-                  >
-                    <template slot-scope="props">
-                      <el-date-picker
-                        v-model="props.row.timeRange"
-                        type="datetimerange"
-                        :picker-options="pickerOptions"
-                        range-separator="至"
-                        start-placeholder="开始日期"
-                        end-placeholder="结束日期"
-                        align="right"
-                        size="mini"
-                      >
-                      </el-date-picker>
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    label="操作"
-                    prop="operation"
-                    width="120"
-                  >
-                    <template slot-scope="props">
-                      <el-button
-                        @click="handleClickDetail(props.row)"
-                        type="text"
-                        size="small"
-                      >查看</el-button>
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </el-form-item>
             </el-form>
 
           </el-aside>
-
-          <!-- main
-          <el-main>
-            这里是团队项目的聊天窗口
-          </el-main> -->
 
         </el-container>
       </el-container>
@@ -285,17 +182,15 @@ taskId: Long 事项id
 import { patchOneTask, getTaskById } from '@/api/task.js'
 import { getAllClassificationTitle } from '@/api/classification.js'
 import CreateTaskBox from '@/components/CreateTaskBox'
-import SonTaskBox from '@/components/SonTaskBox'
-import Axios from "axios";
+// import TaskBox from '@/components/TaskBox'
 export default {
-  name: "TaskBox",
-  components: { CreateTaskBox, SonTaskBox },
+  name: "SonTaskBox",
+  components: { CreateTaskBox, },
   data () {
     return {
       userId: 1,
-      dialogVisible: this.taskBoxDialogVisible,//是否弹出对话框
+      dialogVisible: false,//是否弹出对话框
       createTaskBoxDialogVisible: false,//创建事项组件的显示控制
-      sonTaskBoxDialogVisible: false,//子事项的显示控制
       isEditting: false,//是否正在编辑，用于动态class
       isSaved: true,//标志当前的修改是否已经被保存
       chosen_taskId: 0,
@@ -370,74 +265,37 @@ export default {
       this.isEditting = !this.isEditting;
     },
     //处理isdone勾选框事件
-    onTaskDoneRadioChange (row) {
-      console.log("row", row);
-      //如果是父事项的勾选
-      if (row == null) {
-        this.taskInfo.isdone = !this.taskInfo.isdone;
+    onTaskDoneRadioChange () {
+      this.taskInfo.isdone = !this.taskInfo.isdone;
 
-        //通过isdone来获取state
-        if (this.taskInfo.isdone) {
-          if (new Date() > new Date(this.taskInfo.timeRange[1])) {
-            this.taskInfo.taskState = '延期完成';
-            this.$message({
-              message: "延期完成了一个事项，记得下次要准时完成！",
-              type: "warning",
-            });
-          }
-          else {
-            this.taskInfo.taskState = '已完成';
-            this.$message({
-              message: "恭喜你，按时完成了一个事项！请再接再厉！",
-              type: "success",
-            });
-          }
+      //通过isdone来获取state
+      if (this.taskInfo.isdone) {
+        if (new Date() > new Date(this.taskInfo.timeRange[1])) {
+          this.taskInfo.taskState = '延期完成';
+          this.$message({
+            message: "延期完成了一个事项，记得下次要准时完成！",
+            type: "warning",
+          });
         }
         else {
-          if (new Date() > this.taskInfo.timeRange[1])
-            this.taskInfo.taskState = '延期中';
-          else if (new Date < this.taskInfo.timeRange[0])
-            this.taskInfo.taskState = '未开始';
-          else
-            this.taskInfo.taskState = '进行中';
+          this.taskInfo.taskState = '已完成';
           this.$message({
-            message: "取消事项完成",
-            type: "info",
+            message: "恭喜你，按时完成了一个事项！请再接再厉！",
+            type: "success",
           });
         }
       }
-      //如果是子事项的勾选
       else {
-        row.isdone = !row.isdone;
-
-        if (row.isdone) {
-          if (new Date() > new Date(this.taskInfo.timeRange[1])) {
-            row.taskState = '延期完成';
-            this.$message({
-              message: "延期完成了一个事项，记得下次要准时完成！",
-              type: "warning",
-            });
-          }
-          else {
-            row.taskState = '已完成';
-            this.$message({
-              message: "恭喜你，按时完成了一个事项！请再接再厉！",
-              type: "success",
-            });
-          }
-        }
-        else {
-          if (new Date() > this.taskInfo.timeRange[1])
-            row.taskState = '延期中';
-          else if (new Date < this.taskInfo.timeRange[0])
-            row.taskState = '未开始';
-          else
-            row.taskState = '进行中';
-          this.$message({
-            message: "取消事项完成",
-            type: "info",
-          });
-        }
+        if (new Date() > this.taskInfo.timeRange[1])
+          this.taskInfo.taskState = '延期中';
+        else if (new Date < this.taskInfo.timeRange[0])
+          this.taskInfo.taskState = '未开始';
+        else
+          this.taskInfo.taskState = '进行中';
+        this.$message({
+          message: "取消事项完成",
+          type: "info",
+        });
       }
     },
     //处理优先级下拉框的指令
@@ -446,15 +304,7 @@ export default {
     },
     //确定isdone属性
     setIsdone () {
-      //确定父事项属性
       this.taskInfo.isdone = this.taskInfo.taskState.indexOf("完成") >= 0;
-
-      //确定子事项属性
-      if (this.taskInfo.familyMembers != null) {
-        for (let i = 0; i < this.taskInfo.familyMembers.length; i++) {
-          this.taskInfo.familyMembers[i].isdone = this.taskInfo.familyMembers[i].taskState.indexOf("完成") >= 0;
-        }
-      }
     },
     timeTrans (time, type) {
       let date = new Date(new Date(time).getTime() + 8 * 3600 * 1000)
@@ -477,7 +327,7 @@ export default {
       })
         .then(() => {
           this.taskInfo.isInDustbin = new Date();
-          let backendTaskInfo = this.getBackendTaskInfo(this.taskInfo);
+          let backendTaskInfo = this.getBackendTaskInfo();
           patchOneTask(backendTaskInfo)
             .then((res) => {
               console.log(res);
@@ -506,9 +356,9 @@ export default {
 
 
     },
-    getBackendTaskInfo (taskInfo) {
+    getBackendTaskInfo () {
       let _taskState = 0;
-      switch (taskInfo.taskState) {
+      switch (this.taskInfo.taskState) {
         case '进行中':
           _taskState = 0;
           break;
@@ -524,7 +374,7 @@ export default {
       }
 
       let _priority = 0;
-      switch (taskInfo.priority) {
+      switch (this.taskInfo.priority) {
         case '无优先级':
           _priority = 0;
           break;
@@ -539,19 +389,30 @@ export default {
           break;
       }
       let backendTaskInfo = {
-        taskId: taskInfo.id,
-        taskTitle: taskInfo.taskTitle,
-        taskDetail: taskInfo.taskDetail,
+        taskId: this.taskInfo.id,
+        taskTitle: this.taskInfo.taskTitle,
+        taskDetail: this.taskInfo.taskDetail,
         taskState: _taskState,
-        classificationTitle: taskInfo.classificationTitle,
+        classificationTitle: this.taskInfo.classificationTitle,
         priority: _priority,
-        startTime: taskInfo.timeRange[0],
-        endTime: taskInfo.timeRange[1],
-        isParent: taskInfo.familyPosition == 'parent' ? 1 : 0,
-        isInDustbin: taskInfo.isInDustbin,
+        startTime: this.taskInfo.timeRange[0],
+        endTime: this.taskInfo.timeRange[1],
+        isParent: this.taskInfo.familyPosition == 'parent' ? 1 : 0,
+        isInDustbin: this.taskInfo.isInDustbin,
         relativeTask: []//todo
       }
       return backendTaskInfo;
+    },
+    updateDBTaskInfo () {
+      let backendTaskInfo = this.getBackendTaskInfo();
+
+      patchOneTask(backendTaskInfo)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
     },
     //获取该用户的所有分组名称
     setThisUserAllClassificaitonTitle () {
@@ -572,26 +433,17 @@ export default {
         })
     },
     //保存事项，向后端发patch请求
-    saveTask (msg) {
-      let backendFatherTaskInfo = this.getBackendTaskInfo(this.taskInfo);
-      let requestList = []
-      for (let item of this.taskInfo.familyMembers) {
-        var request = patchOneTask(this.getBackendTaskInfo(item));
-        requestList.push(request);
-      }
-      Axios.all([patchOneTask(backendFatherTaskInfo), ...requestList])
+    saveTask () {
+      let backendTaskInfo = this.getBackendTaskInfo();
+
+      patchOneTask(backendTaskInfo)
         .then((res) => {
-          console.log("saveTask success", res);
+          console.log(res);
           this.$message({
             type: 'success',
             message: '保存事项成功！'
           })
-
           this.isSaved = true;
-
-          //如果是退出组件时的保存事项，要给父组件发消息
-          if (msg == 'exitComponent')
-            this.$emit('resetDialogVisible');
         })
         .catch((err) => {
           console.log(err);
@@ -661,8 +513,10 @@ export default {
     },
     //根据父页面传来的taskId，向后端获取整套数据
     setFrontendTaskObj (taskId) {
+      console.log("向后端请求儿子数据！")
       getTaskById(taskId)
         .then((res) => {
+          console.log("儿子数据的事项获取成功！", res)
           //然后要把后端拉回来的task对象转换成前端要用的对象
           if (res.data != null || res.data != {}) {
 
@@ -705,21 +559,18 @@ export default {
                 timeRange: [value.startTime, value.endTime],
                 familyPosition: value.isParent == 1 ? 'parent' : 'child',
                 familyMembers: value.relativeTask,
-                isInDustbin: value.isInDusbin,
-                tag: value.tag
+                isInDustbin: value.isInDusbin
               }
 
               if (taskInfo.familyMembers != null && taskInfo.familyMembers != []) {
                 //获取familyMembers
                 for (let item of taskInfo.familyMembers) {
-                  item['id'] = item['taskId'];
-                  item['taskTitle'] = item['taskTitle']
-                  item['taskDetail'] = item['taskDetail']
-                  //获取isdone
-                  item['isdone'] = _taskState.indexOf("完成") >= 0 ? true : false;
                   //获取taskState
                   item['taskState'] = this.getFrontendState(item.taskState, item.startTime, item.endTime);
-                  item['classification'] = item['classificationTitle']
+
+                  //获取isdone
+                  item['isdone'] = _taskState.indexOf("完成") >= 0 ? true : false;
+
                   //获取priority
                   switch (item.priority) {
                     case 0:
@@ -738,8 +589,6 @@ export default {
 
                   //获取timeRange
                   item['timeRange'] = [item.startTime, item.endTime];
-                  item['familyPosition'] = 'child';
-                  item['isInDustbin'] = item['isInDustbin']
                 }//end of for
               }
 
@@ -753,17 +602,9 @@ export default {
           console.log(err);
         })
     },
-    //点击“查看详情”按钮
-    handleClickDetail (row) {
-      console.log("查看详情！")
-      this.chosen_taskId = row.taskId;
-      this.sonTaskBoxDialogVisible = true;
-    },
-    resetDialogVisible () {
-      this.sonTaskBoxDialogVisible = false;
-    },
-  },
 
+
+  },
   computed: {
     //计算优先级标签的颜色
     priorityColor () {
@@ -879,7 +720,6 @@ export default {
 
 
   },
-
   watch: {
     taskBoxDialogVisible: {
       handler (newVal) {
@@ -890,7 +730,6 @@ export default {
     },
     taskInfo: {
       handler (newVal) {
-        console.log("检测到事项信息修改！")
         this.isSaved = false;
       },
       deep: true,
@@ -898,17 +737,25 @@ export default {
     },
     dialogVisible: {
       handler (newVal) {
-        console.log("接收到父组件传参：", this.taskId)
+        console.log("接收到爸爸事项传参：", newVal)
+
         //打开页面，向后端请求
         if (newVal == true) {
+
           this.setFrontendTaskObj(this.taskId);
         }
         //如果子组件被关闭了，把dialogVisible=false的值同步给父组件
         if (newVal == false && this.isSaved) {
-          let backendTaskInfo = this.getBackendTaskInfo(this.taskInfo);
+          let backendTaskInfo = this.getBackendTaskInfo();
 
-          //在这个函数里调用了emit
-          this.saveTask('exitComponent');
+          patchOneTask(backendTaskInfo)
+            .then((res) => {
+              console.log(res);
+              this.$emit('resetDialogVisible');
+            })
+            .catch((err) => {
+              console.log(err);
+            })
         }
         else {
           this.$emit('resetDialogVisible');
@@ -917,7 +764,7 @@ export default {
     },
   },
   mounted: function () {
-    console.log("this.taskId", this.taskId)
+    console.log("儿子this.taskId")
     this.setFrontendTaskObj(this.taskId);//接收从父组件传来的事项信息
     this.setThisUserAllClassificaitonTitle();//获取该用户的所有分组名称
 

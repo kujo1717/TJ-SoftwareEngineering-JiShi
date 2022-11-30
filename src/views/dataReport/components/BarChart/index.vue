@@ -45,7 +45,17 @@ export default {
     }
   },
   mounted () {
-    this.initEcharts();
+    this.$nextTick(() => {
+      this.initEcharts();
+    })
+  },
+  watch:{
+    seriesData:{
+      handler(newVal){
+        this.initEcharts();
+      },
+      deep:true
+    }
   },
   methods: {
     initEcharts () {

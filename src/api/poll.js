@@ -13,6 +13,5 @@ export function postPoll(param) {
     url: '/api/poll/postPoll',
     method: 'post',
     data: param,
-
   })
 }

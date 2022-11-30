@@ -88,18 +88,7 @@ export const constantRoutes = [
       }
     ],
   },
-  {
-    path: '/quadrantView',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'quadrantView',
-        component: () => import('@/views/quadrantView/index'),
-        meta: { title: '四象限视图#待合并', icon: 'form' }
-      }
-    ],
-  },
+
   {
     path: '/viewLog',
     component: Layout,
@@ -122,6 +111,18 @@ export const constantRoutes = [
         name: 'DataReport',
         component: () => import('@/views/dataReport/index'),
         meta: { title: '数据分析', icon: 'form' }
+      }
+    ],
+  },
+  {
+    path: '/dustbin',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'Dustbin',
+        component: () => import('@/views/dustbin/index'),
+        meta: { title: '回收站', icon: 'form' }
       }
     ],
   },
@@ -182,7 +183,7 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/projects/project1',
     name: 'Projects',
-    hidden:true,
+    hidden: true,
     meta: {
       title: '项目#待删除',
       icon: 'nested'

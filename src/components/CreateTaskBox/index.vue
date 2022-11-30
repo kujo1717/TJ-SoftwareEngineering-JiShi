@@ -6,8 +6,8 @@
 
 传参说明：
 1.createTaskBoxDialogVisible: bool 控制对话框显示
-2.timeRange: 列表 时间范围
-[Date(), Date()]
+2.timeRange: 列表 时间范围 [Date(), Date()]
+3.parentTaskId: 父事项的id，这样在post的时候会用post子事项的方法
 */
 <template>
   <div>
@@ -122,11 +122,11 @@
       <div class="divToRight">
         <el-button
           type="primary"
-          @click="buttonExit()"
+          @click="buttonCertain()"
         >确认</el-button>
         <el-button
           type="info"
-          @click="buttonExit()"
+          @click="buttonCancel()"
         >取消</el-button>
       </div>
     </el-dialog>
@@ -135,23 +135,17 @@
 
 <script>
 /* eslint-disable */
+import { postOneNewTask, postOneSonTask } from "@/api/task.js"
 export default {
   name: "CreateTaskBox",
   data () {
     return {
       dialogVisible: this.createTaskBoxDialogVisible,
-      // taskInfo: {
-      //   title: "", //事项名称
-      //   detail: "", //事项详述
-      //   classification: "默认分类", //事项分类
-      //   priority: "无优先级", //优先级
-      //   start: this.dateObj.start,
-      //   end: this.dateObj.end,
-      // },
+
       taskInfo: {
+        userId: 1,
         taskTitle: '',
         taskDetail: "",//详情的文字
-        isdone: true,
         classification: '',
         priority: '无优先级',
         timeRange: this.timeRange,
@@ -169,17 +163,17 @@ export default {
         label: '生活'
       }],
       createForm_rules: {
-        title: [
+        taskTitle: [
           { required: true, message: "请输入事项名称", trigger: "blur" },
           { max: 10, message: "事项名称最多不超过10个字符", trigger: "blur" },
         ],
-        detail: [
+        taskDetail: [
           { max: 50, message: "事项详述最多不超过50个字符", trigger: "blur" },
         ],
       },
     };
   },
-  props: ["createTaskBoxDialogVisible", "timeRange"],
+  props: ["createTaskBoxDialogVisible", "timeRange", "parentTaskId"],
   methods: {
     //处理分类的下拉框
     handleClassifyCommand () {
@@ -191,18 +185,117 @@ export default {
       this.taskInfo.priority = command;
     },
 
-    //按钮的退出方法
-    buttonExit () {
-      this.dialogVisible = false;
-
-      //这里要写把新事项往后端存的代码
-      //code here......
-
+    //取消按钮
+    buttonCancel () {
       this.$message({
-        message: "事项创建成功！",
-        type: "success",
+        message: "取消事项创建",
+        type: "info",
       });
+      this.dialogVisible = false;
     },
+    //确认按钮
+    buttonCertain () {
+      //判断是否填写事项标题
+      if (this.taskInfo.taskTitle == '') {
+        this.$message({
+          message: "请填写事项标题！",
+          type: 'warning'
+        })
+        return;
+      }
+
+      let _priority = 0;
+      switch (this.taskInfo.priority) {
+        case '无优先级':
+          _priority = 0;
+          break;
+        case '低优先级':
+          _priority = 1;
+          break;
+        case '中优先级':
+          _priority = 2;
+          break;
+        case '高优先级':
+          _priority = 3;
+          break;
+      }
+
+      //如果是创建父事项
+      if (this.parentTaskId == null) {
+        //这里要写把新事项往后端存的代码
+        //创建后端实体类
+        let backendTaskInfo = {
+          userId: this.taskInfo.userId,
+          taskTitle: this.taskInfo.taskTitle,
+          taskDetail: this.taskInfo.taskDetail,
+          taskState: 0,
+          classificationTitle: this.taskInfo.classification,
+          priority: _priority,
+          startTime: this.taskInfo.timeRange[0],
+          endTime: this.taskInfo.timeRange[1],
+          isParent: 1,
+          //relativeTask: []
+        }
+        console.log("kk",backendTaskInfo)
+
+        //发后端请求
+        postOneNewTask(backendTaskInfo)
+          .then((res) => {
+            console.log(res);
+            this.$message({
+              message: "事项创建成功！",
+              type: "success",
+            });
+            this.dialogVisible = false;
+          })
+          .catch((err) => {
+            console.log(err);
+            this.$message({
+              message: "事项创建失败",
+              type: "danger",
+            });
+            this.dialogVisible = false;
+          })
+      }
+      //如果是创建子事项
+      else {
+        //这里要写把新事项往后端存的代码
+        //创建后端实体类
+        let backendSonTaskObj = {
+          userId: this.taskInfo.userId,
+          taskTitle: this.taskInfo.taskTitle,
+          taskDetail: this.taskInfo.taskDetail,
+          taskState: 0,
+          classificationTitle: this.taskInfo.classification,
+          priority: _priority,
+          startTime: this.taskInfo.timeRange[0],
+          endTime: this.taskInfo.timeRange[1],
+          isParent: 0,
+          relativeTask: []
+        }
+
+        //发后端请求
+        postOneSonTask(this.parentTaskId, backendSonTaskObj)
+          .then((res) => {
+            console.log(res);
+            this.dialogVisible = false;
+          })
+          .catch((err) => {
+            console.log(err);
+            this.dialogVisible = false;
+          })
+      }
+    },
+    // //添加子事项
+    // addOneSonTask (userId, sonTaskObj) {
+    //   postOneSonTask(userId, sonTaskObj)
+    //     .then((res) => {
+    //       console.log(res);
+    //     })
+    //     .catch((err) => {
+    //       console.log(err);
+    //     })
+    // }
   },
   mounted: function () {
     this.dialogVisible = this.createTaskBoxDialogVisible;

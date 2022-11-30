@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import $ from 'jquery'
+
 //kanban组件
 import vueKanban from 'vue-kanban'
 Vue.use(vueKanban)
@@ -81,5 +83,6 @@ new Vue({
   el: '#app',
   router,
   store,
+  $,
   render: h => h(App)
 })
