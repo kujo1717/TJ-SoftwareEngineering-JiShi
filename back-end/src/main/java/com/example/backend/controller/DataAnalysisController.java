@@ -72,10 +72,10 @@ public class DataAnalysisController {
                 }
             }
 
-
+            //当前月的天数
+            int dayNumOfMonth = DateUtil.getDayNumOfMonth(year, month);
             //2：计算一个月内的事项完成情况
             Map<Integer, Integer> oneMonthFinishedNumMap = new HashMap<>();
-            int dayNumOfMonth = DateUtil.getDayNumOfMonth(year, month);
             for(int day=1; day<=dayNumOfMonth; day++)
             {
                 List<Task> oneDayTaskList = taskService.selectOneDayFinishedTaskList(userId, year, month, day);
@@ -83,19 +83,27 @@ public class DataAnalysisController {
                 oneMonthFinishedNumMap.put(day, finishedNumOfOneDay);
             }
 
-            //3：计算几个”率“
+            //3：计算一个月内的事项新建情况
+            Map<Integer, Integer> oneMonthNewCreateNumMap = new HashMap<>();
+            for(int day=1; day<=dayNumOfMonth; day++)
+            {
+                List<Task> oneDayTaskList = taskService.selectOneDayFinishedTaskList(userId, year, month, day);
+                int createdNumOfOneDay = oneDayTaskList.size();
+                oneMonthNewCreateNumMap.put(day, createdNumOfOneDay);
+            }
+
+            //4：计算几个”率“
             float finishRate = calculateFinishRate(taskList);
             float timelyRate = calculateTimelyRate(taskList);
             float delayRate = calculateDelayRate(taskList);
 
-            //4.计算当前月的天数
-            int numOfDays = DateUtil.getDayNumOfMonth(year, month);
 
 
             AnalysisData analysisData = new AnalysisData(finishedStateNum, doingStateNum, delayingStateNum, delayedFinishedStateNum,
                                                         finishRate, timelyRate, delayRate,
                                                         oneMonthFinishedNumMap,
-                                                        numOfDays);
+                                                        oneMonthNewCreateNumMap,
+                                                        dayNumOfMonth);
             return Result.success(analysisData);
         }
         catch(Exception e)

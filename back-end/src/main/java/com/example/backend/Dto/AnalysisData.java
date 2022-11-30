@@ -1,6 +1,7 @@
 package com.example.backend.Dto;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,8 +32,10 @@ public class AnalysisData {
     private float timelyRate;//在已经完成的事项中，按时完成的事项占的比例
     private float delayRate;//在所有事项中，延期完成和延期中的事项占的比例
 
-    //每天的数据
+    //每天完成的数据
     private Map<Integer, Integer> oneMonthFinishedNumMap;
+    //每天新建的数据
+    private Map<Integer, Integer> oneMonthNewCreatedNumMap;
 
     //当前月的天数
     private int daysOfMonth;

@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,8 +46,9 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> findTaskByMonth(Long userId, int year, int month) {
-        List<Task> taskList = taskMapper.selectByMonth(userId, year, month);
+    public List<Task> findTaskByMonth(Long userId, int year, int month) throws ParseException {
+        int daysOfMonth = DateUtil.getDayNumOfMonth(year, month);
+        List<Task> taskList = taskMapper.selectByMonth(userId, year, month, daysOfMonth);
         return taskList;
     }
 
@@ -94,57 +97,54 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Result<List<Task>> findAllTaskAndRelative(Long userId) {
-        try {
-            List<Task> taskList = taskMapper.selectAllTaskAndRelative(userId);
+    public List<Task> findAllTaskAndRelative(Long userId) {
+
+        List<Task> taskList = taskMapper.selectAllTaskAndRelative(userId);
 
 
-            List<Task> taskListResult = new ArrayList<>();
-            List<Long> okIdList = new ArrayList<>();
+        List<Task> taskListResult = new ArrayList<>();
+        List<Long> okIdList = new ArrayList<>();
 
-            Task currentTask = null;
-            for (Task t : taskList) {
-                if (!okIdList.contains(t.getTaskId())) {
-                    if (currentTask != null)
-                        taskListResult.add(currentTask);
-                    currentTask = t;
-                    okIdList.add(t.getTaskId());
-                }
-                //把相同的taskId进行合并，就是合并它们的relativeTask
-                else
-                    currentTask.addOneRelativeTask(t.getRelativeTask().get(0));
+        Task currentTask = null;
+        for (Task t : taskList) {
+            if (!okIdList.contains(t.getTaskId())) {
+                if (currentTask != null)
+                    taskListResult.add(currentTask);
+                currentTask = t;
+                okIdList.add(t.getTaskId());
             }
+            //把相同的taskId进行合并，就是合并它们的relativeTask
+            else if(t.getRelativeTask() != null && t.getRelativeTask().size() != 0)
+                currentTask.addOneRelativeTask(t.getRelativeTask().get(0));
+        }
 
-            if(currentTask.getRelativeTask() != null) {
-                if(currentTask.getRelativeTask().size() != 0) {
-                    //不应该返回已被删除的子事项
-                    for (int i = currentTask.getRelativeTask().size() - 1; i >= 0; i--) {
-                        if (!currentTask.getRelativeTask().get(i).getIsInDustbin().equals("0")) {
-                            currentTask.getRelativeTask().remove(i);
-                        }
+        if (currentTask.getRelativeTask() != null) {
+            if (currentTask.getRelativeTask().size() != 0) {
+                //不应该返回已被删除的子事项
+                for (int i = currentTask.getRelativeTask().size() - 1; i >= 0; i--) {
+                    if (!currentTask.getRelativeTask().get(i).getIsInDustbin().equals("0")) {
+                        currentTask.getRelativeTask().remove(i);
                     }
                 }
             }
+        }
 
-            if (currentTask != null)
-                taskListResult.add(currentTask);
-            return Result.success(taskListResult);
-        }
-        catch (Exception e)
-        {
-            System.out.println(e);
-            return Result.fail(500,"获取用户的所有事项失败！");
-        }
+        if (currentTask != null)
+            taskListResult.add(currentTask);
+        return taskListResult;
+
+
     }
 
     @Override
     public Long insertOneNewTask(Task task) {
         task.setIsInDustbin("0");
+        task.setCreateTime(DateUtil.getCurrentTimestamp());
+        //如果post的事项没有填入分组，则自动归入默认分组
+        if(task.getClassificationTitle() == null)
+            task.setClassificationTitle("默认分组");
         Long newID = Long.valueOf(taskMapper.insert(task));
-//        if(newID == Integer.MIN_VALUE + 1001)
-//            return Result.fail(500,"插入数据失败！");
-//
-//        return Result.success("插入数据成功！");
+
         return newID;
     }
 
@@ -196,6 +196,16 @@ public class TaskServiceImpl implements TaskService {
         return taskList;
     }
 
+    /**
+     * @description:获取一个月内完成的事项列表
+     * @author: hym
+     * @date: 2022/11/30 10:32
+     * @param: userId
+     * @param: year
+     * @param: month
+     * @param: day
+     * @return: java.util.List<com.example.backend.entity.Task>
+     **/
     @Override
     public List<Task> selectOneDayFinishedTaskList(Long userId, int year, int month, int day) {
         //保证一位数的日期也是dd格式
@@ -205,7 +215,23 @@ public class TaskServiceImpl implements TaskService {
         return taskList;
     }
 
+    /**
+     * @description:获取一个月内新建的事项列表
+     * @author: hym
+     * @date: 2022/11/30 10:32
+     * @param: userId
+     * @param: year
+     * @param: month
+     * @param: day
+     * @return: java.util.List<com.example.backend.entity.Task>
+     **/
+    @Override
+    public List<Task> selectOneDayCreatedTaskList(Long userId, int year, int month, int day){
+        //保证一位数的日期也是dd格式
+        String dayStr = day < 10 ? "0" + Integer.toString(day) : Integer.toString(day);
 
-
+        List<Task> taskList = taskMapper.selectOneDayCreatedTaskList(userId, year, month, dayStr);
+        return taskList;
+    }
 
 }
