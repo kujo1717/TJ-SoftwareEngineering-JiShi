@@ -187,26 +187,26 @@
     <ActivityMarkCard v-if="rate_val != -1" :activity_id="activity_id" :user_id="user_id" :hadrate="rated" :showVal="rate_val" @MarkActivity="ComponentsMarkActivity"></ActivityMarkCard>
 
     <!-- 活动投票卡片 -->
-    <el-col :span="12" v-if="false">
+    <el-col :span="12" v-if="true">
       <!-- 目前活动有投票-->
-      <span v-if="hasVote">
-        <!-- 展示投票 -->
-        <el-card>
-          <div v-for="(poll,index) in Polls" :key="index">
-            <vue-poll :key="index" v-bind="poll.options" @addvote="addVote" />
-            <span>
-              <el-button type="primary" @click="confirmVote">确认</el-button>
-              <el-button @click="cancelVote">取消</el-button>
-            </span>
-          </div>
-        </el-card>
-      </span>
+      <!--span v-if="hasVote"-->
+      <!-- 展示投票 -->
+      <el-button @click="getPoll">查看本活动投票</el-button>
+      <el-card>
+        <div v-for="(poll,index) in Polls" :key="index">
+          <vue-poll :key="index" v-bind="poll.options" @addvote="addVote" />
+          <span>
+            <el-button type="primary" @click="confirmVote">确认</el-button>
+            <el-button @click="cancelVote">取消</el-button>
+          </span>
+        </div>
+      </el-card>
+      <!--/span-->
 
-      <span v-else>
-        <el-card>
+      <span>
+        <el-card v-if="user_id/*=creator_data.id*/">
           <!-- 创建人发起投票 -->
-
-          <el-button @click="clickCreateVote" v-if="false" type="primary">新建投票</el-button>
+          <el-button @click="clickCreateVote" v-if="true" type="primary">新建投票</el-button>
         </el-card>
       </span>
 
@@ -353,8 +353,8 @@ import {
   patchActFinish,
   patchActStopApply,
   postActivityApply
-  } from '@/api/activity'
-import { getpoll,postPoll } from '@/api/poll'
+} from '@/api/activity'
+import { getPoll, postPoll } from '@/api/poll'
 import { getoptions, putTotal } from '@/api/vote_option'
 import { CodeToText, regionData } from 'element-china-area-data'
 import VuePoll from 'vue-poll'
@@ -364,6 +364,7 @@ export default {
   components: { VuePoll, ActivityMarkCard },
   data() {
     return {
+      activity_id_test: 1,
       /**
        * 用户个人信息
        */
@@ -442,7 +443,7 @@ export default {
       // 这个活动目前是否有投票,
       hasVote: '',
       // 选中的选项
-      selectedOption:'',
+      selectedOption: '',
       // 这个投票的选项与数据
       Polls: [],
       // 我是否能进行投票
@@ -586,39 +587,44 @@ export default {
       ]
     }
   },
+  created: function() {
+    this.initData()
+  },
   methods: {
+    initData() {
+      this.Polls = getPoll()
+      console.log('this.Polls')
+    },
     /** 投票*/
     // api
     // 获取此时的投票信息
-    async getpoll() {
-      let polls = []
+    async getPoll() {
+      const polls = []
 
-      await getpoll(this.activity_id)
+      await getPoll(this.activity_id_test)
         .then((res) => {
           this.canIVote = true
+
           res.data.forEach((ele) => {
-            let answers = []
-            getoptions(ele.poll_id)
-              .then((res) => {
-                res.data.forEach((ele) => {
-                  answers.push({
-                    value: ele.option_id,
-                    text: ele.option_name,
-                    votes: ele.vote_num
-                  })
+            const answers = []
+            getoptions(ele.poll_id).then((res) => {
+              console.log(res)
+              res.data.forEach((ele) => {
+                answers.push({
+                  value: ele.option_id,
+                  text: ele.option_name,
+                  votes: ele.vote_num
                 })
               })
-              .catch((err) => {
-                console.log(err)
+              const options = []
+              options.push({ question: ele.topic_text, answers: answers })
+              polls.push({
+                poll_id: ele.poll_id,
+                deadline: ele.deadline,
+                multiple_choice: ele.multiple_choice,
+                options: options,
+                activity_id: this.activity_id_test
               })
-            let options = []
-            options.push({ question: ele.topic_text })
-            polls.push({
-              poll_id: ele.poll_id,
-              deadline: ele.deadline,
-              multiple_choice: ele.multiple_choice,
-              options: options,
-              activity_id: this.activity_id
             })
           })
           this.Polls = polls
@@ -631,7 +637,7 @@ export default {
     addVote(obj) {
       this.showVoteButtons = true
       console.log(obj)
-      this.selectedOption=obj.value
+      this.selectedOption = obj.value
       console.log('选项的value，目前该选项的票数，本投票的总票数')
     },
     // 确定投票，api
@@ -688,7 +694,7 @@ export default {
         this.showVoteButtons = true
         // 重新请求api，获取当前的投票情况
 
-        this.VoteOptions = this.getpoll(this.poll_id)
+        this.VoteOptions = this.getPoll(this.poll_id)
         this.VotePollKey += 1
         // this.$forceUpdate();
       })
@@ -714,42 +720,37 @@ export default {
 
     // 确认新建投票
     confirm_createVote() {
-      // 通过表单测试
-      this.$refs['newVote'].validate((valid) => {
-        if (!valid) {
-          return
-        } else {
-          // api
-          // 创建新的投票
-          const post_data = this.newVoteFrom
-          postPoll(post_data)
-            .then((res) => {
-              console.log('postPoll:res:', res)
-              this.$message({
-                type: 'success',
-                message: '投票创建成功'
-              })
-            })
-            .catch((err) => {
-              console.log('postPoll:err:', err)
-            })
-          
-          this.edit_confirm_loading = true
-          // 全局loading模板
-          const thisContent = this
-          const edit_loading = thisContent.$loading({
-            lock: true,
-            text: '创建新投票，请稍候...',
-            spinner: 'el-icon-loading',
-            background: 'rgba(0, 0, 0, 0.5)'
+      // api
+      // 创建新的投票
+      this.newVoteFrom.activity_id = this.activity_id_test
+      const post_data = this.newVoteFrom
+      console.log(post_data)
+      postPoll(post_data)
+        .then((res) => {
+          console.log('postPoll:res:', res),
+          this.$message({
+            type: 'success',
+            message: '投票创建成功'
           })
-          setTimeout(() => {
-            this.isShow_dialog_createVote = false
-            this.edit_confirm_loading = false
-            edit_loading.close()
-          }, 1000)
-        }
+        })
+        .catch((err) => {
+          console.log('postPoll:err:', err)
+        })
+
+      this.edit_confirm_loading = true
+      // 全局loading模板
+      const thisContent = this
+      const edit_loading = thisContent.$loading({
+        lock: true,
+        text: '创建新投票，请稍候...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.5)'
       })
+      setTimeout(() => {
+        this.isShow_dialog_createVote = false
+        this.edit_confirm_loading = false
+        edit_loading.close()
+      }, 1000)
     },
     // 取消新建投票
     cancel_createVote() {

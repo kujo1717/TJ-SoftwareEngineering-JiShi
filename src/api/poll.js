@@ -1,9 +1,9 @@
 import request from '@/utils/request'
 
 // 获取投票
-export function getpoll(acitivity_id) {
+export function getPoll(acitivity_id) {
   return request({
-    url: '/api/poll/getpoll/' + acitivity_id.toString(),
+    url: '/api/poll/getPoll/' + acitivity_id.toString(),
     method: 'get',
     params: {}
   })

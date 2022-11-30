@@ -186,7 +186,7 @@ export default {
     }
   },
   created: function() {
-    this.inintData()
+    this.initData()
   },
   methods: {
     open() {
@@ -211,7 +211,7 @@ export default {
         )
       }
     },
-    inintData() {
+    initData() {
       this.showData = this.tableData
     },
     submitFun() {
