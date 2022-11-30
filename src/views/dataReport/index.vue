@@ -7,6 +7,7 @@
         placeholder="选择月"
         :editable="false"
         size="mini"
+        @change="getBackendToFrontend()"
       >
       </el-date-picker>
     </el-card>
@@ -161,6 +162,7 @@
 
 <script>
 import { getAnalyzeData } from '@/api/dataAnalyze.js'
+import { getCurrentYear, getCurrentMonth } from '@/utils/time.js'
 import LineHeapChart from './components/LineHeapChart'
 import PieFlatChart from './components/PieFlatChart'
 import PieFilletChart from './components/PieFilletChart'
@@ -175,11 +177,15 @@ export default {
   },
   data () {
     return {
-      chosenTime: '',
+      userId: 1,
       bigSize: 3,
       smallSize: 2,
       upLeftPanelRate: 3,
       barChartVisible: true,
+
+      chosenTime: getCurrentYear() + '-' + getCurrentMonth(),
+      chosen_year: getCurrentYear(),
+      chosen_month: getCurrentMonth(),
 
       //上方显示的各状态事项数
       allStateNum: {
@@ -250,31 +256,31 @@ export default {
 
       lineSeriesData: [
         {
-        name: '完成事项数',
-        type: 'line',
-        stack: '总量',
-        areaStyle: {},
-        emphasis: {
-          focus: 'series'
+          name: '完成事项数',
+          type: 'line',
+          stack: '总量',
+          areaStyle: {},
+          emphasis: {
+            focus: 'series'
+          },
+          smooth: true,
+          data: [120, 132, 101, 134, 90, 230, 210, 3466, 67, 36]
         },
-        smooth: true,
-        data: [120, 132, 101, 134, 90, 230, 210, 3466, 67, 36]
-      },
-      {
-        name: '新建事项数',
-        type: 'line',
-        stack: '总量',
-        emphasis: {
-          focus: 'series'
-        },
-        areaStyle: {
-          // 改变区域颜色
-          //color: '#fadb14'
-        },
-        //光滑线条
-        smooth: true,
-        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      }
+        {
+          name: '新建事项数',
+          type: 'line',
+          stack: '总量',
+          emphasis: {
+            focus: 'series'
+          },
+          areaStyle: {
+            // 改变区域颜色
+            //color: '#fadb14'
+          },
+          //光滑线条
+          smooth: true,
+          data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        }
       ],
       lineXAxisData: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15',
         '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'],
@@ -285,11 +291,20 @@ export default {
 
 
   },
+
+  watch: {
+    chosenTime: {
+      handler (newVal) {
+        this.chosen_year = newVal.getFullYear();
+        this.chosen_month = newVal.getMonth() + 1;
+      }
+    }
+  },
   methods: {
     getBackendToFrontend () {
-      getAnalyzeData(1, 2022, 11)
+      getAnalyzeData(this.userId, this.chosen_year, this.chosen_month)
         .then((res) => {
-          console.log(res)
+          console.log("请求数据分析成功！", res)
           const backendData = res.data;
 
           //柱状图数据

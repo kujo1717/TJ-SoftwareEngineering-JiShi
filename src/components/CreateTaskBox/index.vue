@@ -234,8 +234,9 @@ export default {
           startTime: this.taskInfo.timeRange[0],
           endTime: this.taskInfo.timeRange[1],
           isParent: 1,
-          relativeTask: []
+          //relativeTask: []
         }
+        console.log("kk",backendTaskInfo)
 
         //发后端请求
         postOneNewTask(backendTaskInfo)

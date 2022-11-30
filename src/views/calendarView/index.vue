@@ -43,7 +43,8 @@ import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import listPlugin from "@fullcalendar/list";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import moment from "moment";
-
+import * as HolidayUtil from "./utils/holiday.js";
+import * as GetdomUtil from "./utils/getdom.js"
 
 export default {
   name: "CalenderView",
@@ -53,7 +54,7 @@ export default {
       userId: 1,//todo: 从cookie里拿
       displayCalendar: false,
       fisrt: true,
-      chosen_taskId:0,
+      chosen_taskId: 0,
       chosen_dateObj: {}, //当前选中的日期
       chosen_taskObj: {//当前选中的任务
         taskTitle: '背单词',
@@ -202,7 +203,7 @@ export default {
 
           this.taskList[i].timeRange = [arg.event.start, arg.event.end];
           //3.向后端发patch请求
-          //let backendTaskLi
+          //let backendTaskList
           patchOneTask(this.getBackendTaskList()[i])
             .then((res) => {
               console.log("patch请求成功！", res);
@@ -283,7 +284,7 @@ export default {
       else {
         if (new Date() > Date.parse(endTime))
           return '延期中';
-        else if (new Date()< Date.parse(startTime))
+        else if (new Date() < Date.parse(startTime))
           return '未开始';
         else
           return '进行中';
@@ -291,16 +292,20 @@ export default {
     },
 
     getFrontendTaskList () {
+
       //从后端拉取数据
       getAllTaskAndRelative(this.userId)
         .then((res) => {
+
           let taskList = []
           //然后要把后端拉回来的task对象转换成前端要用的对象
           if (res.data != null || res.data != []) {
             let backendDataList = res.data;
+
             if (backendDataList == null)
               return;
             backendDataList.forEach((value) => {
+
               if (value.isInDustbin == '0') {
                 //获取taskState
                 let _taskState = this.getFrontendState(value.taskState, value.startTime, value.endTime);
@@ -346,8 +351,11 @@ export default {
           this.calendarOptions.events = this.getEvents();
           this.calendarOptions.resources = this.getResources();
           this.displayCalendar = true;
-          //return taskList;
-          console.log("前端请求结束！")
+
+          //确定节假日的代码
+          this.setHolidayInfo();
+          this.addWatchDom();
+
         })//end of then
         .catch((err) => {
           this.displayCalendar = true;
@@ -356,6 +364,21 @@ export default {
         })
       return null;
     },//end of method
+    setHolidayInfo () {
+      this.$nextTick(() => {
+        //获取dom元素，确定节假日
+        let domList = document.getElementsByClassName("fc-daygrid-day-top")
+
+        for (let dom of domList) {
+          let dateDom = dom.innerHTML;
+          let year = GetdomUtil.getDomYear(dateDom);
+          let month = GetdomUtil.getDomMonth(dateDom);
+          let day = GetdomUtil.getDomDay(dateDom);
+          let holidayOrLunar = HolidayUtil.getHolidayInfo(year, month, day);
+          dom.setAttribute('data-text', holidayOrLunar);
+        }
+      })
+    },
     getBackendTaskList () {
       let backendTaskList = []
       this.taskList.forEach((value) => {
@@ -408,10 +431,19 @@ export default {
       return backendTaskList;
     },//end of method
 
-    updateTitleDOM () {
-      this.titleDom = document.getElementById('fc-dom-1');
+    updateHolidayAndLunarDom () {
+      console.log("监听到dom元素变化！")
+      this.setHolidayInfo();
     },
-
+    addWatchDom () {
+      this.$nextTick(() => {
+        console.log("添加监听！")
+        let domList = document.getElementsByTagName("button");
+        for (let dom of domList) {
+          dom.addEventListener("click", this.updateHolidayAndLunarDom);
+        }
+      })
+    }
   },
 
   watch: {
@@ -466,13 +498,16 @@ export default {
   background-color: transparent;
 }
 
-// ::v-deep .el-input__inner:hover {
-//   background-color: transparent;
-//   border-color: transparent;
-// }
+//添加节假日
+::v-deep .fc-daygrid-day-top::after {
+  content: attr(data-text);
+  position: relative;
+  right: 0.4em;
+  top: 0.25em;
+}
 
-// ::v-deep .el-input__inner:active {
-//   background-color: transparent;
-//   border-color: transparent;
-// }
+::v-deep .fc-daygrid-day-number {
+  // position: relative;
+  // left: 3em;
+}
 </style>

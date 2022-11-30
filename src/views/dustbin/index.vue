@@ -9,8 +9,9 @@
     </div>
     <el-table
       ref="table"
-      :data="tableData.filter(data => !search || data.taskTitle.toLowerCase().includes(search.toLowerCase()))"
+      :data="show_table.filter(data => !search || data.taskTitle.toLowerCase().includes(search.toLowerCase()))"
       style="width: 100%"
+      v-loading="loading"
     >
       <el-table-column
         :key="currentInfoKey"
@@ -70,6 +71,15 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="query.pageNum"
+      :page-sizes="[5, 10, 20, 30]"
+      :page-size="query.pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="query.total"
+    ></el-pagination>
   </div>
 </template>
 
@@ -81,6 +91,14 @@ export default {
     return {
       search: '',
       currentInfoKey: 1,
+      show_table: [],//分页实际展示的table
+      //分页数据
+      query: {
+        pageNum: 1,
+        pageSize: 10,
+        total: 0
+      },
+      loading: true,
       //需要一开始由后端赋值
       tableData: [{
         task_id: 100,
@@ -257,10 +275,13 @@ export default {
                   isInDustbin: this.timeTrans(value.isInDustbin)
                 })
               }
+
             })
           }//end of if
 
           this.tableData = taskList;
+
+          this.initPage();
         })//end of then
         .catch((err) => {
           console.log(err);
@@ -268,7 +289,7 @@ export default {
     },//end of method
 
     timeTrans (time, type) {
-      if(time == null || time == '')
+      if (time == null || time == '')
         return null;
       let date = new Date(new Date(time).getTime() + 8 * 3600 * 1000)
       date = date.toJSON();
@@ -279,10 +300,121 @@ export default {
         date = date.substring(0, 19).replace('T', ' ')
       }
       return date
-    }
+    },
+    /**
+* 分页所用函数start
+*/
+    //初始化分页
+    initPage () {
+      //初始化分页
+      this.show_table = this.tableData.slice(0, 10);
+      this.query.total = this.tableData.length;//总页数设置
+      this.loading = false;
+    },
+    //得到符合条件的信息
+    postKeyAndFetch () {
+      this.show_table = this.searchResource();
+    },
+    searchResource () {
+      this.loading = true;
+      // //函数返回值为筛选后的列表
+      // let search = this.input;
+      // let result = this.order_table.slice(0);//深拷贝
+      // let i = 0;
+      // if (search)//有内容才执行关键字筛选
+      // {
+      //   result = result.filter(data => {
+      //     return Object.keys(data).some(key => {
+      //       return String(data[key]).toLowerCase().indexOf(search) > -1
+      //     })
+      //   })
+
+      // }
+      // //复选框筛选
+      // for (i = 0; i < result.length; i++) {
+      //   console.log(result.length);
+      //   console.log(i);
+
+      //   if ((result[i].role == "进行中 " && !this.bool_showElder) ||
+      //     (result[i].role == "护工" && !this.bool_showCarer) ||
+      //     (result[i].role == "医生" && !this.bool_showDoctor) ||
+      //     (result[i].haveBad == "无" && this.bool_showBadOnly)) {
+      //     //删除不符合条件的项
+      //     result.splice(i, 1);
+      //     i--;//！！！！注意result.length动态变化！
+      //     continue;
+      //   }
+      // }
+
+
+      //分页参数的更改
+      let result = this.show_table;
+      this.query.total = result.length;//总页数设置
+      this.loading = false;
+      return result;
+    },
+    //切换当前页显示的数据条数，执行方法
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`);
+      this.query.pageSize = val;
+      this.getPageData();
+    },
+    //切换页数，执行方法
+    handleCurrentChange (val) {
+      //console.log(`当前页: ${val}`);
+      this.query.pageNum = val;
+      this.getPageData();
+    },
+    getPageData () {
+      this.postKeyAndFetch();
+      const DataAll = this.tableData.slice(0);//深拷贝
+      //每次执行方法，将展示的数据清空
+      this.show_table = [];
+      //第一步：当前页的第一条数据在总数据中的位置
+      let strlength = (this.query.pageNum - 1) * this.query.pageSize + 1;
+      //第二步：当前页的最后一条数据在总数据中的位置
+      let endlength = this.query.pageNum * this.query.pageSize;
+      //第三步：此判断很重要，执行时机：当分页的页数在最后一页时，进行重新筛选获取数据时
+      //获取本次表格最后一页第一条数据所在的位置的长度
+      let resStrLength = 0;
+      if (DataAll.length % this.query.pageSize == 0) {
+        resStrLength = (parseInt(DataAll.length / this.query.pageSize) - 1) * this.query.pageSize + 1
+      } else {
+        resStrLength = parseInt(DataAll.length / this.query.pageSize) * this.query.pageSize + 1
+      }
+      //如果上一次表格的最后一页第一条数据所在的位置的长度 大于 本次表格最后一页第一条数据所在的位置的长度，则将本次表格的最后一页第一条数据所在的位置的长度 为最后长度
+      if (strlength > resStrLength) {
+        strlength = resStrLength
+      }
+      //第四步：此判断很重要，当分页的页数切换至最后一页，如果最后一页获取到的数据长度不足最后一页设置的长度，则将设置的长度 以 获取到的数据长度 为最后长度
+      if (endlength > DataAll.length) {
+        endlength = DataAll.length;
+      }
+      //第五步：循环获取当前页数的数据，放入展示的数组中
+      for (let i = strlength - 1; i < endlength; i++) {
+        this.show_table.push(DataAll[i]);
+      }
+      //数据的总条数
+      this.query.total = DataAll.length;
+    },
+    /**
+     * 分页所用函数end
+     */
+
+
   },
   mounted: function () {
+    //在这个函数里的then执行了页数初始化
     this.getFrontendTaskList();
+  },
+  watch:{
+    tableData:{
+      deep:true,
+      immediate:true,
+      handler(){
+        this.initPage();
+      }
+    }
   }
 }
 

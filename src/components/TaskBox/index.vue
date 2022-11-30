@@ -111,6 +111,24 @@ taskId: Long 事项id
                   </el-option>
                 </el-select>
               </el-form-item>
+              
+              <!--标签-->
+              <el-form-item class="formItem">
+                <i class="el-icon-price-tag"></i>个性化标签：
+                <el-select
+                  v-model="taskInfo.tag"
+                  :popper-append-to-body="false"
+                >
+
+                  <el-option
+                    v-for="item in tagList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
 
               <!--优先级-->
               <el-form-item class="formItem">
@@ -306,6 +324,13 @@ export default {
       }, {
         value: '生活',
         label: '生活'
+      }],
+      tagList: [{
+        value:'室内',
+        label:'室内'
+      },{
+        value:'户外',
+        label:'户外'
       }],
 
       //日历选择
@@ -565,7 +590,7 @@ export default {
           this.isSaved = true;
 
           //如果是退出组件时的保存事项，要给父组件发消息
-          if(msg == 'exitComponent')
+          if (msg == 'exitComponent')
             this.$emit('resetDialogVisible');
         })
         .catch((err) => {
@@ -680,7 +705,8 @@ export default {
                 timeRange: [value.startTime, value.endTime],
                 familyPosition: value.isParent == 1 ? 'parent' : 'child',
                 familyMembers: value.relativeTask,
-                isInDustbin: value.isInDusbin
+                isInDustbin: value.isInDusbin,
+                tag: value.tag
               }
 
               if (taskInfo.familyMembers != null && taskInfo.familyMembers != []) {

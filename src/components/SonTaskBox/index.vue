@@ -96,6 +96,24 @@ taskId: Long 事项id
                 </el-select>
               </el-form-item>
 
+              <!--标签-->
+              <el-form-item class="formItem">
+                <i class="el-icon-price-tag"></i>个性化标签：
+                <el-select
+                  v-model="taskInfo.tag"
+                  :popper-append-to-body="false"
+                >
+
+                  <el-option
+                    v-for="item in tagList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+
               <!--优先级-->
               <el-form-item class="formItem">
                 <i class="iconfont icon-louti"></i>优先级：
@@ -201,6 +219,13 @@ export default {
       }, {
         value: '生活',
         label: '生活'
+      }],
+      tagList: [{
+        value:'室内',
+        label:'室内'
+      },{
+        value:'户外',
+        label:'户外'
       }],
 
       //日历选择
@@ -713,10 +738,10 @@ export default {
     dialogVisible: {
       handler (newVal) {
         console.log("接收到爸爸事项传参：", newVal)
-        
+
         //打开页面，向后端请求
         if (newVal == true) {
-          
+
           this.setFrontendTaskObj(this.taskId);
         }
         //如果子组件被关闭了，把dialogVisible=false的值同步给父组件

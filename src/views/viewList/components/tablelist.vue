@@ -11,7 +11,9 @@
     <!-- 顶部工具栏 -->
     <div class="drop_down_box">
       <div class="left_box">
-        <!-- 左边的下拉框，可快捷筛选，即为表格的筛选器赋值 -->
+        <!--导出按钮-->
+        <ExportButton :taskList="contents_data" />
+        <!-- 左边的下拉框，可快捷筛选，即为表格的筛选器赋值
         <el-select
           @change="TopSelectValChange"
           v-model="select_allTasks_Option"
@@ -24,7 +26,34 @@
             :value="item.value"
           >
           </el-option>
-        </el-select>
+        </el-select> -->
+        <!--复选框-->
+        <el-checkbox
+          label="未开始"
+          v-model="bool_showNoStart"
+          @change="postKeyAndFetch()"
+        ></el-checkbox>
+        <el-checkbox
+          label="已完成"
+          v-model="bool_showFinished"
+          @change="postKeyAndFetch()"
+        ></el-checkbox>
+        <el-checkbox
+          label="进行中"
+          v-model="bool_showDoing"
+          @change="postKeyAndFetch()"
+        ></el-checkbox>
+        <el-checkbox
+          label="延期中"
+          v-model="bool_showDelaying"
+          @change="postKeyAndFetch()"
+        ></el-checkbox>
+        <el-checkbox
+          label="延期完成"
+          v-model="bool_showDelayedFinished"
+          @change="postKeyAndFetch()"
+        ></el-checkbox>
+
       </div>
       <div class="right_box">
         <!--搜索框-->
@@ -33,15 +62,16 @@
             class="inline-input"
             v-model="searchText"
             style="width: 300px; float: right"
+            size="mini"
             :fetch-suggestions="SearchTaskByKeyWord"
             placeholder="请输入事项关键词"
             @select="SelectTaskSearchSuggestion"
           ></el-autocomplete>
         </div>
         <!-- 表头设置 -->
-        <el-card
+        <div
           shadow="hover"
-          style="display: flex; justify-content: center; align-items: center"
+          style="display: flex;"
           body-style="padding:0;margin:0 .3em 0 .3em;"
           class="arrange_head"
         >
@@ -102,9 +132,12 @@
                 确定
               </el-button>
             </div>
-            <span slot="reference">表头设置</span>
+            <el-button
+              slot="reference"
+              size="mini"
+            >表头设置</el-button>
           </el-popover>
-        </el-card>
+        </div>
       </div>
     </div>
 
@@ -207,6 +240,21 @@
             </template>
           </el-table-column>
 
+          <!-- 分组Col,group -->
+          <el-table-column
+            :label="head_data_common_dict['tag'].label"
+            class-name="tag_col"
+            :width="head_data_common_dict['tag'].width"
+            v-if="
+              head_item.key == 'tag' && head_data_common_dict['tag'].isShow
+            "
+            :key="head_data_common_dict['tag'].prio"
+          >
+            <template slot-scope="props">
+              <span>{{ props.row.tag }}</span>
+            </template>
+          </el-table-column>
+
           <!-- 优先级Col,priority -->
           <el-table-column
             :label="head_data_common_dict['priority'].label"
@@ -286,28 +334,48 @@
         </span>
       </el-table>
     </div>
+
+    
   </div>
 </template>
 
 <script>
 import { getAllTaskAndRelative, patchOneTask } from '@/api/task.js'
 import TaskBox from '@/components/TaskBox'
+import ExportButton from './ExportButton'
 import draggable from "vuedraggable";
 export default {
   name: "tablelist",
-  components: { draggable, TaskBox },
+  components: { draggable, TaskBox, ExportButton },
   data () {
     return {
       userId: 1,
       taskBoxDialogVisible: false,
       chosen_taskObj: {},
-      chosen_taskId:0,
+      chosen_taskId: 0,
       backendData: [],
       commonTaskList: [],
+
+      
+
+      //复选框筛选
+      bool_showNoStart: true,
+      bool_showFinished: true,
+      bool_showDoing: true,
+      bool_showDelaying: true,
+      bool_showDelayedFinished: true,
+
+      //excel的数据
+      filename: '',
+      autoWidth: true,
+      bookType: 'xlsx',
+      
+
       /**
        * 表格数据
        */
       contents_data: [],
+      init_data: [],
 
       //表格真正使用的表头数据
       head_data_common: [
@@ -342,6 +410,14 @@ export default {
           isShow: true,
           label: "分组",
           prio: 2,
+        },
+        //标签
+        {
+          key: "tag",
+          width: "150rem",
+          isShow: true,
+          label: "标签",
+          prio: 20,
         },
         //优先级
         {
@@ -440,7 +516,14 @@ export default {
           label: "分组",
           prio: 2,
         },
-
+        //标签
+        {
+          key: "tag",
+          width: "150rem",
+          isShow: true,
+          label: "标签",
+          prio: 20,
+        },
         //优先级 
         {
           key: "priority",
@@ -555,6 +638,9 @@ export default {
       MyProjects: -1,
       //项目下拉选择器的显示
       ShowProjectSelect: false,
+
+     
+      
     };
   },
   mounted () {
@@ -938,16 +1024,17 @@ export default {
       backendData.forEach((value) => {
         //获取孩子数据
         let childrenList = []
-        
+
         if (value.relativeTask != null) {
           value.relativeTask.forEach((val) => {
-            
+
             childrenList.push({
               taskId: val.taskId,
               name: val.taskTitle,
               startTime: val.startTime,
               endTime: val.endTime,
               group: val.classificationTitle,
+              tag: val.tag,
               priority: val.priority,
               state_val: this.getFrontendState(val.taskState),
               state_label: "",
@@ -977,6 +1064,7 @@ export default {
         })
       })
 
+      this.init_data = frontendData;
       return frontendData;
     },
     //格林威治时间转标准时间戳
@@ -1013,8 +1101,26 @@ export default {
         .catch((err) => {
           console.log(err);
         })
+    },
+    postKeyAndFetch () {
+      console.log("调用postKeyAndFetch！")
+      let new_contents_data = []
+      for (let item of this.init_data) {
+        if (!this.bool_showNoStart && item.state_val == "未开始")
+          continue;
+        if (!this.bool_showDoing && item.state_val == "进行中")
+          continue;
+        if (!this.bool_showFinished && item.state_val == "已完成")
+          continue;
+        if (!this.bool_showDelaying && item.state_val == "延期中")
+          continue;
+        if (!this.bool_showDelayedFinished && item.state_val == "延期完成")
+          continue;
 
-
+        //没被筛选框筛掉，才放入新的列表中
+        new_contents_data.push(item);
+      }
+      this.contents_data = new_contents_data;
     },
 
     // 请求某id事项的children事项，
@@ -1281,7 +1387,7 @@ export default {
             familyMembers: value.relativeTask,
             isInDustbin: value.isInDusbin
           }
-          
+
           console.log(item)
           taskList.push(item);
 
@@ -1292,6 +1398,10 @@ export default {
       })//end of then
       return taskList;
     },//end of method 
+
+
+
+   
   },
   computed: {
     //方便直接获取head_data_common的值
