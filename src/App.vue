@@ -5,7 +5,9 @@
 </template>
 
 <script>
+import { AMapManager } from "vue-amap";
 export default {
-  name: 'App'
-}
+  name: "App",
+
+};
 </script>

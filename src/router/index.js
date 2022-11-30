@@ -242,6 +242,19 @@ export const constantRoutes = [
     ],
     hidden: true
   },
+  {
+    path: '/testAmap',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'testAmap',
+        component: () => import('@/views/testAmap/index'),
+        meta: { title: 'testAmap', icon: 'user' }
+      }
+    ],
+
+  },
 
 
 

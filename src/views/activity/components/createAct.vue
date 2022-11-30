@@ -77,6 +77,11 @@
                 :style="{ width: '100%' }"
               ></el-input>
             </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="innerVisible = !innerVisible"
+                >选择地图地址</el-button
+              >
+            </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="" prop="limit_capacity">
@@ -108,7 +113,7 @@
               ></el-input-number>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <!-- <el-col :span="12">
             <el-form-item label="" prop="repeat" required>
               <el-switch
                 v-model="newact_form.repeat"
@@ -140,7 +145,7 @@
                 >
               </el-radio-group>
             </el-form-item>
-          </el-col>
+          </el-col> -->
           <el-col :span="24">
             <el-form-item label="详细说明" prop="intro_text">
               <el-input
@@ -176,16 +181,33 @@
         <el-button @click="cancel_CreateAct">取消</el-button>
         <el-button type="primary" @click="confirm_CreateAct">确定</el-button>
       </div>
+
+      <!-- 地图选择 -->
+      <!-- <el-dialog
+        width="70%"
+        title="地图选择 Dialog"
+        :visible.sync="innerVisible"
+        append-to-body
+      >
+      </el-dialog> -->
+
+      <MapChoose
+        :dialogShow.sync="innerVisible"
+        @locationSure="locationSure"
+        :primitiveData_comp="primitiveData"
+      ></MapChoose>
     </el-dialog>
   </div>
 </template>
 <script>
 import { postAct } from "@/api/activity";
 import { parseTime } from "@/utils";
+import MapChoose from "@/components/MapChoose";
+
 export default {
   inheritAttrs: false,
   name: "CreateActivity",
-  components: {},
+  components: { MapChoose },
   props: {
     isShow: {
       type: Boolean,
@@ -195,10 +217,9 @@ export default {
   },
   data() {
     return {
-      /**用户信息 */
-      user_id: 1145,
-      user_name: "用户名-静态测试",
-
+      //map:null,
+      primitiveData: [],
+      innerVisible: false,
       isShow_: true,
       newact_form: {
         title_name: undefined,
@@ -286,7 +307,20 @@ export default {
       ],
     };
   },
-  computed: {},
+  computed: {
+    user_id: {
+      get: function () {
+        return this.$store.getters.id;
+      },
+      set: function (newVal) {},
+    },
+    user_name: {
+      get: function () {
+        return this.$store.getters.name;
+      },
+      set: function (newVal) {},
+    },
+  },
   watch: {
     isShow: {
       handler(newValue, oldValue) {
@@ -299,10 +333,52 @@ export default {
   created() {},
   mounted() {
     this.isShow_ = this.isShow;
-    // console.log(this.isShow_);
-    // console.log("CreateActivity");
+    setTimeout(() => {
+      this.getLngLatLocation();
+    }, 100);
   },
   methods: {
+    //地图
+    locationSure(val) {
+      console.log("val", val);
+      this.newact_form.address = val.address_formatted;
+      this.primitiveData = val.value;
+      // console.log("primitiveData:", this.primitiveData);
+    },
+    //浏览器IP定位
+    getLngLatLocation() {
+      let that = this;
+      AMap.plugin("AMap.CitySearch", function () {
+        var citySearch = new AMap.CitySearch();
+        citySearch.getLocalCity(function (status, result) {
+          if (status === "complete" && result.info === "OK") {
+            // 查询成功，result即为当前所在城市信息
+            console.log("通过ip获取当前城市：", result);
+            that.primitiveData = [
+              (result.bounds.northeast.lng + result.bounds.southwest.lng) / 2,
+              (result.bounds.northeast.lat + result.bounds.southwest.lat) / 2,
+            ];
+            console.log("primitiveData", that.primitiveData);
+            //逆向地理编码
+            AMap.plugin("AMap.Geocoder", function () {
+              var geocoder = new AMap.Geocoder({
+                // city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
+                city: result.adcode,
+              });
+
+              var lnglat = result.rectangle.split(";")[0].split(",");
+
+              geocoder.getAddress(lnglat, function (status, data) {
+                if (status === "complete" && data.info === "OK") {
+                  // result为对应的地理位置详细信息
+                  console.log(data);
+                }
+              });
+            });
+          }
+        });
+      });
+    },
     onOpen() {},
     onClose() {
       //   this.$refs["create_activity"].resetFields();
@@ -370,8 +446,8 @@ export default {
                   capacity: this.newact_form.capacity,
                   current_people: 1,
                   state: 0,
-                  participant_num:1,
-                  applicant_num:0,
+                  participant_num: 1,
+                  applicant_num: 0,
 
                   //前端repeat_interval undefined，后端null空，返回实体不含前端repeat_interval
                   repeat_interval: this.newact_form.repeat

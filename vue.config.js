@@ -36,10 +36,12 @@ module.exports = {
       warnings: false,
       errors: true
     },
+    before: require('./mock/mock-server.js'),
     //跨域配置
     proxy: {
       "/api": {
-        target: "http://localhost:8081/", // 目标代理接口地址
+        // 目标代理接口地址
+        target: process.env.NODE_ENV === 'development' ? "http://localhost:8081/" : "http://localhost:8081/",
         secure: false,
         changeOrigin: true, // 开启代理，在本地创建一个虚拟服务端
         //ws: true, // 是否启用websockets

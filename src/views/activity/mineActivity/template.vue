@@ -13,6 +13,20 @@ export default {
       id: "",
     };
   },
+  computed: {
+    user_id: {
+      get: function () {
+        return this.$store.getters.id;
+      },
+      set: function (newVal) {},
+    },
+    user_name: {
+      get: function () {
+        return this.$store.getters.name;
+      },
+      set: function (newVal) {},
+    },
+  },
   methods: {
     //返回模板列表页面
     returnTemplatePage() {

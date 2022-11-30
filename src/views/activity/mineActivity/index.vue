@@ -429,6 +429,7 @@ export default {
     },
   },
   mounted() {
+    console.log("this.$store.getters.id;", this.$store.getters.id);
     const query = this.$route.query;
     // console.log(query);
 
