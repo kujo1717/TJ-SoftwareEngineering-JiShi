@@ -64,7 +64,7 @@ export function getActList_Participate(user_id, state) {
 //根据活动id，获取活动详细内容
 export function getActDetail(activity_id, user_id) {
     return request({
-        url: '/api/activity/getActDetail/' + activity_id.toString() ,
+        url: '/api/activity/getActDetail/' + activity_id.toString(),
         method: 'get',
         params: {
             user_id: user_id
@@ -75,21 +75,28 @@ export function getActDetail(activity_id, user_id) {
 
 
 //新建一个活动，输入Activity实体
-export function postAct(param) {
+export function postAct(activity, tag_ids) {
     return request({
         url: '/api/activity/postAct',
         method: 'post',
-        data: param,
- 
+        params: {
+            tag_ids: tag_ids.join(",")
+        },
+        data: activity
+
+
     })
 }
 
 //更新一个活动信息，输入Activity实体
-export function patchAct(param) {
+export function patchAct(param, tag_ids) {
     return request({
         url: '/api/activity/patchOneAct',
         method: 'patch',
         data: param,
+        params: {
+            tag_ids: tag_ids.join(",")
+        },
 
     })
 }
@@ -140,7 +147,7 @@ export function deleteActivityApply(user_id, activity_id) {
             user_id: user_id,
             activity_id: activity_id
         },
- 
+
     })
 }
 
@@ -150,7 +157,7 @@ export function patchActStopApply(param) {
         url: '/api/activity/creatorStopApply',
         method: 'patch',
         params: param,
- 
+
     })
 }
 
@@ -161,7 +168,7 @@ export function patchActFinish(param) {
         url: '/api/activity/creatorFinishAct',
         method: 'patch',
         params: param,
- 
+
     })
 }
 
@@ -178,7 +185,7 @@ export function deleteActivity(user_id, activity_id) {
             user_id: user_id,
             activity_id: activity_id
         },
- 
+
     })
 }
 

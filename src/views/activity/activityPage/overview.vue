@@ -9,6 +9,12 @@
       </div>
       <div class="hint">创建于{{ act_time_created_label }}</div>
 
+      <!-- tags -->
+      <div>
+        <el-tag v-for="(tag, i) in tags" :key="i" style="margin-right: 1em">
+          {{ tag.tag_name }}
+        </el-tag>
+      </div>
       <!-- 活动状态 -->
       <div>
         <span class="font-bold">活动状态:</span>
@@ -490,7 +496,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="" prop="limit_capacity">
+            <!-- <el-form-item label="" prop="limit_capacity">
               <el-radio-group
                 v-model="newact_form.limit_capacity"
                 size="medium"
@@ -503,7 +509,7 @@
                   >{{ item.label }}</el-radio
                 >
               </el-radio-group>
-            </el-form-item>
+            </el-form-item> -->
           </el-col>
           <el-col :span="12">
             <el-form-item
@@ -517,6 +523,24 @@
                 :step="1"
                 :min="2"
               ></el-input-number>
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="24">
+            <el-form-item label="标签" required>
+              <el-checkbox-group
+                v-model="newact_form.tags"
+                @change="TagGroupChange"
+              >
+                <span
+                  v-for="(tag, tag_index) in optional_tags"
+                  :key="tag_index"
+                >
+                  <el-checkbox border :label="tag.tag_id">{{
+                    tag.tag_name
+                  }}</el-checkbox>
+                </span>
+              </el-checkbox-group>
             </el-form-item>
           </el-col>
           <!-- <el-col :span="12">
@@ -612,6 +636,7 @@ import {
 import MapChoose from "@/components/MapChoose";
 
 import { getInfo } from "@/api/user";
+import { getAllTag } from "@/api/tag";
 
 import { getPoll, postPoll } from "@/api/poll";
 import { getoptions, putTotal } from "@/api/vote_option";
@@ -653,6 +678,8 @@ export default {
       act_introText: "",
       // 一句话介绍
       summary: "",
+      //tags
+      tags: [],
       // 配图
       act_imgs: [],
 
@@ -790,6 +817,7 @@ export default {
         repeat_interval: undefined,
         detail_text: undefined,
         file_value: null,
+        tags: [],
       },
       newact_rules: {
         title_name: [
@@ -840,6 +868,8 @@ export default {
 
         detail_text: [],
       },
+      //可选tag
+      optional_tags: [],
       file_valueAction: "https://jsonplaceholder.typicode.com/posts/",
       file_valuefileList: [],
       limit_capacityOptions: [
@@ -1081,13 +1111,15 @@ export default {
           this.newact_form.longitude = act_detail.longitude;
           this.newact_form.latitude = act_detail.latitude;
 
-
           this.newact_form.limit_capacity = act_detail.limit_capacity;
           this.newact_form.capacity = act_detail.capacity;
           this.newact_form.repeat_interval = act_detail.repeat_interval;
 
           this.newact_form.detail_text = act_detail.detail_text;
-
+          this.newact_form.tags = res.data.activity_tags.map((x) => {
+            // return parseInt(x.tag_id);
+            return x.tag_id;
+          });
           // 展示卡片的data，赋值
           this.address_name = act_detail.address_name;
           this.address_formatted = act_detail.address_formatted;
@@ -1102,7 +1134,7 @@ export default {
           this.state_val = act_detail.state;
           this.create_time_date = act_detail.create_time;
           this.act_time_created_label = this.create_time_date;
-
+          this.tags = res.data.activity_tags;
           const start_time_date = new Date(act_detail.start_time);
 
           const end_time_date = new Date(act_detail.end_time);
@@ -1210,6 +1242,7 @@ export default {
       //   name: "ActivityEdit",
       //   query: query_data,
       // });
+      this.GetAllTags();
       this.isShow_dialog_edit = true;
     },
     // 点击删除
@@ -1339,8 +1372,6 @@ export default {
     },
     // confirm修改
     ConfirmEdit() {
-      
-
       this.$refs["create_activity"].validate(async (valid) => {
         if (!valid) {
           return;
@@ -1382,7 +1413,7 @@ export default {
             // file_value: "",
           };
           console.log("patch_data,", patch_data);
-          await patchAct(patch_data)
+          await patchAct(patch_data, this.newact_form.tags)
             .then((res) => {
               console.log("patchAct:res:", res);
               // 关闭修改页面，停止loading
@@ -1458,6 +1489,24 @@ export default {
       return isRightSize && isAccept;
     },
 
+    /**Tag */
+    GetAllTags() {
+      //get all tags
+      getAllTag()
+        .then((res) => {
+          this.optional_tags = res.data;
+          console.log("getAllTag:res:", res);
+        })
+        .catch((err) => {
+          console.log("getAllTag:err:", err);
+        });
+      setTimeout(() => {
+        this.getLngLatLocation();
+      }, 100);
+    },
+    TagGroupChange() {
+      console.log("this.newact_form.tags", this.newact_form.tags);
+    },
     // 用户是不是这个活动的创建者
     async Get_isCreator() {
       console.log("this.activity_id:", this.activity_id);

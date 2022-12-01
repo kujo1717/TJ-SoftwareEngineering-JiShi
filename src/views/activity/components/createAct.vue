@@ -95,7 +95,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="" prop="limit_capacity">
+            <!-- <el-form-item label="" prop="limit_capacity">
               <el-radio-group
                 v-model="newact_form.limit_capacity"
                 size="medium"
@@ -108,7 +108,7 @@
                   >{{ item.label }}</el-radio
                 >
               </el-radio-group>
-            </el-form-item>
+            </el-form-item> -->
           </el-col>
           <el-col :span="12">
             <el-form-item
@@ -122,6 +122,24 @@
                 :step="1"
                 :min="2"
               ></el-input-number>
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="24">
+            <el-form-item label="标签" required>
+              <el-checkbox-group
+                v-model="newact_form.tags"
+                @change="TagGroupChange"
+              >
+                <span
+                  v-for="(tag, tag_index) in optional_tags"
+                  :key="tag_index"
+                >
+                  <el-checkbox border :label="tag.tag_id">{{
+                    tag.tag_name
+                  }}</el-checkbox>
+                </span>
+              </el-checkbox-group>
             </el-form-item>
           </el-col>
           <!-- <el-col :span="12">
@@ -191,6 +209,7 @@
       <div slot="footer">
         <el-button @click="cancel_CreateAct">取消</el-button>
         <el-button type="primary" @click="confirm_CreateAct">确定</el-button>
+        <el-button @click="TestTagAPI">Test Tag API</el-button>
       </div>
 
       <MapChoose
@@ -205,6 +224,7 @@
 import { postAct } from "@/api/activity";
 import { parseTime } from "@/utils";
 import MapChoose from "@/components/MapChoose";
+import { getAllTag, postActTags } from "@/api/tag";
 
 export default {
   inheritAttrs: false,
@@ -238,6 +258,7 @@ export default {
         repeat_interval: undefined,
         intro_text: undefined,
         file_value: null,
+        tags: [],
       },
       newact_rules: {
         title_name: [
@@ -301,6 +322,8 @@ export default {
         },
       ],
 
+      //可选标签
+      optional_tags: [],
     };
   },
   computed: {
@@ -329,12 +352,56 @@ export default {
   created() {},
   mounted() {
     this.isShow_ = this.isShow;
-    setTimeout(() => {
-      this.getLngLatLocation();
-    }, 100);
+    this.GetAllTags();
   },
   methods: {
-    //地图
+    /**Tag */
+    GetAllTags() {
+      //get all tags
+      getAllTag()
+        .then((res) => {
+          this.optional_tags = res.data;
+          console.log("getAllTag:res:", res);
+        })
+        .catch((err) => {
+          console.log("getAllTag:err:", err);
+        });
+      setTimeout(() => {
+        this.getLngLatLocation();
+      }, 100);
+    },
+    //check group change event
+    TagGroupChange(val) {
+      // console.log("newact_form.tags:", this.newact_form.tags);
+      console.log("TagGroupChange:", val);
+    },
+    //测试Tag API
+    TestTagAPI() {
+      let tag_list = [
+        {
+          tag_id: 1,
+          name: "tag_1",
+        },
+        {
+          tag_id: 2,
+          name: "tag_2",
+        },
+      ];
+
+      let activity = {
+        act: 1,
+        id: 2,
+      };
+      postActTags(1, tag_list, activity)
+        .then((res) => {
+          console.log("postActTags:res:" + res);
+        })
+        .catch((err) => {
+          console.log("postActTags:err:" + err);
+        });
+    },
+
+    //接收地图组件返回值，设置form值
     locationSure(val) {
       console.log("val", val);
       this.newact_form.address_formatted = val.address_formatted;
@@ -429,7 +496,7 @@ export default {
 
                 // console.log("create_time", create_time);
                 // let create_time=now.getFullYear()+"-"+(now.getMonth()+1)+"-"+now.getDay()+" "+
-                let post_data = {
+                let activity = {
                   // activity_id: undefined,
                   title_name: this.newact_form.title_name,
                   detail_text: this.newact_form.intro_text,
@@ -437,23 +504,20 @@ export default {
                   start_time: this.newact_form.start_time,
                   end_time: this.newact_form.end_time,
                   create_time: create_time,
-           
-                  
+
                   hit_num: 0,
                   //limit_capacity 1限制人数
                   limit_capacity: this.newact_form.limit_capacity,
                   capacity: this.newact_form.capacity,
-                
+
                   state: 0,
                   participant_num: 1,
                   applicant_num: 0,
                   //地址
-                  address_name:this.newact_form.address_name,
-                  address_formatted:this.newact_form.address_formatted,
-                  longitude:this.newact_form.longitude,
-                  latitude:this.newact_form.latitude,
-
-
+                  address_name: this.newact_form.address_name,
+                  address_formatted: this.newact_form.address_formatted,
+                  longitude: this.newact_form.longitude,
+                  latitude: this.newact_form.latitude,
 
                   //前端repeat_interval undefined，后端null空，返回实体不含前端repeat_interval
                   repeat_interval: this.newact_form.repeat
@@ -462,8 +526,9 @@ export default {
                   creator_id: this.user_id,
                   vote_id: undefined,
                 };
-                console.log("post_data", post_data);
-                await postAct(post_data)
+                let tag_list = [1, 2, 3];
+                console.log("post:activity", activity);
+                await postAct(activity, this.newact_form.tags)
                   .then((res) => {
                     console.log("postAct,res", res);
                     this.$message({
