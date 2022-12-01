@@ -68,15 +68,26 @@
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="活动地址" prop="address">
+            <el-form-item label="活动地点" prop="address_name">
               <el-input
-                v-model="newact_form.address"
-                placeholder="请输入活动地址"
+                v-model="newact_form.address_name"
+                placeholder="请输入活动地点"
                 clearable
                 prefix-icon="el-icon-location-information"
                 :style="{ width: '100%' }"
               ></el-input>
             </el-form-item>
+
+            <el-form-item label="详细地址" prop="address_formatted">
+              <el-input
+                v-model="newact_form.address_formatted"
+                placeholder="可以根据地图选择详细地址"
+                clearable
+                prefix-icon="el-icon-location-information"
+                :style="{ width: '100%' }"
+              ></el-input>
+            </el-form-item>
+
             <el-form-item>
               <el-button type="primary" @click="innerVisible = !innerVisible"
                 >选择地图地址</el-button
@@ -182,15 +193,6 @@
         <el-button type="primary" @click="confirm_CreateAct">确定</el-button>
       </div>
 
-      <!-- 地图选择 -->
-      <!-- <el-dialog
-        width="70%"
-        title="地图选择 Dialog"
-        :visible.sync="innerVisible"
-        append-to-body
-      >
-      </el-dialog> -->
-
       <MapChoose
         :dialogShow.sync="innerVisible"
         @locationSure="locationSure"
@@ -226,12 +228,14 @@ export default {
         summary: undefined,
         start_time: "2022-11-17 00:00:00",
         end_time: undefined,
-        address: undefined,
+        address_name: undefined,
+        address_formatted: undefined,
+        longitude: undefined,
+        latitude: undefined,
         limit_capacity: 1,
         capacity: 2,
         repeat: false,
         repeat_interval: undefined,
-        is_private: 1,
         intro_text: undefined,
         file_value: null,
       },
@@ -258,10 +262,17 @@ export default {
           },
         ],
         end_time: [],
-        address: [
+        address_name: [
           {
             required: true,
-            message: "请输入活动地址",
+            message: "请输入活动地点",
+            trigger: "blur",
+          },
+        ],
+        address_formatted: [
+          {
+            required: false,
+            message: "",
             trigger: "blur",
           },
         ],
@@ -274,13 +285,7 @@ export default {
         ],
         capacity: [],
         repeat_interval: [],
-        is_private: [
-          {
-            required: true,
-            message: "不能为空",
-            trigger: "change",
-          },
-        ],
+
         intro_text: [],
       },
       file_valueAction: "https://jsonplaceholder.typicode.com/posts/",
@@ -295,16 +300,7 @@ export default {
           value: 2,
         },
       ],
-      privateOptions: [
-        {
-          label: "公开",
-          value: 1,
-        },
-        {
-          label: "私密",
-          value: 2,
-        },
-      ],
+
     };
   },
   computed: {
@@ -341,7 +337,10 @@ export default {
     //地图
     locationSure(val) {
       console.log("val", val);
-      this.newact_form.address = val.address_formatted;
+      this.newact_form.address_formatted = val.address_formatted;
+      this.newact_form.longitude = val.value[0];
+      this.newact_form.latitude = val.value[1];
+
       this.primitiveData = val.value;
       // console.log("primitiveData:", this.primitiveData);
     },
@@ -438,23 +437,29 @@ export default {
                   start_time: this.newact_form.start_time,
                   end_time: this.newact_form.end_time,
                   create_time: create_time,
-                  address: this.newact_form.address,
-                  city: "city_default",
+           
+                  
                   hit_num: 0,
                   //limit_capacity 1限制人数
                   limit_capacity: this.newact_form.limit_capacity,
                   capacity: this.newact_form.capacity,
-                  current_people: 1,
+                
                   state: 0,
                   participant_num: 1,
                   applicant_num: 0,
+                  //地址
+                  address_name:this.newact_form.address_name,
+                  address_formatted:this.newact_form.address_formatted,
+                  longitude:this.newact_form.longitude,
+                  latitude:this.newact_form.latitude,
+
+
 
                   //前端repeat_interval undefined，后端null空，返回实体不含前端repeat_interval
                   repeat_interval: this.newact_form.repeat
                     ? this.newact_form.repeat_interval
                     : undefined,
                   creator_id: this.user_id,
-                  is_private: this.newact_form.is_private,
                   vote_id: undefined,
                 };
                 console.log("post_data", post_data);

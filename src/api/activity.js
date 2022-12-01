@@ -64,8 +64,11 @@ export function getActList_Participate(user_id, state) {
 //根据活动id，获取活动详细内容
 export function getActDetail(activity_id, user_id) {
     return request({
-        url: '/api/activity/getActDetail/' + activity_id.toString() + '/' + user_id.toString(),
+        url: '/api/activity/getActDetail/' + activity_id.toString() ,
         method: 'get',
+        params: {
+            user_id: user_id
+        }
 
     })
 }
@@ -77,9 +80,7 @@ export function postAct(param) {
         url: '/api/activity/postAct',
         method: 'post',
         data: param,
-        headers: {
-            TokenValue: '',
-        }
+ 
     })
 }
 
@@ -89,9 +90,7 @@ export function patchAct(param) {
         url: '/api/activity/patchOneAct',
         method: 'patch',
         data: param,
-        headers: {
-            TokenValue: '',
-        }
+
     })
 }
 
@@ -128,9 +127,7 @@ export function postActivityApply(param) {
         url: '/api/activity/postActApply',
         method: 'post',
         data: param,
-        headers: {
-            TokenValue: '',
-        }
+
     })
 }
 
@@ -143,9 +140,7 @@ export function deleteActivityApply(user_id, activity_id) {
             user_id: user_id,
             activity_id: activity_id
         },
-        headers: {
-            TokenValue: '',
-        }
+ 
     })
 }
 
@@ -155,9 +150,7 @@ export function patchActStopApply(param) {
         url: '/api/activity/creatorStopApply',
         method: 'patch',
         params: param,
-        headers: {
-            TokenValue: '',
-        }
+ 
     })
 }
 
@@ -168,9 +161,7 @@ export function patchActFinish(param) {
         url: '/api/activity/creatorFinishAct',
         method: 'patch',
         params: param,
-        headers: {
-            TokenValue: '',
-        }
+ 
     })
 }
 
@@ -187,9 +178,7 @@ export function deleteActivity(user_id, activity_id) {
             user_id: user_id,
             activity_id: activity_id
         },
-        headers: {
-            TokenValue: '',
-        }
+ 
     })
 }
 

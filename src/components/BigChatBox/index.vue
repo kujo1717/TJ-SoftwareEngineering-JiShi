@@ -107,7 +107,24 @@ export default {
       </div>
     );
   },
-  computed: {},
+  computed: {
+   
+    /**
+     * 用户个人信息
+     */
+    userId: {
+      get: function () {
+        return this.$store.getters.id;
+      },
+
+    },
+    user_name: {
+      get: function () {
+        return this.$store.getters.name;
+      },
+
+    },
+  },
   watch: {},
   created() {},
   async mounted() {
