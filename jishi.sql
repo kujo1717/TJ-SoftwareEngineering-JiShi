@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 30/11/2022 22:15:48
+ Date: 01/12/2022 23:05:06
 */
 
 SET NAMES utf8mb4;
@@ -29,8 +29,6 @@ CREATE TABLE `activity`  (
   `start_time` datetime(0) NULL DEFAULT NULL,
   `end_time` datetime(0) NULL DEFAULT NULL,
   `create_time` datetime(0) NULL DEFAULT NULL,
-  `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `region` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `hit_num` int(0) NULL DEFAULT NULL,
   `limit_capacity` tinyint(1) NULL DEFAULT NULL,
   `capacity` int(0) NULL DEFAULT NULL,
@@ -38,17 +36,21 @@ CREATE TABLE `activity`  (
   `repeat_interval` int(0) NULL DEFAULT NULL,
   `creator_id` bigint(0) NULL DEFAULT NULL,
   `state` tinyint(0) NULL DEFAULT 0,
-  `mark` int(0) NULL DEFAULT NULL,
+  `mark` double NULL DEFAULT NULL,
   `applicant_num` int(0) NULL DEFAULT NULL,
-  `address_id` bigint(0) NULL DEFAULT NULL,
+  `address_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `address_formatted` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `longitude` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `latitude` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`activity_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of activity
 -- ----------------------------
-INSERT INTO `activity` VALUES (1597567450432405506, '6 create', '6 create', '6 create', '2022-11-17 00:00:00', NULL, '2022-11-29 20:25:36', '6 create', NULL, 0, 1, 2, 1, NULL, 6, 2, NULL, 0, NULL);
-INSERT INTO `activity` VALUES (1597817835638226946, '地图测试', '地图测试', '地图测试', '2022-11-17 00:00:00', NULL, '2022-11-30 13:00:32', '上海市静安区南京西路街道南京西路1204号', NULL, 0, 1, 2, 1, NULL, 6, 0, NULL, 0, NULL);
+INSERT INTO `activity` VALUES (1598127202166128641, '修改后test1', 'test', 'test', '2022-11-17 00:00:00', NULL, '2022-12-01 09:29:51', 0, 1, 4, 1, NULL, 6, 0, NULL, 0, '            address_name: this.newact_form.address_name,', '上海市静安区江宁路街道西康路1290号', '121.447456', '31.23206');
+INSERT INTO `activity` VALUES (1598310982021562370, '1231', '1231', '1231', '2022-11-17 00:00:00', NULL, '2022-12-01 21:40:07', 0, 1, 2, 1, NULL, 6, 0, NULL, 0, '1231', NULL, NULL, NULL);
+INSERT INTO `activity` VALUES (1598318285118607362, 'tag_list', NULL, 'tag_list', '2022-11-17 00:00:00', NULL, '2022-12-01 22:09:09', 0, 1, 2, 1, NULL, 6, 0, NULL, 0, 'tag_list', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for activity_apply
@@ -86,21 +88,20 @@ CREATE TABLE `activity_invite`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `activity_mark`;
 CREATE TABLE `activity_mark`  (
-  `mark_id` bigint(0) NOT NULL,
   `activity_id` bigint(0) NOT NULL,
-  `user_id` bigint(0) NULL DEFAULT NULL,
+  `user_id` bigint(0) NOT NULL,
   `mark` int(0) NULL DEFAULT NULL,
   `mark_time` datetime(0) NULL DEFAULT NULL,
-  PRIMARY KEY (`mark_id`) USING BTREE
+  PRIMARY KEY (`activity_id`, `user_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of activity_mark
 -- ----------------------------
-INSERT INTO `activity_mark` VALUES (1597568588397412354, 1597567450432405506, 6, 4, '2022-11-29 20:30:07');
-INSERT INTO `activity_mark` VALUES (1597568605615030273, 1597567450432405506, 1146, 2, '2022-11-29 20:30:11');
-INSERT INTO `activity_mark` VALUES (1597907267590660098, 1597906550960267266, 1146, 4, '2022-11-30 18:55:54');
-INSERT INTO `activity_mark` VALUES (1597907363573112833, 1597906550960267266, 6, 3, '2022-11-30 18:56:17');
+INSERT INTO `activity_mark` VALUES (1597567450432405506, 6, 4, '2022-11-29 20:30:07');
+INSERT INTO `activity_mark` VALUES (1597567450432405506, 1146, 2, '2022-11-29 20:30:11');
+INSERT INTO `activity_mark` VALUES (1597906550960267266, 6, 3, '2022-11-30 18:56:17');
+INSERT INTO `activity_mark` VALUES (1597906550960267266, 1146, 4, '2022-11-30 18:55:54');
 
 -- ----------------------------
 -- Table structure for activity_participate
@@ -115,10 +116,9 @@ CREATE TABLE `activity_participate`  (
 -- ----------------------------
 -- Records of activity_participate
 -- ----------------------------
-INSERT INTO `activity_participate` VALUES (1597566700876726274, 1145);
-INSERT INTO `activity_participate` VALUES (1597567450432405506, 6);
-INSERT INTO `activity_participate` VALUES (1597567450432405506, 1146);
-INSERT INTO `activity_participate` VALUES (1597817835638226946, 6);
+INSERT INTO `activity_participate` VALUES (1598127202166128641, 6);
+INSERT INTO `activity_participate` VALUES (1598310982021562370, 6);
+INSERT INTO `activity_participate` VALUES (1598318285118607362, 6);
 
 -- ----------------------------
 -- Table structure for activity_tag
@@ -133,6 +133,8 @@ CREATE TABLE `activity_tag`  (
 -- ----------------------------
 -- Records of activity_tag
 -- ----------------------------
+INSERT INTO `activity_tag` VALUES (1598310982021562370, 1);
+INSERT INTO `activity_tag` VALUES (1598310982021562370, 2);
 
 -- ----------------------------
 -- Table structure for activity_work
@@ -233,12 +235,12 @@ INSERT INTO `notice` VALUES (2, 1, '活动开始提醒', '您的活动要开始�
 -- ----------------------------
 DROP TABLE IF EXISTS `poll`;
 CREATE TABLE `poll`  (
-  `activity_id` bigint(0) NOT NULL,
   `poll_id` bigint(0) NOT NULL,
+  `activity_id` bigint(0) NOT NULL,
   `topic_text` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `deadline` datetime(0) NULL DEFAULT NULL,
   `multiple_choice` tinyint(1) NULL DEFAULT NULL,
-  PRIMARY KEY (`poll_id`, `activity_id`) USING BTREE
+  PRIMARY KEY (`poll_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -268,12 +270,15 @@ DROP TABLE IF EXISTS `tag`;
 CREATE TABLE `tag`  (
   `tag_id` bigint(0) NOT NULL,
   `tag_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `num` int(0) NULL DEFAULT NULL,
   PRIMARY KEY (`tag_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of tag
 -- ----------------------------
+INSERT INTO `tag` VALUES (1, '学习', 0);
+INSERT INTO `tag` VALUES (2, '工作', 0);
 
 -- ----------------------------
 -- Table structure for task

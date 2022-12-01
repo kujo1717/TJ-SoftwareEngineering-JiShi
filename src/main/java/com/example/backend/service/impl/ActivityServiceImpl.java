@@ -113,11 +113,9 @@ public class ActivityServiceImpl implements ActivityService{
     }
 
     @Override
-    public Result<String> UpdateAct(Activity act){
+    public Integer  UpdateAct(Activity act){
         int resultCount = activityMapper.updateById(act);
-        if(resultCount == 0)
-            return Result.fail(500,"更新数据失败！");
-        return Result.success("更新数据成功！");
+        return resultCount;
     }
 
     @Override

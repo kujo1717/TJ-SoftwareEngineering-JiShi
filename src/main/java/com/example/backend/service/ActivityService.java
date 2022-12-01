@@ -59,7 +59,7 @@ public interface ActivityService {
 
 
     /**更新一个活动的信息,输入一个Activity，按照ID查找而更新*/
-    Result<String> UpdateAct(Activity act);
+    Integer UpdateAct(Activity act);
 
     /**判断用户是不是活动的创建者*/
     ActivityUserRole isCreator(Long user_id, Long activity_id) ;
