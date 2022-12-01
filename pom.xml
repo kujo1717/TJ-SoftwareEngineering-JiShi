@@ -114,6 +114,14 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.83</version>
         </dependency>
+
+<!--        多主键问题-->
+        <dependency>
+            <groupId>com.github.jeffreyning</groupId>
+            <artifactId>mybatisplus-plus</artifactId>
+            <version>1.2.0-RELEASE</version>
+        </dependency>
+
     </dependencies>
 
     <build>
