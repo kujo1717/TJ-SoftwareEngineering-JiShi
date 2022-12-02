@@ -1,22 +1,15 @@
 package com.example.backend.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.api.R;
-import com.example.backend.common.DateUtil;
+import com.example.backend.Tools.DateUtil;
 import com.example.backend.common.Result;
 import com.example.backend.entity.Task;
-import com.example.backend.entity.User;
-import com.example.backend.mapper.RelativeMapper;
 import com.example.backend.mapper.TaskMapper;
-import com.example.backend.mapper.UserMapper;
 import com.example.backend.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -143,6 +136,9 @@ public class TaskServiceImpl implements TaskService {
         //如果post的事项没有填入分组，则自动归入默认分组
         if(task.getClassificationTitle() == null)
             task.setClassificationTitle("默认分组");
+        //如果post的事项没有填入tag，则置为“无”
+        if(task.getTag() == null)
+            task.setTag("无");
         Long newID = Long.valueOf(taskMapper.insert(task));
 
         return newID;
@@ -180,10 +176,9 @@ public class TaskServiceImpl implements TaskService {
         }
 
         //2: 如果之前完成了，更新后没完成，删掉真实完成时间
-        if(oldTask.getTaskState() != 0 && task.getTaskState() == 0)
-            task.setRelativeTask(null);
+        else if(oldTask.getTaskState() != 0 && task.getTaskState() == 0)
+            task.setRealFinishTime(null);
 
-        System.out.println(task);
         int resultCount = taskMapper.updateById(task);
         if(resultCount == 0)
             return Result.fail(500,"更新数据失败！");
