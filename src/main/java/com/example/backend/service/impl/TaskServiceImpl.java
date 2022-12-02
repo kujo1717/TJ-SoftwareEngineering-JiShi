@@ -1,6 +1,6 @@
 package com.example.backend.service.impl;
 
-import com.example.backend.Tools.DateUtil;
+import com.example.backend.Tools.DateTimeUtil;
 import com.example.backend.common.Result;
 import com.example.backend.entity.Task;
 import com.example.backend.mapper.TaskMapper;
@@ -40,7 +40,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<Task> findTaskByMonth(Long userId, int year, int month) throws ParseException {
-        int daysOfMonth = DateUtil.getDayNumOfMonth(year, month);
+        int daysOfMonth = DateTimeUtil.getDayNumOfMonth(year, month);
         List<Task> taskList = taskMapper.selectByMonth(userId, year, month, daysOfMonth);
         return taskList;
     }
@@ -132,7 +132,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Long insertOneNewTask(Task task) {
         task.setIsInDustbin("0");
-        task.setCreateTime(DateUtil.getCurrentTimestamp());
+        task.setCreateTime(DateTimeUtil.getCurrentTimestamp());
         //如果post的事项没有填入分组，则自动归入默认分组
         if(task.getClassificationTitle() == null)
             task.setClassificationTitle("默认分组");
@@ -158,12 +158,12 @@ public class TaskServiceImpl implements TaskService {
         //1: 如果之前没完成，更新后完成了：更新真实完成时间，并把所有孩子也完成了
         if(oldTask.getTaskState() == 0 && task.getTaskState() != 0) {
             //更新真实完成时间
-            task.setRealFinishTime(DateUtil.getCurrentTimestamp());
+            task.setRealFinishTime(DateTimeUtil.getCurrentTimestamp());
 
             //完成所有孩子（递归）
             for(Task sonTask : task.getRelativeTask()){
                 //如果及时完成
-                if(DateUtil.getCurrentTimestamp().before(sonTask.getEndTime()))
+                if(DateTimeUtil.getCurrentTimestamp().before(sonTask.getEndTime()))
                     sonTask.setTaskState((short) 1);
                 //如果没有及时完成
                 else{

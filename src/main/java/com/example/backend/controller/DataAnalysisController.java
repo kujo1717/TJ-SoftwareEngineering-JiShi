@@ -1,7 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.AnalysisData;
-import com.example.backend.Tools.DateUtil;
+import com.example.backend.Tools.DateTimeUtil;
 import com.example.backend.common.Result;
 import com.example.backend.entity.Task;
 import com.example.backend.service.TaskService;
@@ -69,7 +69,7 @@ public class DataAnalysisController {
             }
 
             //当前月的天数
-            int dayNumOfMonth = DateUtil.getDayNumOfMonth(year, month);
+            int dayNumOfMonth = DateTimeUtil.getDayNumOfMonth(year, month);
             //2：计算一个月内的事项完成情况
             Map<Integer, Integer> oneMonthFinishedNumMap = new HashMap<>();
             for(int day=1; day<=dayNumOfMonth; day++)
@@ -187,7 +187,7 @@ public class DataAnalysisController {
 
 
             Timestamp endTime = t.getEndTime();
-            Timestamp currentTime = DateUtil.getCurrentTimestamp();
+            Timestamp currentTime = DateTimeUtil.getCurrentTimestamp();
             if(dbState == 0 && endTime != null ) {
                 if(endTime.before(currentTime))
                     delayCount++;
