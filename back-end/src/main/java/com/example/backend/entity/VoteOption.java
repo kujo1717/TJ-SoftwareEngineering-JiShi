@@ -1,8 +1,6 @@
 package com.example.backend.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +18,7 @@ public class VoteOption {
   private Long pollID;
   @TableField(value="vote_num",update ="%s+1",updateStrategy = FieldStrategy.IGNORED)
   private int voteNum;
+
   public String getoptionName() {
     return optionName;
   }
