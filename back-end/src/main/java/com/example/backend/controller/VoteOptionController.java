@@ -25,22 +25,22 @@ public class VoteOptionController {
   private VoteOptionService voteOptionService;
 
   @ApiOperation("获取投票选项")
-  @GetMapping("/getoptions/{poll_id}")
-  public Result<List<VoteOption>> findVoteOption(@ApiParam(name = "poll_id", value = "投票id", required = true)
-                                                 @PathVariable("poll_id") Long poll_id) {
+  @GetMapping("/getoptions/{pollID}")
+  public Result<List<VoteOption>> findVoteOption(@ApiParam(name = "pollID", value = "投票id", required = true)
+                                                 @PathVariable("pollID") Long pollID) {
     List<VoteOption> list;
     try {
-      list = voteOptionService.findVoteOption(poll_id);
+      list = voteOptionService.findVoteOption(pollID);
       return Result.success(list);
     } catch (Exception e) {
-      return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "findPoll failed");
+      return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "getoptions failed");
     }
   }
   @ApiOperation("统计总票数")
-  @PutMapping("/putTotal/{option_id}")
-  public int putTotal(@ApiParam(name="option_id", value="选项id", required = true)
-                                     @PathVariable("option_id") Long option_id)
+  @PutMapping("/putTotal/{optionID}")
+  public int putTotal(@ApiParam(name="optionID", value="选项id", required = true)
+                                     @PathVariable("optionID") Long optionID)
   {
-    return voteOptionService.UpdateVotes(option_id);
+    return voteOptionService.UpdateVotes(optionID);
   }
 }

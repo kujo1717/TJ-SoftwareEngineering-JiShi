@@ -33,15 +33,21 @@ public class PollController {
   @PostMapping("/postPoll")
   public Result<String> insertOneNewPoll(@RequestBody Map<String,Object> pollWithOption)
   {
-    DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    String topic_text = JSON.toJSONString(pollWithOption.get("topic_text"));
-
-    Long activity_id = Long.parseLong(JSON.toJSONString(pollWithOption.get("activity_id")));
-    boolean multiple_choice=Boolean.parseBoolean(JSON.toJSONString(pollWithOption.get("multiple_choice")));
-    List<options> voteoptions = JSON.parseArray(JSON.toJSONString(pollWithOption.get("option")), options.class);
-    LocalDateTime deadline=LocalDateTime.now();
-    if(JSON.toJSONString(pollWithOption.get("deadline")).length()>2) {
-      deadline = LocalDateTime.parse(JSON.toJSONString(pollWithOption.get("deadline")),df);
+    try {
+      String topicText = JSON.toJSONString(pollWithOption.get("topic_text"));
+      Long activity_id = Long.parseLong(JSON.toJSONString(pollWithOption.get("activity_id")).replace("\"", ""));
+      boolean multipleChoice = Boolean.parseBoolean(JSON.toJSONString(pollWithOption.get("multipleChoice")));
+      List<options> voteoptions = JSON.parseArray(JSON.toJSONString(pollWithOption.get("option")), options.class);
+      LocalDateTime deadline = LocalDateTime.now();
+      String deadline_input=JSON.toJSONString(pollWithOption.get("deadline")).replace("\"", "");
+      if (deadline_input.length() > 4) {
+        deadline=LocalDateTime.parse(deadline_input, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+      }
+      Long pollID = pollService.createPoll(activity_id, topicText, deadline, multipleChoice);
+      return voteOptionService.createVoteOptions(voteoptions, pollID);
+    }
+    catch(Exception e){
+      return Result.fail(10001,"验证失败");
     }
     Long poll_id=pollService.createPoll(activity_id,topic_text,deadline,multiple_choice);
     return voteOptionService.createVoteOptions(voteoptions,poll_id);
@@ -50,7 +56,7 @@ public class PollController {
   @ApiOperation("获取投票")
   @GetMapping("/getPoll/{activity_id}")
   public Result<List<Poll>> findPoll(@ApiParam(name="activity_id", value="活动id", required = true)
-                               @PathVariable("activity_id") Long activity_id){
+                                     @PathVariable("activity_id") Long activity_id){
     List<Poll> list;
     try {
       list=pollService.findPoll(activity_id);
