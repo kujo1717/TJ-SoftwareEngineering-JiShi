@@ -9,10 +9,13 @@ import com.mysql.jdbc.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import com.alibaba.fastjson.JSON;
+
+
+
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -49,8 +52,6 @@ public class PollController {
     catch(Exception e){
       return Result.fail(10001,"验证失败");
     }
-    Long poll_id=pollService.createPoll(activity_id,topic_text,deadline,multiple_choice);
-    return voteOptionService.createVoteOptions(voteoptions,poll_id);
   }
 
   @ApiOperation("获取投票")
