@@ -198,7 +198,7 @@ export default {
                 message: '事项永久删除成功！'
               });
             })
-            .then((err) => {
+            .catch((err) => {
               console.log(err);
               this.$message({
                 type: 'danger',
@@ -236,7 +236,7 @@ export default {
                 message: '回收站清空成功！'
               });
             })
-            .then((err) => {
+            .catch((err) => {
               console.log(err);
               this.$message({
                 type: 'danger',
