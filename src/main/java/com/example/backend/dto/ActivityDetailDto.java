@@ -20,6 +20,7 @@ import java.util.Date;
  * @Description:
  */
 @Data
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ActivityDetailDto {
 
@@ -46,7 +47,8 @@ public class ActivityDetailDto {
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd hh:mm:ss")
     private Date create_time;
 
-
+    private String address;
+    private String region;
     private Integer hit_num;
 
     private Boolean limit_capacity;
@@ -57,17 +59,13 @@ public class ActivityDetailDto {
     private Short repeat_interval;
 
     @JsonSerialize(using = ToStringSerializer.class)
+
     private Long creator_id;
     //报名人数
     private Integer applicant_num;
 
     //参与人数
     private Integer participant_num;
-
-    private String address_formatted;
-    private String address_name;
-    private Double longitude;
-    private Double latitude;
     /**
      * 添加属性
      *
@@ -88,7 +86,8 @@ public class ActivityDetailDto {
         this.start_time = activity.getStart_time();
         this.end_time = activity.getEnd_time();
         this.create_time = activity.getCreate_time();
-
+        this.address = activity.getAddress();
+        this.region = activity.getRegion();
         this.hit_num = activity.getHit_num();
         this.limit_capacity = activity.getLimit_capacity();
         this.capacity = activity.getCapacity();
@@ -97,11 +96,7 @@ public class ActivityDetailDto {
         this.applicant_num = activity.getApplicant_num();
         this.participant_num = activity.getParticipant_num();
 
-        this.address_formatted=activity.getAddress_formatted();
-        this.address_name=activity.getAddress_name();
-        this.longitude=activity.getLongitude();
-        this.latitude=activity.getLatitude();
-        this.repeat_interval=activity.getRepeat_interval();
+
 
     }
 

@@ -25,9 +25,9 @@ public interface ActivityMarkService {
     /**
      * 获取某活动的所有评价
      */
-    List<Map<String,Object>>  GetActAllMark(Long activity_id);
+    List<ActivityMark> GetActAllMark(Long activity_id);
 
 
     /**查询用户某个活动的评价，若无则返回空*/
-    List<Map<String,Object>> GetUserMarktoAct(Long activity_id, Long user_id);
+    Map<String,Object> GetUserMarktoAct(Long activity_id, Long user_id);
 }

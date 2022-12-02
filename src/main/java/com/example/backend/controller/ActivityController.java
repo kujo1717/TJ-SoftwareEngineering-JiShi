@@ -159,12 +159,12 @@ public class ActivityController {
     }
 
     @ApiOperation("获取一个活动的detail")
-    @GetMapping("/getActDetail/{activity_id}")
+    @GetMapping("/getActDetail/{activity_id}/{user_id}")
     public Result<Map<String,Object>> getAct(
             @ApiParam(name = "activity_id", value = "活动id", required = true)
             @PathVariable(name = "activity_id") Long activity_id,
             @ApiParam(name = "id", value = "用户id", required = true)
-            @RequestParam("user_id") Long user_id) {
+            @PathVariable("user_id") Long user_id) {
 //        System.out.println(id);
         Activity activity;
         Map<String,Object> res_map=new HashMap<>();
@@ -182,7 +182,7 @@ public class ActivityController {
 
             /**该用户对活动的评分*/
 
-            List<Map<String,Object>> activityMark=activityMarkService.GetUserMarktoAct(activity_id,user_id);
+            Map<String,Object> activityMark=activityMarkService.GetUserMarktoAct(activity_id,user_id);
 
             res_map.put("activity_detail",activityDetailDto);
             res_map.put("activity_mark",activityMark);
@@ -192,7 +192,7 @@ public class ActivityController {
 
             return Result.success(res_map);
         } catch (Exception e) {
-            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "getAct failed,活动id：" + activity_id+res_map);
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "getAct failed,活动id：" + activity_id);
         }
 
     }
