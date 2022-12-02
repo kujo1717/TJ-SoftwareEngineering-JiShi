@@ -29,25 +29,19 @@ public class ActivityMarkServiceImpl implements ActivityMarkService {
     }
 
     @Override
-    public List<ActivityMark> GetActAllMark(Long activity_id) {
-        List<ActivityMark> activityMarkList=new ArrayList<>();
-        QueryWrapper<ActivityMark> queryWrapper=new QueryWrapper<>();
-        queryWrapper.eq("activity_id",activity_id);
-        activityMarkList=activityMarkMapper.selectList(queryWrapper);
+    public List<Map<String,Object>>  GetActAllMark(Long activity_id) {
+        List<Map<String,Object>>  activityMarkList=new ArrayList<>();
+        activityMarkList=activityMarkMapper.SelectActMark(activity_id);
 
         return activityMarkList;
     }
 
 
+
     @Override
-    public Map<String,Object> GetUserMarktoAct(Long activity_id, Long user_id) {
-        Map<String,Object> map=new HashMap<>();
-
-        QueryWrapper<ActivityMark> queryWrapper=new QueryWrapper<>();
-        queryWrapper.eq("activity_id",activity_id)
-                .eq("user_id",user_id);
-
-        map.put("mark",activityMarkMapper.selectList(queryWrapper));
-        return map;
+    public List<Map<String,Object>> GetUserMarktoAct(Long activity_id, Long user_id) {
+        List<Map<String,Object>> list=new ArrayList<>();
+        list=activityMarkMapper.SelectActMark(activity_id,user_id);
+        return list;
     }
 }
