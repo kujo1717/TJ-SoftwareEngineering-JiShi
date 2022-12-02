@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 01/12/2022 23:05:06
+ Date: 02/12/2022 11:53:17
 */
 
 SET NAMES utf8mb4;
@@ -135,20 +135,6 @@ CREATE TABLE `activity_tag`  (
 -- ----------------------------
 INSERT INTO `activity_tag` VALUES (1598310982021562370, 1);
 INSERT INTO `activity_tag` VALUES (1598310982021562370, 2);
-
--- ----------------------------
--- Table structure for activity_work
--- ----------------------------
-DROP TABLE IF EXISTS `activity_work`;
-CREATE TABLE `activity_work`  (
-  `activity_id` bigint(0) NOT NULL,
-  `work_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  PRIMARY KEY (`activity_id`, `work_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of activity_work
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for address

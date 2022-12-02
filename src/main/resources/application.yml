@@ -8,8 +8,10 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
 #    url: jdbc:mysql://42.192.45.95:3306/jishi
     url: jdbc:mysql://localhost:3306/jishi?
-    username: root
-    password: 657826973YANGyan?
+#    username: root
+#    password: 657826973YANGyan?
+    username: jishi
+    password: WeKCSAME52dEdTBL
   mail:
     host: smtp.qq.com #发送邮件服务器
     username: 417695971@qq.com #QQ邮箱

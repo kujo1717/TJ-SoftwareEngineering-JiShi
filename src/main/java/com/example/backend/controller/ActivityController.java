@@ -51,21 +51,24 @@ public class ActivityController {
 
     @ApiOperation("获取所有活动")
     @GetMapping("/getAll")
-    public Result<List<Activity>> getAll() {
-        List<Activity> list;
-        try {
-            list = activityService.getAll();
-            return Result.success(list);
-        } catch (Exception e) {
-            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "getAll failed");
-        }
+    public Result<Map<String,Object>> GetAll() {
+        List<Activity> activityList=activityService.getAll();
+        Map<String,Object> map=new HashMap<>();
+        map.put("all act",activityList);
+        return Result.success(map);
     }
 
 
-    @ApiOperation("获取所有活动")
+    @ApiOperation("Hello")
     @GetMapping("/HelloWorld")
-    public Result<String> HelloWorld() {
-        return Result.success("hello world!");
+    public Result<Map<String,Object>> HelloWorld() {
+//        Map<String,Object> map=new HashMap<>();
+//        map.put("hello","hello");
+//        return Result.success(map);
+        List<Activity> activityList=activityService.getAll();
+        Map<String,Object> map=new HashMap<>();
+        map.put("all act",activityList);
+        return Result.success(map);
     }
 
     @ApiOperation("获取用户的所有报名的活动")
