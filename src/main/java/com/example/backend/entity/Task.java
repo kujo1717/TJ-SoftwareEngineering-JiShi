@@ -31,20 +31,15 @@ public class Task {
     @JsonSerialize(using= ToStringSerializer.class)
     private Long taskId;
     private String taskTitle;
-    @TableField(updateStrategy = FieldStrategy.IGNORED )
     private String taskDetail;
     private short taskState;
     private String classificationTitle;
     private short priority;
-    @TableField(updateStrategy = FieldStrategy.IGNORED )
     private Timestamp startTime;
-    @TableField(updateStrategy = FieldStrategy.IGNORED )
     private Timestamp endTime;
     private short isParent;
     private String isInDustbin;
-    @TableField(updateStrategy = FieldStrategy.IGNORED )
     private Timestamp realFinishTime;
-    @TableField(updateStrategy = FieldStrategy.IGNORED )
     private String tag;
     private Timestamp createTime;
 
