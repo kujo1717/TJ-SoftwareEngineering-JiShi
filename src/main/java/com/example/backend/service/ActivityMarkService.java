@@ -1,7 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.entity.ActivityMark;
-import com.example.backend.entity.UserMark;
+
 import com.example.backend.mapper.ActivityMarkMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

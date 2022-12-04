@@ -39,9 +39,9 @@ public interface TaskMapper extends BaseMapper<Task> {
                     @Result(column = "priority",property = "priority"),
                     @Result(column = "start_time",property = "startTime"),
                     @Result(column = "end_time",property = "endTime"),
-                    @Result(column = "is_parent",property = "isParent"),
                     @Result(column = "create_time",property = "createTime"),
                     @Result(column = "tag",property = "tag"),
+                    @Result(column = "is_parent",property = "isParent"),
                     @Result(column = "relative_task_id",property = "relativeTask",javaType = List.class,
                             one=@One(select = "com.example.backend.mapper.TaskMapper.selectById")
                     )

@@ -2,6 +2,7 @@ package com.example.backend.dto;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.example.backend.entity.Task;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

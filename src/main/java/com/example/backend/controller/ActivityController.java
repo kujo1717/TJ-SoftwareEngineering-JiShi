@@ -9,10 +9,7 @@ import com.example.backend.entity.Activity;
 import com.example.backend.entity.ActivityApply;
 import com.example.backend.entity.ActivityMark;
 import com.example.backend.entity.ActivityParticipate;
-import com.example.backend.service.ActivityApplyService;
-import com.example.backend.service.ActivityMarkService;
-import com.example.backend.service.ActivityParticipateService;
-import com.example.backend.service.ActivityService;
+import com.example.backend.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -42,6 +39,9 @@ public class ActivityController {
     @Autowired
     private ActivityParticipateService activityParticipateService;
 
+    @Autowired
+    private ActivityTagService activityTagService;
+
 
     @Autowired
     private ActivityMarkService activityMarkService;
@@ -51,33 +51,36 @@ public class ActivityController {
 
     @ApiOperation("获取所有活动")
     @GetMapping("/getAll")
-    public Result<List<Activity>> getAll() {
-        List<Activity> list;
-        try {
-            list = activityService.getAll();
-            return Result.success(list);
-        } catch (Exception e) {
-            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "getAll failed");
-        }
+    public Result<Map<String,Object>> GetAll() {
+        List<Activity> activityList=activityService.getAll();
+        Map<String,Object> map=new HashMap<>();
+        map.put("all act",activityList);
+        return Result.success(map);
     }
 
 
-    @ApiOperation("获取所有活动")
+    @ApiOperation("Hello")
     @GetMapping("/HelloWorld")
-    public Result<String> HelloWorld() {
-        return Result.success("hello world!");
+    public Result<Map<String,Object>> HelloWorld() {
+//        Map<String,Object> map=new HashMap<>();
+//        map.put("hello","hello");
+//        return Result.success(map);
+        List<Activity> activityList=activityService.getAll();
+        Map<String,Object> map=new HashMap<>();
+        map.put("all act",activityList);
+        return Result.success(map);
     }
 
     @ApiOperation("获取用户的所有报名的活动")
-        @GetMapping("/getAllApply")
-    public Result<List<Map<String,Object>>> getActList_UserAllApply(
+    @GetMapping("/getAllApply")
+    public Result<List<Map<String, Object>>> getActList_UserAllApply(
             @ApiParam(name = "id", value = "用户id", required = true)
-             @RequestParam("user_id") Long user_id,
+            @RequestParam("user_id") Long user_id,
             @ApiParam(name = "state", value = "活动状态", required = true)
             @RequestParam("state") Short state) {
-        List<Map<String,Object>> map=new ArrayList<>();
+        List<Map<String, Object>> map = new ArrayList<>();
         try {
-            map = activityService.getUserAllApplyActList(user_id,state);
+            map = activityService.getUserAllApplyActList(user_id, state);
             return Result.success(map);
         } catch (Exception e) {
             return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "getAllApply failed");
@@ -87,14 +90,14 @@ public class ActivityController {
 
     @ApiOperation("获取用户的所有参与的活动")
     @GetMapping("/getAllParticipate")
-    public Result<List<Map<String,Object>>> getActList_UserAllParticipate(
+    public Result<List<Map<String, Object>>> getActList_UserAllParticipate(
             @ApiParam(name = "id", value = "用户id", required = true)
             @RequestParam("user_id") Long user_id,
             @ApiParam(name = "state", value = "活动状态", required = true)
             @RequestParam("state") Short state) {
-        List<Map<String,Object>> map=new ArrayList<>();
+        List<Map<String, Object>> map = new ArrayList<>();
         try {
-            map = activityService.getUserAllParticipateActList(user_id,state);
+            map = activityService.getUserAllParticipateActList(user_id, state);
             return Result.success(map);
         } catch (Exception e) {
             return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "getAllParticipate failed");
@@ -103,17 +106,17 @@ public class ActivityController {
 
     @ApiOperation("获取用户所有的相关活动，报名、参与")
     @GetMapping("/getAllActList")
-    public Result<List<Map<String,Object>>> getActList_UserALl(
+    public Result<List<Map<String, Object>>> getActList_UserALl(
             @ApiParam(name = "id", value = "用户id", required = true)
             @RequestParam("user_id") Long user_id,
             @ApiParam(name = "state", value = "活动状态", required = true)
             @RequestParam("state") Short state) {
-        List<Map<String,Object>> map_all=new ArrayList<>();
-        List<Map<String,Object>> map_apply=new ArrayList<>();
-        List<Map<String,Object>> map_participate=new ArrayList<>();
+        List<Map<String, Object>> map_all = new ArrayList<>();
+        List<Map<String, Object>> map_apply = new ArrayList<>();
+        List<Map<String, Object>> map_participate = new ArrayList<>();
         try {
-            map_participate = activityService.getUserAllParticipateActList(user_id,state);
-            map_apply = activityService.getUserAllApplyActList(user_id,state);
+            map_participate = activityService.getUserAllParticipateActList(user_id, state);
+            map_apply = activityService.getUserAllApplyActList(user_id, state);
             map_all.addAll(map_apply);
             map_all.addAll(map_participate);
             return Result.success(map_all);
@@ -123,20 +126,16 @@ public class ActivityController {
     }
 
 
-
-
-
-
     @ApiOperation("获取用户的所有创建的活动")
     @GetMapping("/getAllCreate")
-    public Result<List<Map<String,Object>>> getActList_UserAlleCreate(
+    public Result<List<Map<String, Object>>> getActList_UserAlleCreate(
             @ApiParam(name = "id", value = "用户id", required = true)
             @RequestParam("user_id") Long user_id,
             @ApiParam(name = "state", value = "活动状态", required = true)
             @RequestParam("state") Short state) {
-        List<Map<String,Object>> map=new ArrayList<>();
+        List<Map<String, Object>> map = new ArrayList<>();
         try {
-            map = activityService.getUserAllCreateActList(user_id,state);
+            map = activityService.getUserAllCreateActList(user_id, state);
             return Result.success(map);
         } catch (Exception e) {
             return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "getAllCreate failed");
@@ -160,14 +159,14 @@ public class ActivityController {
 
     @ApiOperation("获取一个活动的detail")
     @GetMapping("/getActDetail/{activity_id}")
-    public Result<Map<String,Object>> getAct(
+    public Result<Map<String, Object>> getAct(
             @ApiParam(name = "activity_id", value = "活动id", required = true)
             @PathVariable(name = "activity_id") Long activity_id,
             @ApiParam(name = "id", value = "用户id", required = true)
             @RequestParam("user_id") Long user_id) {
 //        System.out.println(id);
         Activity activity;
-        Map<String,Object> res_map=new HashMap<>();
+        Map<String, Object> res_map = new HashMap<>();
         try {
             /**获取Activity实体*/
             activity = activityService.getAct(activity_id);
@@ -181,18 +180,20 @@ public class ActivityController {
 
 
             /**该用户对活动的评分*/
+            List<Map<String, Object>> activityMark = activityMarkService.GetUserMarktoAct(activity_id, user_id);
 
-            List<Map<String,Object>> activityMark=activityMarkService.GetUserMarktoAct(activity_id,user_id);
+            /**活动的tag*/
+            List<Map<String, Object>> activityTags = activityTagService.GetActAllTags(activity_id);
 
-            res_map.put("activity_detail",activityDetailDto);
-            res_map.put("activity_mark",activityMark);
-            res_map.put("user_id",user_id);
-
+            res_map.put("activity_detail", activityDetailDto);
+            res_map.put("activity_mark", activityMark);
+            res_map.put("user_id", user_id);
+            res_map.put("activity_tags", activityTags);
 
 
             return Result.success(res_map);
         } catch (Exception e) {
-            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "getAct failed,活动id：" + activity_id+res_map);
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "getAct failed,活动id：" + activity_id + res_map);
         }
 
     }
@@ -200,30 +201,63 @@ public class ActivityController {
 
     @ApiOperation("新建活动")
     @PostMapping("/postAct")
-    public Result<Integer> insertOneActivity(@RequestBody Activity activity) {
-//        System.out.println(activity);
-        Integer newID;
-        try{
-            newID=activityService.CreateAct(activity);
-            if (newID==Integer.MIN_VALUE+1001){
+    public Result<Map<String,Object>> insertOneActivity(
+            @RequestBody Activity activity,
+            @ApiParam(name = "tag_ids", value = "tag_ids", required = true)
+            @RequestParam("tag_ids") List<Long> tag_ids) {
+        Map<String,Object> result_map=new HashMap<>();
+        System.out.println(activity);
+        System.out.println(tag_ids);
+        Long newID;
+        try {
+            /**创建活动*/
+            newID = activityService.CreateAct(activity);
+            if (newID == Integer.MIN_VALUE + 1001) {
                 return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "insertOneActivity FAILED");
             }
             //创建人自动参与该活动
-            ActivityParticipate activityParticipate=new ActivityParticipate(activity.getActivity_id(),activity.getCreator_id());
+            ActivityParticipate activityParticipate = new ActivityParticipate(activity.getActivity_id(), activity.getCreator_id());
             activityParticipateService.AddParticipant(activityParticipate);
-        }catch (Exception e){
+
+            /**创建关联tag*/
+            activityTagService.AddActTags(activity.getActivity_id(), tag_ids);
+//            System.out.println("创建关联tag");
+//            for (Long tag_id:tag_ids){
+//                System.out.println(tag_id);
+//            }
+
+        } catch (Exception e) {
             return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "insertOneActivity FAILED");
         }
-
-        return Result.success(newID);
+        result_map.put("activity_id",newID);
+        return Result.success(result_map);
     }
 
-    @ApiOperation("更新活动的基本信息")
+    @ApiOperation("更新活动信息")
     @PatchMapping("/patchOneAct")
-    public Result<String> patchOneAct(@RequestBody Activity activity) {
+    public Result<String> patchOneAct(@RequestBody Activity activity,
+                                      @ApiParam(name = "tag_ids", value = "tag_ids", required = true)
+                                      @RequestParam("tag_ids") List<Long> tag_ids) {
         System.out.println("activity" + activity);
-//        return Result.success("patchOneAct");
-        return activityService.UpdateAct(activity);
+        System.out.println("tag_ids" + tag_ids);
+        Long activity_id = activity.getActivity_id();
+        try {
+            /**更新activity表*/
+            Integer resultCount = activityService.UpdateAct(activity);
+            /**更新tag*/
+            //删除所有旧tag
+            activityTagService.DeleteActAllTags(activity_id);
+            //添加当前tag
+            activityTagService.AddActTags(activity_id, tag_ids);
+
+            if (resultCount == 0) {
+                return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "patchOneAct FAILED");
+            }
+            return Result.success("patchOneAct SUCCESS");
+        } catch (Exception e) {
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "patchOneAct FAILED");
+        }
+
     }
 
 
@@ -337,21 +371,21 @@ public class ActivityController {
             //修改活动状态
             Integer res = activityService.SetActivityState(activity_id, 1);
             //取所有报名者
-            List<ActivityApply> applyList=activityApplyService.GetAllApplicantList(activity_id);
+            List<ActivityApply> applyList = activityApplyService.GetAllApplicantList(activity_id);
             //取得活动信息
-            Activity activity=activityService.getAct(activity_id);
-            Integer capacity=activity.getCapacity();
-            Integer participatant_num=activity.getParticipant_num();
+            Activity activity = activityService.getAct(activity_id);
+            Integer capacity = activity.getCapacity();
+            Integer participatant_num = activity.getParticipant_num();
             //按时间排序，最早在前
-            List<ActivityApply> applyList_sort=applyList.stream().sorted
+            List<ActivityApply> applyList_sort = applyList.stream().sorted
                     (Comparator.comparingLong(a -> a.getApply_time().getTime())).collect(Collectors.toList());
 //            System.out.println("applyList_sort:"+applyList_sort.toString());
 
             //删除所有报名人
             activityApplyService.DeleteAct(activity_id);
             //按剩余空位，报名人依次进入参与名单
-            for (int i=0;i<capacity-participatant_num;i++){
-                ActivityParticipate participate=new ActivityParticipate();
+            for (int i = 0; i < capacity - participatant_num; i++) {
+                ActivityParticipate participate = new ActivityParticipate();
                 participate.setActivity_id(activity_id);
                 participate.setUser_id(applyList_sort.get(i).getUser_id());
                 activityParticipateService.AddParticipant(participate);
@@ -364,7 +398,6 @@ public class ActivityController {
 
         }
     }
-
 
 
     /**
@@ -426,12 +459,12 @@ public class ActivityController {
      */
     @ApiOperation("获取参与某活动的所有用户列表")
     @GetMapping("/getActApplicantList")
-    public Result<List<Map<String,Object>>>GetActApplicantList(
+    public Result<List<Map<String, Object>>> GetActApplicantList(
             @ApiParam(name = "activity_id", value = "活动id", required = true)
             @RequestParam("activity_id") Long activity_id) {
         try {
-            List<Map<String,Object>> list=new ArrayList<>();
-            list=activityParticipateService.SelectActApplicantList(activity_id);
+            List<Map<String, Object>> list = new ArrayList<>();
+            list = activityParticipateService.SelectActApplicantList(activity_id);
             return Result.success(list);
         } catch (Exception e) {
             return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "GetActApplicantList FAILED");
@@ -439,38 +472,60 @@ public class ActivityController {
     }
 
 
-
     /**
      * 创建人删除活动
      * 同时删除其他所有表的相关记录
-     * */
+     */
     @ApiOperation("创建人删除活动")
     @DeleteMapping("/deleteAct")
-    public Result<Map<String,Object>> DeleteAct(
+    public Result<Map<String, Object>> DeleteAct(
             @ApiParam(name = "user_id", value = "用户id", required = true)
             @RequestParam("user_id") Long user_id,
             @ApiParam(name = "activity_id", value = "活动id", required = true)
-            @RequestParam("activity_id") Long activity_id){
+            @RequestParam("activity_id") Long activity_id) {
         Integer delete_act;
-        Map<String,Object> res_map=new HashMap<>();
-        res_map.put("user_id",user_id);
-        res_map.put("activity_id",activity_id);
-        try{
+        Map<String, Object> res_map = new HashMap<>();
+        res_map.put("user_id", user_id);
+        res_map.put("activity_id", activity_id);
+        try {
             /**删除活动本身*/
-           delete_act=activityService.DeleteAct(activity_id);
-           System.out.println("delete_act:"+delete_act);
-           if (delete_act==1){
-               /**act本体删除成功，删除相关的表记录*/
-               activityApplyService.DeleteAct(activity_id);
-               activityParticipateService.DeleteAct(activity_id);
-               return Result.success(res_map);
-           }else{
-               return Result.fail(HttpStatus.EXPECTATION_FAILED.value(),"DeleteAct FAILED!");
-           }
-        }catch (Exception e){
-            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(),"DeleteAct FAILED!");
+            delete_act = activityService.DeleteAct(activity_id);
+            System.out.println("delete_act:" + delete_act);
+            if (delete_act == 1) {
+                /**act本体删除成功，删除相关的表记录*/
+                activityApplyService.DeleteAct(activity_id);
+                activityParticipateService.DeleteAct(activity_id);
+                return Result.success(res_map);
+            } else {
+                return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "DeleteAct FAILED!");
+            }
+        } catch (Exception e) {
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "DeleteAct FAILED!");
         }
 
+    }
+
+    /**获取地图范围内的活动*/
+    @ApiOperation("获取地图范围内的活动")
+    @GetMapping("/getMapAct")
+    public Result<Map<String,Object>> GetMapAct(
+            @ApiParam(name = "latitudes", value = "latitudes", required = true)
+            @RequestParam("latitudes") List<Double> latitudes,
+            @ApiParam(name = "longitudes", value = "longitudes", required = true)
+            @RequestParam("longitudes") List<Double> longitudes
+            ) {
+//        System.out.println("latitudes"+latitudes);
+        Map<String,Object> map=new HashMap<>();
+        List<Activity> activityList = new ArrayList<>();
+        try {
+            activityList=activityService.GetMapActList(latitudes,longitudes);
+            map.put("activityList",activityList);
+            map.put("latitudes",latitudes);
+            map.put("longitudes",longitudes);
+            return Result.success(map);
+        } catch (Exception e) {
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "GetMapAct failed");
+        }
     }
 
 

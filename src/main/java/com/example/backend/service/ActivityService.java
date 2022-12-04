@@ -52,14 +52,14 @@ public interface ActivityService {
 
 
     /**新建活动*/
-    Integer CreateAct(Activity act);
+    Long CreateAct(Activity act);
 
     /**删除活动*/
     Integer DeleteAct(Long activity_id);
 
 
     /**更新一个活动的信息,输入一个Activity，按照ID查找而更新*/
-    Result<String> UpdateAct(Activity act);
+    Integer UpdateAct(Activity act);
 
     /**判断用户是不是活动的创建者*/
     ActivityUserRole isCreator(Long user_id, Long activity_id) ;
@@ -67,5 +67,13 @@ public interface ActivityService {
 
     /**修改活动的状态，指定为目标状态*/
     Integer SetActivityState(Long activity_id,Integer state_val);
+
+
+
+    /**获取地图范围内的所有活动*/
+    List<Activity> GetMapActList(List<Double>Latitudes,List<Double>Longitudes);
+
+    /**活动的images，覆盖*/
+    String PatchActImages(String images,Long activity_id);
 
 }

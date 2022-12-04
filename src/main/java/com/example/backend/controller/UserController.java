@@ -45,7 +45,7 @@ public class UserController {
     public Result<User> findUser(){
         //System.out.println(jwtUtil.getUserId(request.getHeader("token")));
         Long userid = Long.valueOf(jwtUtil.getUserId(request.getHeader("token")));
-        return userService.findUser(userid);
+        return Result.success(userService.findUser(userid));
     }
     @GetMapping("logout")
     public Result<String> logout(){

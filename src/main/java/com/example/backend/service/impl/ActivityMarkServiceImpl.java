@@ -2,7 +2,7 @@ package com.example.backend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.backend.entity.ActivityMark;
-import com.example.backend.entity.UserMark;
+
 import com.example.backend.mapper.ActivityMarkMapper;
 import com.example.backend.service.ActivityMarkService;
 import org.springframework.beans.factory.annotation.Autowired;

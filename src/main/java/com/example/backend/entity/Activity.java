@@ -56,7 +56,6 @@ public class Activity {
 
     @DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd hh:mm:ss")
-
     @TableField( "create_time")
     private Date create_time;
 
@@ -96,6 +95,9 @@ public class Activity {
 
     @TableField( "latitude")
     private Double latitude;
+
+    @TableField( "images")
+    private String images;
 
 
 

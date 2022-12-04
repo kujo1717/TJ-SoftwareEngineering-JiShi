@@ -28,6 +28,8 @@ public class MvcConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/static/");  // 静态资源路径
     }
 
+
+
     /**
      * jwt拦截器
      * */
