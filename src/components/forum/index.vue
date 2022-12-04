@@ -31,7 +31,7 @@
         maxlength="200"
         v-model="message"
       ></el-input>
-      <el-button type="info" round class="submit-message" @click="submitMessage"
+      <el-button type="info" round class="submit-message"
         >留言</el-button
       >
     </div>
