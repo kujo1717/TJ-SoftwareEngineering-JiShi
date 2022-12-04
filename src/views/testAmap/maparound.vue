@@ -75,8 +75,13 @@
             >
               <el-card id="info-window">
                 <div>
-                  <p>{{ window.address }}</p>
-                  <el-button type="text">查看详情</el-button>
+                  <p>{{ window.activity_id }}</p>
+                  <p>{{ window.activity_id }}</p>
+                  <el-button
+                    type="text"
+                    @click="ClickActDetail(window.activity_id)"
+                    >查看详情00</el-button
+                  >
                 </div>
               </el-card>
             </el-amap-info-window>
@@ -354,6 +359,7 @@ export default {
           showShadow: false,
           visible: false, // 初始是否显示
           address: item.address,
+          activity_id: item.activity_id,
         });
       });
       //  加点
@@ -383,6 +389,18 @@ export default {
       console.log(this.map_scope);
 
       return this.map_scope;
+    },
+
+    //跳转活动详情页面
+    ClickActDetail(activity_id) {
+      //跳转路由
+      let query_data = {
+        id: activity_id,
+      };
+      this.$router.push({
+        name: "ActivityPage",
+        query: query_data,
+      });
     },
 
     //***/ */

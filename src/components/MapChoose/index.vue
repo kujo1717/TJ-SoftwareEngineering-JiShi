@@ -243,7 +243,9 @@ export default {
       }
     },
   },
-  mounted() {},
+  mounted() {
+    console.log("primitiveData_comp:", this.primitiveData_comp);
+  },
   methods: {
     itemChange(n, index) {
       const that = this;

@@ -587,7 +587,7 @@
               ></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="24">
+          <el-col :span="24" v-if="false">
             <el-form-item label="上传相关图片" prop="file_value">
               <el-upload
                 ref="file_value"
@@ -611,12 +611,13 @@
         <el-button @click="CancelEdit">取消</el-button>
         <el-button type="primary" @click="ConfirmEdit">确定</el-button>
       </div>
-
-      <MapChoose
-        :dialogShow.sync="innerVisible"
-        @locationSure="locationSure"
-        :primitiveData_comp="primitiveData"
-      ></MapChoose>
+      <span v-if="primitiveData != -1">
+        <MapChoose
+          :dialogShow.sync="innerVisible"
+          @locationSure="locationSure"
+          :primitiveData_comp="primitiveData"
+        ></MapChoose>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -800,10 +801,10 @@ export default {
 
       //show地图
       innerVisible: false,
-      /* 修改活动信息 */
+
       //map:null,
-      primitiveData: [],
-      innerVisible: false,
+      primitiveData: -1,
+      /* 修改活动信息 */
       isShow_: true,
       newact_form: {
         title_name: undefined,
@@ -1251,6 +1252,9 @@ export default {
       //   query: query_data,
       // });
       this.GetAllTags();
+      setTimeout(() => {
+        this.getLngLatLocation();
+      }, 100);
       this.isShow_dialog_edit = true;
     },
     // 点击删除
@@ -1508,9 +1512,6 @@ export default {
         .catch((err) => {
           console.log("getAllTag:err:", err);
         });
-      setTimeout(() => {
-        this.getLngLatLocation();
-      }, 100);
     },
     TagGroupChange() {
       console.log("this.newact_form.tags", this.newact_form.tags);
