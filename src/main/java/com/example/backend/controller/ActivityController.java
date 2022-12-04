@@ -49,6 +49,21 @@ public class ActivityController {
     @Autowired
     private ModelMapper modelMapper;
 
+
+    @ApiOperation("获取可以报名的活动")
+    @GetMapping("/getAvailableActs")
+    public Result<List<Activity>> getAvailableActs() {
+        List<Activity> list;
+        try {
+            list = activityService.getAvailableActs();
+            return Result.success(list);
+        } catch (Exception e) {
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "getAvailableActs failed");
+        }
+    }
+
+
+
     @ApiOperation("获取所有活动")
     @GetMapping("/getAll")
     public Result<Map<String,Object>> GetAll() {

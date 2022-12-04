@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.entity.ActivityTag;
 import com.example.backend.entity.Tag;
 import org.springframework.stereotype.Service;
 
@@ -22,5 +23,10 @@ public interface ActivityTagService {
 
     /**获取活动的所有tag*/
     List<Map<String, Object>> GetActAllTags(Long activity_id);
+
+    List<ActivityTag> getActTags(Long activity_id);
+    List<Long> getActIDByTags(List<Long> requiredTags);
+    List<Long> getActIDByTag(Long requiredTagID);
+
 
 }

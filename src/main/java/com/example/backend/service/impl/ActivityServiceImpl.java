@@ -179,4 +179,13 @@ public class ActivityServiceImpl implements ActivityService{
         );
         return images;
     }
+
+
+    @Override
+    public List<Activity> getAvailableActs(){
+        QueryWrapper queryWrapper = new QueryWrapper<>();queryWrapper.eq("state", 0);
+        List<Activity> list=activityMapper.selectList(queryWrapper);
+        System.out.println(activityMapper.selectList(queryWrapper));
+        return list;
+    }
 }

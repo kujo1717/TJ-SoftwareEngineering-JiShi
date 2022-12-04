@@ -16,6 +16,8 @@ import java.util.Map;
 @Service
 public interface ActivityService {
 
+    /**获取所有可报名的活动*/
+    List<Activity> getAvailableActs();
 
     List<Activity> getAll();
 

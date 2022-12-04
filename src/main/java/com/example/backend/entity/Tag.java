@@ -26,8 +26,8 @@ public class Tag {
     @TableId(type = IdType.ASSIGN_ID,value = "tag_id")
     private Long tag_id;
 
-    @TableField("name")
-    private String name;
+    @TableField("tag_name")
+    private String tag_name;
 
     @TableField("num")
     private Integer num;

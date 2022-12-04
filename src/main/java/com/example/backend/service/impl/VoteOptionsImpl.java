@@ -17,27 +17,27 @@ import java.util.List;
 public class VoteOptionsImpl implements VoteOptionService{
   @Autowired
   private VoteOptionMapper voteOptionMapper;
-  public List<VoteOption> findVoteOption(Long poll_id){
+  public List<VoteOption> findVoteOption(Long pollID){
 
     QueryWrapper<VoteOption> queryWrapper=new QueryWrapper<>();
     queryWrapper
-      .eq("poll_id",poll_id);
+            .eq("poll_id",pollID);
     List<VoteOption> list=voteOptionMapper.selectList(queryWrapper);
     System.out.println(voteOptionMapper.selectList(queryWrapper));
 
     return list;
   }
-  public int UpdateVotes(Long option_id){
-    VoteOption voteOption =  voteOptionMapper.selectById(option_id);
+  public int UpdateVotes(Long optionID){
+    VoteOption voteOption =  voteOptionMapper.selectById(optionID);
     voteOptionMapper.updateById(voteOption);
     return 1;
   }
-  public Result<String> createVoteOptions(List<options> voteOptions,Long poll_id){
+  public Result<String> createVoteOptions(List<options> voteOptions,Long pollID){
     for (int i=0;i<voteOptions.size();i++){
       VoteOption voteOption=new VoteOption();
-      voteOption.setOption_name(voteOptions.get(i).getOption());
-      voteOption.setPoll_id(poll_id);
-      voteOption.setVote_num(0);
+      voteOption.setOptionName(voteOptions.get(i).getOption());
+      voteOption.setPollID(pollID);
+      voteOption.setVoteNum(0);
       int newID = voteOptionMapper.insert(voteOption);
       if(newID == Integer.MIN_VALUE + 1001) {
         return Result.fail(500, "插入数据失败！");
