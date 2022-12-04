@@ -39,7 +39,7 @@ public class VoteOptionController {
   @ApiOperation("统计总票数")
   @PutMapping("/putTotal/{optionID}")
   public int putTotal(@ApiParam(name="optionID", value="选项id", required = true)
-                                     @PathVariable("optionID") Long optionID)
+                      @PathVariable("optionID") Long optionID)
   {
     return voteOptionService.UpdateVotes(optionID);
   }

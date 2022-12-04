@@ -21,13 +21,12 @@ public class VoteOptionsImpl implements VoteOptionService{
 
     QueryWrapper<VoteOption> queryWrapper=new QueryWrapper<>();
     queryWrapper
-      .eq("poll_id",pollID);
+            .eq("poll_id",pollID);
     List<VoteOption> list=voteOptionMapper.selectList(queryWrapper);
     System.out.println(voteOptionMapper.selectList(queryWrapper));
 
     return list;
   }
-
   public int UpdateVotes(Long optionID){
     VoteOption voteOption =  voteOptionMapper.selectById(optionID);
     voteOptionMapper.updateById(voteOption);
