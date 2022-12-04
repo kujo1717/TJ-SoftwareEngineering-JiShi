@@ -3,9 +3,7 @@ package com.example.backend.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.backend.entity.Classification;
 import com.example.backend.entity.Message;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -16,6 +14,10 @@ import java.util.List;
  */
 @Mapper
 public interface MessageMapper extends BaseMapper<Message> {
-    @Select("SELECT * FROM message WHERE receiver_id=${userId}")
-    List<Message> selectOneUserAllMessage(@Param("userId") Long userId);
+    @Select("SELECT * FROM message WHERE activity_id=${activityId}")
+    List<Message> selectActivityAllMessage(@Param("activityId") Long activityId);
+
+    @Insert("INSERT into message (message_id,activity_id,sender_id,status,type,file_id,send_time,content) values(#{messageId},#{activityId},#{senderId},#{status},#{type},null,#{sendTime},#{content})")
+    @Options(useGeneratedKeys = true, keyProperty = "messageId", keyColumn = "message_id")
+    int insertMessage(Message message);
 }

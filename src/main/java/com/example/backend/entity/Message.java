@@ -9,7 +9,9 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.ibatis.jdbc.Null;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -23,21 +25,44 @@ import java.util.Date;
 @TableName("message")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Message {
-
-    @TableId(type = IdType.ASSIGN_ID)
-    @JsonSerialize(using= ToStringSerializer.class)
+    @JsonSerialize(using = ToStringSerializer.class)
+    @TableId(type = IdType.AUTO)
     private Long messageId;
-
-    @JsonSerialize(using= ToStringSerializer.class)
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long activityId;
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long senderId;
-
-    @JsonSerialize(using= ToStringSerializer.class)
-    private Long receiverId;
-
-    @JsonSerialize(using= ToStringSerializer.class)
-    private Long msgInfoId;
-
     private int status;
+    private int type;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long fileId;
+    private Long sendTime;
+    private String content;
 
-    private Date createTime;
+    public Message(Long activityId, Long senderId, int status, int type, Long sendTime) {
+        this.activityId = activityId;
+        this.senderId = senderId;
+        this.status = status;
+        this.type = type;
+        this.sendTime = sendTime;
+    }
+
+    public Message(Long activityId, Long senderId, int status, int type, Long sendTime, String content) {
+        this.activityId = activityId;
+        this.senderId = senderId;
+        this.status = status;
+        this.type = type;
+        this.sendTime = sendTime;
+        this.content = content;
+    }
+
+    public Message(Long activityId, Long senderId, int status, int type, Long fileId, Long sendTime, String content) {
+        this.activityId = activityId;
+        this.senderId = senderId;
+        this.status = status;
+        this.type = type;
+        this.fileId = fileId;
+        this.sendTime = sendTime;
+        this.content = content;
+    }
 }

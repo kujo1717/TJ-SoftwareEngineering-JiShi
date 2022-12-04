@@ -12,5 +12,7 @@ import java.util.List;
  */
 @Service
 public interface MessageService {
-    List<Message> findOneUserAllClassificationTitle(Long userId);
+    List<Message> findActivityAllMessage(Long activityId);
+
+    int addMessage(Message message);
 }

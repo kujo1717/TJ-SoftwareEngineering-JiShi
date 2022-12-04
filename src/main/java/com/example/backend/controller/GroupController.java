@@ -16,31 +16,38 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @Author 2051196 刘一飞
  * @Date 2022/11/25
  * @JDKVersion 17.0.4
  */
-@Api(tags = {"Contact"})
+@Api(tags = {"Group"})
 @RestController
-@RequestMapping("Contact")
+@RequestMapping("Group")
 public class GroupController {
     @Autowired
     GroupService groupService;
 
     @Autowired
     UserService userService;
-    @ApiOperation("获取某一个群聊的所有用户")
+
+    @ApiOperation("获取某一个用户在群聊中的所有联系人")
     @GetMapping("getOneGroupAllUser")
     public Result<List<User>> findOneGroupAllUser(@ApiParam(name = "groupId", value = "要查找的群聊id", required = true)
-                                                                         @RequestParam("groupId") Long groupId) {
+                                                  @RequestParam("groupId") Long groupId,
+                                                  @ApiParam(name = "userId", value = "用户Id", required = true)
+                                                  @RequestParam("userId") Long userId) {
         try {
             ArrayList<User> users = new ArrayList<>();
             List<Group> oneGroupAllUser = groupService.findOneGroupAllUser(groupId);
-            for (Group g:oneGroupAllUser) {
-                User user1 = userService.findUserById(g.getUserId());
-                users.add(user1);
+            for (Group g : oneGroupAllUser) {
+                // 排除自身的数据
+                if(!Objects.equals(g.getUserId(), userId)) {
+                    User user1 = userService.findUserById(g.getUserId());
+                    users.add(user1);
+                }
             }
 
             return Result.success(users);

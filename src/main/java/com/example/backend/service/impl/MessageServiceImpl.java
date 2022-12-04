@@ -19,8 +19,12 @@ public class MessageServiceImpl implements MessageService {
     MessageMapper messageMapper;
 
     @Override
-    public List<Message> findOneUserAllClassificationTitle(Long userId) {
-        List<Message> messageList = messageMapper.selectOneUserAllMessage(userId);
-        return messageList;
+    public List<Message> findActivityAllMessage(Long activityId) {
+        return messageMapper.selectActivityAllMessage(activityId);
+    }
+
+    @Override
+    public int addMessage(Message message) {
+        return messageMapper.insertMessage(message);
     }
 }
