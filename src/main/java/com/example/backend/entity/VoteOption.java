@@ -10,14 +10,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @TableName("vote_option")
 public class VoteOption {
-  @TableId(type = IdType.ASSIGN_ID)
-  private Long option_id;
-  private String option_name;
-  private Long poll_id;
-  @TableField(update ="%s+1",updateStrategy = FieldStrategy.IGNORED)
-  private int vote_num;
+  @TableId(type = IdType.ASSIGN_ID,value="option_id")
+  private Long optionID;
+  @TableField("option_name")
+  private String optionName;
+  @TableField("poll_id")
+  private Long pollID;
+  @TableField(value="vote_num",update ="%s+1",updateStrategy = FieldStrategy.IGNORED)
+  private int voteNum;
 
-  public String getOption_name() {
-    return option_name;
+  public String getoptionName() {
+    return optionName;
   }
 }

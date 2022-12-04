@@ -34,6 +34,10 @@ public class TagServiceImpl implements TagService {
     public List<Map<String,Object>> GetAllTags() {
         return tagMapper.SelectAll();
     }
-
+    public Tag findTag(Long tag_id){
+        Tag tag=tagMapper.selectById(tag_id);
+        System.out.println(tag);
+        return tag;
+    }
 
 }

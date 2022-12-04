@@ -20,6 +20,8 @@ public interface TagService {
 
     List<Map<String,Object>> GetAllTags();
 
+    Tag findTag(Long tag_id);
+
 
 
 

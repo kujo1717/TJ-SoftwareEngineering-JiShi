@@ -1,6 +1,7 @@
 package com.example.backend.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -18,21 +19,25 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("poll")
+@TableName(value="poll",autoResultMap = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Poll{
   @JsonSerialize(using= ToStringSerializer.class)
-  @TableId(type = IdType.ASSIGN_ID)
-  private Long poll_id;
+  @TableId(type = IdType.ASSIGN_ID,value="poll_id")
+  private Long pollID;
+  @TableField("activity_id")
   private Long activity_id;
-  private String topic_text;
+  @TableField("topic_text")
+  private String topicText;
 
-  @DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
+  @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+  @TableField("deadline")
   private LocalDateTime deadline;
-  private boolean multiple_choice;
+  @TableField("multiple_choice")
+  private boolean multipleChoice;
 
-  public void setActivity_id(Long activity_id) {
+  public void setactivity_id(Long activity_id) {
     this.activity_id = activity_id;
   }
 
@@ -40,11 +45,11 @@ public class Poll{
     this.deadline = deadline;
   }
 
-  public void setMultiple_choice(boolean multiple_choice) {
-    this.multiple_choice = multiple_choice;
+  public void setmultipleChoice(boolean multipleChoice) {
+    this.multipleChoice = multipleChoice;
   }
 
-  public void setTopic_text(String topic_text) {
-    this.topic_text = topic_text;
+  public void settopicText(String topicText) {
+    this.topicText = topicText;
   }
 }
