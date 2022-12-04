@@ -3,21 +3,36 @@
 import ContactsData from "@/assets/contacts";
 import MessagesData from "@/assets/messages";
 import EmojiData from "@/assets/emoji";
-import { getOneGroupAllUser, getUserInfoById } from "@/api/chat";
+import {
+  getOneGroupAllUser,
+  getUserInfoById,
+  getActivityAllMessage,
+  sendMessage,
+} from "@/api/chat";
 export default {
   name: "QqImui",
   components: {},
   data() {
     return {
       GroupMems: null,
-      userId: 1,
+      activityId: 1,
       userData: {
         id: null,
         avatar: null,
-        displayName: null
+        displayName: null,
       },
+      messages: [],
     };
   },
+  // props: {
+  //   activityId: {
+  //     type: Number,
+  //     required: true,
+  //     default: () => {
+  //       return -1;
+  //     },
+  //   },
+  // },
   render() {
     return (
       <div class="qq-lemon-imui">
@@ -31,7 +46,6 @@ export default {
           ref="IMUI"
           on={{
             "pull-messages": this.handlePullMessages,
-            "change-contact": this.handleChansgeContact,
             send: this.handleSend,
           }}
           scopedSlots={{
@@ -94,7 +108,7 @@ export default {
                     <div class="slot-group-title">群成员</div>
                     <div class="slot-group-panel">
                       <input class="slot-search" placeholder="搜索群成员" />
-                      {this.GroupMems.map((item) => (
+                      {(this.GroupMems || []).map((item) => (
                         <div>{item.name}</div>
                       ))}
                     </div>
@@ -108,7 +122,6 @@ export default {
     );
   },
   computed: {
-   
     /**
      * 用户个人信息
      */
@@ -116,42 +129,91 @@ export default {
       get: function () {
         return this.$store.getters.id;
       },
-
     },
     user_name: {
       get: function () {
         return this.$store.getters.name;
       },
-
+    },
+    user_avatar: {
+      get: function () {
+        return this.$store.getters.avatar;
+      },
     },
   },
   watch: {},
   created() {},
   async mounted() {
+    this.activityId = this.$route.query.id;
+    // this.activityId = 1;
+    console.log("BigChatBox:this.activityId:", this.activityId);
+
     const IMUI = this.$refs.IMUI;
-    IMUI.initContacts(ContactsData);
+    var websocket = null;
+    if ("WebSocket" in window) {
+      websocket = new WebSocket("ws://localhost:8081/api/webSocket");
+    } else {
+      alert("该浏览器不支持websocket！");
+    }
+
+    websocket.onopen = function (event) {
+      console.log("建立连接");
+    };
+    websocket.onclose = function (event) {
+      console.log("连接关闭");
+    };
+    websocket.onmessage = function (event) {
+      console.log("收到消息");
+      //将字符串转为JSON对象
+      var message = JSON.parse(event.data);
+      console.log(message);
+      IMUI.appendMessage(message, true);
+    };
+    websocket.onerror = function (event) {
+      console.log("websocket通信发生错误");
+    };
+
+    window.onbeforeunload = function () {
+      websocket.close();
+    };
+
+    // IMUI.initContacts(ContactsData);
+    IMUI.initContacts([
+      {
+        id: this.activityId,
+        displayName: "活动群",
+        isGroup: true,
+        unread: 0,
+        lastSendTime: 1566047865417,
+        lastContent: "这个咋处理啊？",
+      },
+    ]);
     IMUI.initEmoji(EmojiData);
-    IMUI.changeContact(13);
-    await getUserInfoById(this.userId)
-    .then(res => {
-      console.log("用户数据",res);
-      let tmp = res.data;
-      this.userData.id = tmp.userId;
-      this.avatar = tmp.avatar;
-      this.displayName = tmp.name;
-    })
-    .catch(err => {
-      console.log(err);
-    })
-    await getOneGroupAllUser(this.userId)
-    .then((res) => {
-      this.GroupMems = res.data;
-      console.log("!", this.GroupMems);
-    })
-    .catch(err => {
-      console.log(err);
-    })
-    
+    IMUI.changeContact(this.activityId);
+
+    this.userData.id = this.userId;
+    this.userData.avatar = this.user_avatar;
+    this.userData.displayName = this.user_name;
+    console.log("user_info:", this.userData.displayName);
+    // await getUserInfoById(this.userId)
+    //   .then((res) => {
+    //     let tmp = res.data;
+    //     this.userData.id = tmp.userId;
+    //     this.userData.avatar = tmp.avatar;
+    //     this.userData.displayName = tmp.name;
+    //     console.log("用户数据", this.userData);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
+    // await getOneGroupAllUser(1, this.userId)
+    //   .then((res) => {
+    //     this.GroupMems = res.data;
+    //     console.log("联系人数据", this.GroupMems);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   },
   methods: {
     openDrawer(position) {
@@ -176,30 +238,40 @@ export default {
       }
       IMUI.openDrawer(params);
     },
-    handlePullMessages(contact, next) {
-      console.log("contact",contact);
-      // next(MessagesData[contact.id], true);
-      next(
-        [{
-          id: 1,
-          status: "succeed",
-          type: "text",
-          sendTime: 1566047865417,
-          content: "我是测试时候看到的",
-          toContactId: 1,
-          fromUser: this.userData,
-        }], true);
-      // const { IMUI } = this.$refs;
-      // setTimeout(() => {
-      //   next(MessagesData[contact.id], true);
-      // }, 3000);
+    async handlePullMessages(contact, next) {
+      await getActivityAllMessage(this.activityId)
+        .then((res) => {
+          this.messages = res.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      console.log("联系人：", contact);
+      console.log("所有的聊天信息为", this.messages);
+      next(this.messages, true);
     },
-    handleChangeContact() {},
     handleSend(message, next, file) {
-      console.log(message, next, file);
-      setTimeout(() => {
-        next();
-      }, 1000);
+      if (file == null) {
+        // 表明是文本类型
+        console.log(message);
+        console.log(file);
+        sendMessage(
+          this.activityId,
+          this.userId,
+          1,
+          0,
+          new Date().getTime(),
+          message.content
+        )
+          .then((res) => {
+            console.log(res);
+            next();
+          })
+          .catch((err) => {
+            console.log(err);
+            next({ status: "failed" });
+          });
+      }
     },
   },
 };
