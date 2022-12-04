@@ -1,6 +1,7 @@
 package com.example.backend.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.backend.common.Result;
 import com.example.backend.dto.ActivityUserRole;
 import com.example.backend.entity.Activity;
@@ -97,9 +98,10 @@ public class ActivityServiceImpl implements ActivityService{
 
     @Override
     @Transactional
-    public Integer CreateAct(Activity act) {
-        int newID = activityMapper.insert(act);
-
+    public Long CreateAct(Activity act) {
+        Long newID;
+        activityMapper.insert(act);
+        newID=act.getActivity_id();
         return newID;
     }
 
@@ -154,4 +156,27 @@ public class ActivityServiceImpl implements ActivityService{
     }
 
 
+    @Override
+    public List<Activity> GetMapActList(List<Double>Latitudes,List<Double>Longitudes) {
+        QueryWrapper<Activity> queryWrapper=new QueryWrapper<>();
+        queryWrapper
+                .between("latitude",Latitudes.get(0),Latitudes.get(1))
+                .between("longitude",Longitudes.get(0),Longitudes.get(1));
+        List<Activity> activityList=activityMapper.selectList(queryWrapper);
+
+
+        return activityList;
+    }
+
+    @Override
+    public String PatchActImages(String images,Long activity_id) {
+
+        activityMapper.update(
+                null,
+                Wrappers.<Activity>lambdaUpdate()
+                        .set(Activity::getImages,images)
+                        .eq(Activity::getActivity_id,activity_id)
+        );
+        return images;
+    }
 }

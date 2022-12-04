@@ -96,6 +96,9 @@ public class Activity {
     @TableField( "latitude")
     private Double latitude;
 
+    @TableField( "images")
+    private String images;
+
 
 
 

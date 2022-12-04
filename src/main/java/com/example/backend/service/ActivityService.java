@@ -52,7 +52,7 @@ public interface ActivityService {
 
 
     /**新建活动*/
-    Integer CreateAct(Activity act);
+    Long CreateAct(Activity act);
 
     /**删除活动*/
     Integer DeleteAct(Long activity_id);
@@ -67,5 +67,13 @@ public interface ActivityService {
 
     /**修改活动的状态，指定为目标状态*/
     Integer SetActivityState(Long activity_id,Integer state_val);
+
+
+
+    /**获取地图范围内的所有活动*/
+    List<Activity> GetMapActList(List<Double>Latitudes,List<Double>Longitudes);
+
+    /**活动的images，覆盖*/
+    String PatchActImages(String images,Long activity_id);
 
 }

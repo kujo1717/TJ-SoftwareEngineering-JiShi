@@ -201,13 +201,14 @@ public class ActivityController {
 
     @ApiOperation("新建活动")
     @PostMapping("/postAct")
-    public Result<Integer> insertOneActivity(
+    public Result<Map<String,Object>> insertOneActivity(
             @RequestBody Activity activity,
             @ApiParam(name = "tag_ids", value = "tag_ids", required = true)
             @RequestParam("tag_ids") List<Long> tag_ids) {
+        Map<String,Object> result_map=new HashMap<>();
         System.out.println(activity);
         System.out.println(tag_ids);
-        Integer newID = 1;
+        Long newID;
         try {
             /**创建活动*/
             newID = activityService.CreateAct(activity);
@@ -228,8 +229,8 @@ public class ActivityController {
         } catch (Exception e) {
             return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "insertOneActivity FAILED");
         }
-
-        return Result.success(newID);
+        result_map.put("activity_id",newID);
+        return Result.success(result_map);
     }
 
     @ApiOperation("更新活动信息")
@@ -502,6 +503,29 @@ public class ActivityController {
             return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "DeleteAct FAILED!");
         }
 
+    }
+
+    /**获取地图范围内的活动*/
+    @ApiOperation("获取地图范围内的活动")
+    @GetMapping("/getMapAct")
+    public Result<Map<String,Object>> GetMapAct(
+            @ApiParam(name = "latitudes", value = "latitudes", required = true)
+            @RequestParam("latitudes") List<Double> latitudes,
+            @ApiParam(name = "longitudes", value = "longitudes", required = true)
+            @RequestParam("longitudes") List<Double> longitudes
+            ) {
+//        System.out.println("latitudes"+latitudes);
+        Map<String,Object> map=new HashMap<>();
+        List<Activity> activityList = new ArrayList<>();
+        try {
+            activityList=activityService.GetMapActList(latitudes,longitudes);
+            map.put("activityList",activityList);
+            map.put("latitudes",latitudes);
+            map.put("longitudes",longitudes);
+            return Result.success(map);
+        } catch (Exception e) {
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "GetMapAct failed");
+        }
     }
 
 

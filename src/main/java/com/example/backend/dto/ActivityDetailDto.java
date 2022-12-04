@@ -68,6 +68,8 @@ public class ActivityDetailDto {
     private String address_name;
     private Double longitude;
     private Double latitude;
+    private String images;
+
     /**
      * 添加属性
      *
@@ -102,6 +104,7 @@ public class ActivityDetailDto {
         this.longitude=activity.getLongitude();
         this.latitude=activity.getLatitude();
         this.repeat_interval=activity.getRepeat_interval();
+        this.images=activity.getImages();
 
     }
 
