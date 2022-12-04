@@ -1,6 +1,33 @@
 import request from '@/utils/request'
 
+//获取可报名的活动列表,即state=0
+export function getAvailableActs() {
+    return request({
+        url: '/api/activity/getAvailableActs',
+        method: 'get',
+        params: {
+        }
+    })
+}
 
+//获取活动的标签列表
+export function findActTags(act_id) {
+    return request({
+        url: '/api/activityTag/getActTag/'+ act_id.toString(),
+        method: 'get',
+        params: {
+        }
+    })
+}
+
+//获取某（些）标签下的活动列表
+export function getActByTag(param) {
+    return request({
+        url: '/api/activityTag/getActByTag/',
+        method: 'post',
+        data: param
+    })
+}
 
 //获取活动列表,用户所有的，即参与的+报名的
 export function getActList_All(user_id, state) {
