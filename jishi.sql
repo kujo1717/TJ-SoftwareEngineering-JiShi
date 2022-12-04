@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 04/12/2022 11:15:44
+ Date: 04/12/2022 21:29:41
 */
 
 SET NAMES utf8mb4;
@@ -43,13 +43,16 @@ CREATE TABLE `activity`  (
   `longitude` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `latitude` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `images` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-  PRIMARY KEY (`activity_id`) USING BTREE
+  PRIMARY KEY (`activity_id`) USING BTREE,
+  INDEX `creator_id`(`creator_id`) USING BTREE,
+  CONSTRAINT `creator_id` FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of activity
 -- ----------------------------
-INSERT INTO `activity` VALUES (1599231060451835906, 'Cannot invoke \"com.example.backend.entity.User.getId()\" because \"user\" is null', NULL, 'Cannot invoke \"com.example.bac', '2022-11-17 00:00:00', NULL, '2022-12-04 10:36:11', 0, 1, 2, 1, NULL, 1, 0, NULL, 0, 'Cannot invoke \"com.example.backend.entity.User.getId()\" because \"user\" is null', 'Cannot invoke \"com.example.backend.entity.User.getId()\" because \"user\" is null', NULL, NULL, ':/activity/illus/1599231060451835906/404_cloud.0f4bc32b.png');
+INSERT INTO `activity` VALUES (1599384406513020929, 'System', NULL, 'System', '2022-11-17 00:00:00', NULL, '2022-12-04 20:45:32', 0, 1, 2, 1, NULL, 1, 0, NULL, 0, 'System', '上海市静安区江宁路街道康定路408号康定路418弄4号', '121.448486', '31.234702', '');
+INSERT INTO `activity` VALUES (1599384496623448066, 'System2', NULL, 'System2', '2022-11-17 00:00:00', NULL, '2022-12-04 20:45:53', 0, 1, 2, 1, NULL, 1, 0, NULL, 0, 'System2', '中华人民共和国', '122.287838', '31.079829', ':/activity/illus/1599384496623448066/404_cloud.0f4bc32b.png');
 
 -- ----------------------------
 -- Table structure for activity_apply
@@ -59,13 +62,13 @@ CREATE TABLE `activity_apply`  (
   `activity_id` bigint(0) NOT NULL,
   `user_id` bigint(0) NOT NULL,
   `apply_time` datetime(0) NULL DEFAULT NULL,
-  PRIMARY KEY (`activity_id`, `user_id`) USING BTREE
+  PRIMARY KEY (`activity_id`, `user_id`) USING BTREE,
+  CONSTRAINT `activity_id` FOREIGN KEY (`activity_id`) REFERENCES `activity` (`activity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of activity_apply
 -- ----------------------------
-INSERT INTO `activity_apply` VALUES (1599231060451835906, 2, '2022-12-04 10:45:53');
 
 -- ----------------------------
 -- Table structure for activity_invite
@@ -92,16 +95,13 @@ CREATE TABLE `activity_mark`  (
   `user_id` bigint(0) NOT NULL,
   `mark` int(0) NULL DEFAULT NULL,
   `mark_time` datetime(0) NULL DEFAULT NULL,
-  PRIMARY KEY (`activity_id`, `user_id`) USING BTREE
+  PRIMARY KEY (`activity_id`, `user_id`) USING BTREE,
+  CONSTRAINT `activity_mark_activity_id` FOREIGN KEY (`activity_id`) REFERENCES `activity` (`activity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of activity_mark
 -- ----------------------------
-INSERT INTO `activity_mark` VALUES (1597567450432405506, 6, 4, '2022-11-29 20:30:07');
-INSERT INTO `activity_mark` VALUES (1597567450432405506, 1146, 2, '2022-11-29 20:30:11');
-INSERT INTO `activity_mark` VALUES (1597906550960267266, 6, 3, '2022-11-30 18:56:17');
-INSERT INTO `activity_mark` VALUES (1597906550960267266, 1146, 4, '2022-11-30 18:55:54');
 
 -- ----------------------------
 -- Table structure for activity_participate
@@ -110,13 +110,15 @@ DROP TABLE IF EXISTS `activity_participate`;
 CREATE TABLE `activity_participate`  (
   `activity_id` bigint(0) NOT NULL,
   `user_id` bigint(0) NOT NULL,
-  PRIMARY KEY (`activity_id`, `user_id`) USING BTREE
+  PRIMARY KEY (`activity_id`, `user_id`) USING BTREE,
+  CONSTRAINT `activity_participate_activity_id` FOREIGN KEY (`activity_id`) REFERENCES `activity` (`activity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of activity_participate
 -- ----------------------------
-INSERT INTO `activity_participate` VALUES (1599231060451835906, 1);
+INSERT INTO `activity_participate` VALUES (1599384406513020929, 1);
+INSERT INTO `activity_participate` VALUES (1599384496623448066, 1);
 
 -- ----------------------------
 -- Table structure for activity_tag
@@ -131,29 +133,8 @@ CREATE TABLE `activity_tag`  (
 -- ----------------------------
 -- Records of activity_tag
 -- ----------------------------
-INSERT INTO `activity_tag` VALUES (1598310982021562370, 1);
-INSERT INTO `activity_tag` VALUES (1598310982021562370, 2);
-
--- ----------------------------
--- Table structure for address
--- ----------------------------
-DROP TABLE IF EXISTS `address`;
-CREATE TABLE `address`  (
-  `address_id` bigint(20) UNSIGNED ZEROFILL NOT NULL,
-  `address_formatted` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-  `address_name` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-  `longitude` double NULL DEFAULT NULL,
-  `latitude` double NULL DEFAULT NULL,
-  `province` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-  `district` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-  `township` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-  `street` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-  PRIMARY KEY (`address_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of address
--- ----------------------------
+INSERT INTO `activity_tag` VALUES (1599384406513020929, 1);
+INSERT INTO `activity_tag` VALUES (1599384496623448066, 2);
 
 -- ----------------------------
 -- Table structure for classification
@@ -214,6 +195,9 @@ CREATE TABLE `message`  (
 -- Records of message
 -- ----------------------------
 INSERT INTO `message` VALUES (1, 1599231060451835906, 1, 1, 0, 1566047865417, 'test', NULL);
+INSERT INTO `message` VALUES (40, 1599384406513020929, 1, 1, 0, 1670159424087, '123', NULL);
+INSERT INTO `message` VALUES (41, 1599384406513020929, 2, 1, 0, 1670159438437, '222', NULL);
+INSERT INTO `message` VALUES (42, 1599384406513020929, 1, 1, 0, 1670159455175, '111\n\n', NULL);
 
 -- ----------------------------
 -- Table structure for notice
@@ -251,6 +235,8 @@ CREATE TABLE `poll`  (
 -- ----------------------------
 -- Records of poll
 -- ----------------------------
+INSERT INTO `poll` VALUES (1599385924670713857, 1599384406513020929, '\"user_id\"', '2022-12-04 20:51:34', 0);
+INSERT INTO `poll` VALUES (1599387527733702657, 1599384406513020929, '\"http://localhost:9528/#/activity/activityPage?id=1599384406513020929\"', '2022-12-04 20:57:56', 0);
 
 -- ----------------------------
 -- Table structure for relativetask
@@ -324,7 +310,7 @@ INSERT INTO `task` VALUES (1597795136580898817, '9', '', '0', '', 0, '2022-11-17
 -- ----------------------------
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user`  (
-  `id` int(0) NOT NULL AUTO_INCREMENT COMMENT '主码',
+  `id` bigint(0) NOT NULL AUTO_INCREMENT COMMENT '主码',
   `name` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '名字',
   `password` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '密码,MD5加密',
   `email` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '邮箱',
@@ -339,24 +325,7 @@ CREATE TABLE `user`  (
 -- ----------------------------
 INSERT INTO `user` VALUES (1, 'yy', 'yy657826', '657826973@qq.com', NULL, NULL, 'http://localhost:8081/api/static/th.jpg');
 INSERT INTO `user` VALUES (2, 'yy2', 'yy657826', 'm13958790203@163.com', NULL, NULL, 'http://localhost:8081/api/static/th.jpg');
-
--- ----------------------------
--- Table structure for user_mark
--- ----------------------------
-DROP TABLE IF EXISTS `user_mark`;
-CREATE TABLE `user_mark`  (
-  `activity_id` bigint(0) NOT NULL,
-  `marker_id` bigint(0) NOT NULL,
-  `user_id` bigint(0) NOT NULL,
-  `mark` int(0) NOT NULL,
-  `mark_time` datetime(0) NULL DEFAULT NULL,
-  `mark_id` bigint(0) NOT NULL,
-  PRIMARY KEY (`mark_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of user_mark
--- ----------------------------
+INSERT INTO `user` VALUES (111, '111', '111', '111', 111, '111', 'http://localhost:8081/api/static/th.jpg');
 
 -- ----------------------------
 -- Table structure for user_notice
@@ -376,6 +345,20 @@ INSERT INTO `user_notice` VALUES (1, 1, 1);
 INSERT INTO `user_notice` VALUES (1, 2, 0);
 
 -- ----------------------------
+-- Table structure for vote
+-- ----------------------------
+DROP TABLE IF EXISTS `vote`;
+CREATE TABLE `vote`  (
+  `user_id` bigint(0) NOT NULL,
+  `option_id` bigint(0) NOT NULL,
+  PRIMARY KEY (`user_id`, `option_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of vote
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for vote_option
 -- ----------------------------
 DROP TABLE IF EXISTS `vote_option`;
@@ -390,5 +373,9 @@ CREATE TABLE `vote_option`  (
 -- ----------------------------
 -- Records of vote_option
 -- ----------------------------
+INSERT INTO `vote_option` VALUES (1599385924670713858, 'user_id', 1599385924670713857, 3);
+INSERT INTO `vote_option` VALUES (1599385924670713859, 'user_id', 1599385924670713857, 4);
+INSERT INTO `vote_option` VALUES (1599387527800811522, 'http://localhost:9528/#/activity/activityPage?id=1599384406513020929', 1599387527733702657, 0);
+INSERT INTO `vote_option` VALUES (1599387527800811523, 'http://localhost:9528/#/activity/activityPage?id=1599384406513020929', 1599387527733702657, 0);
 
 SET FOREIGN_KEY_CHECKS = 1;
