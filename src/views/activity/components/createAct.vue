@@ -202,11 +202,13 @@
         <!-- <el-button @click="TestTagAPI">Test Tag API</el-button> -->
       </div>
 
-      <MapChoose
-        :dialogShow.sync="innerVisible"
-        @locationSure="locationSure"
-        :primitiveData_comp="primitiveData"
-      ></MapChoose>
+      <span v-if="primitiveData != []">
+        <MapChoose
+          :dialogShow.sync="innerVisible"
+          @locationSure="locationSure"
+          :primitiveData_comp="primitiveData"
+        ></MapChoose>
+      </span>
     </el-dialog>
   </div>
 </template>

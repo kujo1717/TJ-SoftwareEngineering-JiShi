@@ -288,7 +288,7 @@
       <!-- 展示投票 -->
       <el-button @click="getPoll">查看本活动投票</el-button>
       <el-card>
-        <div v-for="(poll, index) in Polls" :key="index">
+        <div v-for="(poll,index) in Polls" :key="index">
           <vue-poll :key="index" v-bind="poll.option" @addvote="addVote" />
           <span>
             <el-button type="primary" @click="confirmVote">确认</el-button>
@@ -299,11 +299,9 @@
       <!--/span-->
 
       <span>
-        <el-card v-if="user_id /*=creator_data.id*/">
+        <el-card v-if="user_id/*=creator_data.id*/">
           <!-- 创建人发起投票 -->
-          <el-button @click="clickCreateVote" v-if="true" type="primary"
-            >新建投票</el-button
-          >
+          <el-button @click="clickCreateVote" v-if="true" type="primary">新建投票</el-button>
         </el-card>
       </span>
 
@@ -587,7 +585,7 @@
               ></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="24">
+          <el-col :span="24" v-if="false">
             <el-form-item label="上传相关图片" prop="file_value">
               <el-upload
                 ref="file_value"
@@ -611,12 +609,13 @@
         <el-button @click="CancelEdit">取消</el-button>
         <el-button type="primary" @click="ConfirmEdit">确定</el-button>
       </div>
-
-      <MapChoose
-        :dialogShow.sync="innerVisible"
-        @locationSure="locationSure"
-        :primitiveData_comp="primitiveData"
-      ></MapChoose>
+      <span v-if="primitiveData != -1">
+        <MapChoose
+          :dialogShow.sync="innerVisible"
+          @locationSure="locationSure"
+          :primitiveData_comp="primitiveData"
+        ></MapChoose>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -650,7 +649,6 @@ export default {
   components: { VuePoll, ActivityMarkCard, MapChoose },
   data() {
     return {
-      activity_id_test: 1,
       /**
        * 用户个人信息
        */
@@ -800,10 +798,10 @@ export default {
 
       //show地图
       innerVisible: false,
-      /* 修改活动信息 */
+
       //map:null,
-      primitiveData: [],
-      innerVisible: false,
+      primitiveData: -1,
+      /* 修改活动信息 */
       isShow_: true,
       newact_form: {
         title_name: undefined,
@@ -903,64 +901,58 @@ export default {
     };
   },
   created: function () {
-    this.initData();
   },
   methods: {
-    initData() {
-      this.Polls = getPoll();
-      console.log("this.Polls");
-    },
+
     /** 投票*/
     // api
     // 获取此时的投票信息
     async getPoll() {
-      const polls = [];
-
-      await getPoll(this.activity_id_test)
+      const polls = []
+      await getPoll(this.activity_id)
         .then((res) => {
-          this.canIVote = true;
-
+          this.canIVote = true
           res.data.forEach((ele) => {
-            const answers = [];
-            getoptions(ele.poll_id).then((res) => {
-              console.log(res);
+            const answers = []
+            getoptions(ele.pollID).then((res) => {
+              console.log(res)
               res.data.forEach((ele) => {
                 answers.push({
-                  value: ele.option_id,
-                  text: ele.option_name,
-                  votes: ele.vote_num,
-                });
-              });
-              const option = [];
-              option.push({ question: ele.topic_text, answers: answers });
+                  value: ele.optionID,
+                  text: ele.optionName,
+                  votes: ele.voteNum
+                })
+              })
+              const option = []
+              option.push({ question: ele.topicText, answers: answers })
               polls.push({
-                poll_id: ele.poll_id,
+                poll_id: ele.pollId,
                 deadline: ele.deadline,
-                multiple_choice: ele.multiple_choice,
+                multiple_choice: ele.multipleChoice,
                 option: option,
-                activity_id: this.activity_id_test,
-              });
-            });
-          });
-          this.Polls = polls;
+                activity_id: this.activity_id
+              })
+            })
+          })
+          this.Polls = polls
         })
         .catch((err) => {
-          console.log(err);
-        });
+          console.log('geterr:' + err)
+        })
     },
     // 暂时投票
     addVote(obj) {
-      this.showVoteButtons = true;
-      console.log(obj);
-      this.selectedOption = obj.value;
-      console.log("选项的value，目前该选项的票数，本投票的总票数");
+      this.showVoteButtons = true
+      console.log(obj)
+      this.selectedOption = obj.value
+      console.log('选项的value，目前该选项的票数，本投票的总票数')
     },
     // 确定投票，api
     confirmVote() {
       // 弹窗确认
-      const h = this.$createElement;
+      const h = this.$createElement
       this.$msgbox({
-        title: "确定本次投票",
+        title: '确定本次投票',
         // message:
         // h("p", null, [
         //   h("span", null, "将把管理员 "),
@@ -969,107 +961,107 @@ export default {
         // ]),
         // dangerouslyUseHTMLString: true,
         showCancelButton: true,
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
         beforeClose: (action, instance, done) => {
           // 点击了 确认
-          if (action === "confirm") {
-            instance.confirmButtonLoading = true;
-            instance.confirmButtonText = "执行中...";
+          if (action === 'confirm') {
+            instance.confirmButtonLoading = true
+            instance.confirmButtonText = '执行中...'
             // 向后端接口请求
             putTotal(this.selectedOption)
               .then()
               .catch((err) => {
-                console.log("putTotal:err", err);
-              });
+                console.log('putTotal:err', err)
+              })
             // 静态测试，3s后完成操作
             setTimeout(() => {
-              done();
-              this.canIVote = false;
-              this.showVoteButtons = false;
+              done()
+              this.canIVote = false
+              this.showVoteButtons = false
               setTimeout(() => {
-                instance.confirmButtonLoading = false;
-              }, 300);
-            }, 500);
+                instance.confirmButtonLoading = false
+              }, 300)
+            }, 500)
           } else {
-            done();
+            done()
           }
-        },
+        }
       }).then((action) => {
         this.$message({
-          type: "info",
-          message: "action: " + action,
-        });
-      });
+          type: 'info',
+          message: 'action: ' + action
+        })
+      })
     },
 
     // 撤回临时投票
     cancelVote() {
       this.$nextTick(() => {
-        this.showVoteButtons = true;
+        this.showVoteButtons = true
         // 重新请求api，获取当前的投票情况
 
-        this.VoteOptions = this.getPoll(this.poll_id);
-        this.VotePollKey += 1;
+        this.VoteOptions = this.getPoll(this.poll_id)
+        this.VotePollKey += 1
         // this.$forceUpdate();
-      });
+      })
     },
 
     // 新建投票
     clickCreateVote() {
-      this.isShow_dialog_createVote = true;
+      this.isShow_dialog_createVote = true
     },
     // 新建投票diaglog 关闭前
     handleClose_creatVote() {
-      this.edit_confirm_loading = false;
-      this.isShow_dialog_createVote = false;
+      this.edit_confirm_loading = false
+      this.isShow_dialog_createVote = false
     },
     // 新增选项
     createVote_addOption() {
-      this.newVoteFrom.option.push({ option: "" });
+      this.newVoteFrom.option.push({ option: '' })
     },
     // 删除选项
     createVote_removeOption(option_i) {
-      this.newVoteFrom.option.splice(option_i, 1);
+      this.newVoteFrom.option.splice(option_i, 1)
     },
 
     // 确认新建投票
     confirm_createVote() {
       // api
       // 创建新的投票
-      this.newVoteFrom.activity_id = this.activity_id_test;
-      const post_data = this.newVoteFrom;
-      console.log("post_data:", post_data);
+      this.newVoteFrom.activity_id = this.activity_id
+      const post_data = this.newVoteFrom
+      console.log('post_data:', post_data)
       postPoll(post_data)
         .then((res) => {
-          console.log("postPoll:res:", res),
-            this.$message({
-              type: "success",
-              message: "投票创建成功",
-            });
+          console.log('postPoll:res:', res),
+          this.$message({
+            type: 'success',
+            message: '投票创建成功'
+          })
         })
         .catch((err) => {
-          console.log("postPoll:err:", err);
-        });
+          console.log('postPoll:err:', err)
+        })
 
-      this.edit_confirm_loading = true;
+      this.edit_confirm_loading = true
       // 全局loading模板
-      const thisContent = this;
+      const thisContent = this
       const edit_loading = thisContent.$loading({
         lock: true,
-        text: "创建新投票，请稍候...",
-        spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.5)",
-      });
+        text: '创建新投票，请稍候...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.5)'
+      })
       setTimeout(() => {
-        this.isShow_dialog_createVote = false;
-        this.edit_confirm_loading = false;
-        edit_loading.close();
-      }, 1000);
+        this.isShow_dialog_createVote = false
+        this.edit_confirm_loading = false
+        edit_loading.close()
+      }, 1000)
     },
     // 取消新建投票
     cancel_createVote() {
-      this.isShow_dialog_createVote = false;
+      this.isShow_dialog_createVote = false
     },
     /**
      * 活动信息
@@ -1251,6 +1243,9 @@ export default {
       //   query: query_data,
       // });
       this.GetAllTags();
+      setTimeout(() => {
+        this.getLngLatLocation();
+      }, 100);
       this.isShow_dialog_edit = true;
     },
     // 点击删除
@@ -1508,9 +1503,6 @@ export default {
         .catch((err) => {
           console.log("getAllTag:err:", err);
         });
-      setTimeout(() => {
-        this.getLngLatLocation();
-      }, 100);
     },
     TagGroupChange() {
       console.log("this.newact_form.tags", this.newact_form.tags);
