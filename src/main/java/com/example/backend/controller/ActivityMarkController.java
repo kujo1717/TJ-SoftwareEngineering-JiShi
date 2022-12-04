@@ -2,13 +2,9 @@ package com.example.backend.controller;
 
 import com.example.backend.common.Result;
 import com.example.backend.entity.ActivityMark;
-import com.example.backend.entity.UserMark;
-import com.example.backend.mapper.ActivityMarkMapper;
 import com.example.backend.service.ActivityMarkService;
-import com.example.backend.service.UserMarkService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

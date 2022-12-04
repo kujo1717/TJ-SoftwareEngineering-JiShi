@@ -1,6 +1,6 @@
 package com.example.backend.service;
 
-import com.example.backend.Dto.FormatMessage;
+import com.example.backend.dto.FormatMessage;
 import com.mysql.jdbc.log.Log;
 import org.springframework.stereotype.Component;
 

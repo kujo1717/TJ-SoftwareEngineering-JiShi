@@ -1,7 +1,7 @@
 package com.example.backend.controller;
 
-import com.example.backend.Dto.FormatMessage;
-import com.example.backend.Dto.FormatUser;
+import com.example.backend.dto.FormatMessage;
+import com.example.backend.dto.FormatUser;
 import com.example.backend.common.Result;
 import com.example.backend.entity.File;
 import com.example.backend.entity.Message;
@@ -67,12 +67,12 @@ public class ChatController {
     }
 
     private FormatUser formatUser(User user) {
-        return new FormatUser(user.getUserId(), user.getName(), user.getAvatar());
+        return new FormatUser(user.getId(), user.getName(), user.getAvatar());
     }
 
     private FormatMessage formatMessage(Message m){
         // 获取发送消息的用户的信息
-        User user = userService.findUserById(m.getSenderId());
+        User user = userService.findUser(m.getSenderId());
         FormatUser formatUser = formatUser(user);
         // 格式化信息的状态和类型
         String status = formatStatus(m.getStatus());

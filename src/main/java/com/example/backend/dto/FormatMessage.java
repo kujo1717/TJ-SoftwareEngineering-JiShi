@@ -1,4 +1,4 @@
-package com.example.backend.Dto;
+package com.example.backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

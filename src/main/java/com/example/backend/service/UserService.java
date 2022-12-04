@@ -14,7 +14,7 @@ import javax.mail.MessagingException;
  */
 @Service
 public interface UserService {
-    Result<User> findUser(Long id);
+    User findUser(Long id);
     Result<String> confirmUser(String email, String password);
     Result<String> registerUser(String email,String password,String name);
     Result<User> putUser(Long id,String name,String introduce,int age,String imgUrl);

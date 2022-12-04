@@ -7,6 +7,7 @@ import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.User;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.service.UserService;
+import org.apache.ibatis.jdbc.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -28,15 +29,15 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     @Autowired
     JavaMailSenderImpl mailSender;
-    public Result<User> findUser(Long id){
+    public User findUser(Long id){
         User user = userMapper.selectById(id);//利用mybatis-plus的单表查询，自己不用写SQL语句
         //没有找到用户，返回错误码
         if(user == null){
-            return Result.fail(10001,"用户不存在");
+            return null;
         }
 
         //找到用户，返回正确信息
-        return Result.success(user);
+        return user;
     }
     public Result<String> confirmUser(String email,String password){
         User user=userMapper.selectByEmail(email);
