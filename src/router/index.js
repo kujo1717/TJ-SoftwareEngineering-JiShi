@@ -248,7 +248,7 @@ export const constantRoutes = [
     component: Layout,
     children: [
       {
-        path: 'index',
+        path: 'testAmap',
         name: 'testAmap',
         component: () => import('@/views/testAmap/index'),
         meta: { title: 'testAmap', icon: 'user' }
@@ -256,7 +256,19 @@ export const constantRoutes = [
     ],
 
   },
+  {
+    path: '/activityAround',
+    component: Layout,
+    children: [
+      {
+        path: 'activityAround',
+        name: 'ActivityAround',
+        component: () => import('@/views/testAmap/activityAround'),
+        meta: { title: 'activityAround', icon: 'user' }
+      }
+    ],
 
+  },
 
 
   // 404 page must be placed at the end !!!

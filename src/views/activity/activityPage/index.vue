@@ -1,6 +1,6 @@
 <template>
   <div class="actpi_view">
-    <el-tabs v-model="activeName" type="card" >
+    <el-tabs v-model="activeName" type="card">
       <el-tab-pane label="活动概览" name="overview">
         <ActivityPageOverView></ActivityPageOverView
       ></el-tab-pane>
@@ -17,32 +17,32 @@
             </el-card>
           </el-col>
         </el-row>
-        
       </el-tab-pane>
     </el-tabs>
   </div>
 </template>
 <script>
 import ActivityPageOverView from "./overview.vue";
-import Forum from "@/components/forum/index.vue"
-import BigChatBox from "@/components/BigChatBox/index.vue"
+import Forum from "@/components/forum/index.vue";
+import BigChatBox from "@/components/BigChatBox/index.vue";
 export default {
   name: "ActivityPage",
-  components: { ActivityPageOverView, BigChatBox, Forum},
+  components: { ActivityPageOverView, BigChatBox, Forum },
   data() {
     return {
-      activeName:'overview'
+      activeName: "overview",
+      activity_id: -1,
     };
   },
   methods: {},
   mounted() {
-
+    this.activity_id = this.$route.query.id;
+    console.log("activityPage:index:this.activity_id:", this.activity_id);
   },
 };
 </script>
 <style lang="less" scoped>
-.actpi_view{
-
+.actpi_view {
 }
 .card-item {
   background: white;

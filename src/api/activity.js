@@ -64,34 +64,40 @@ export function getActList_Participate(user_id, state) {
 //根据活动id，获取活动详细内容
 export function getActDetail(activity_id, user_id) {
     return request({
-        url: '/api/activity/getActDetail/' + activity_id.toString() + '/' + user_id.toString(),
+        url: '/api/activity/getActDetail/' + activity_id.toString(),
         method: 'get',
+        params: {
+            user_id: user_id
+        }
 
     })
 }
 
 
 //新建一个活动，输入Activity实体
-export function postAct(param) {
+export function postAct(activity, tag_ids) {
     return request({
         url: '/api/activity/postAct',
         method: 'post',
-        data: param,
-        headers: {
-            TokenValue: '',
-        }
+        params: {
+            tag_ids: tag_ids.join(",")
+        },
+        data: activity
+
+
     })
 }
 
 //更新一个活动信息，输入Activity实体
-export function patchAct(param) {
+export function patchAct(param, tag_ids) {
     return request({
         url: '/api/activity/patchOneAct',
         method: 'patch',
         data: param,
-        headers: {
-            TokenValue: '',
-        }
+        params: {
+            tag_ids: tag_ids.join(",")
+        },
+
     })
 }
 
@@ -128,9 +134,7 @@ export function postActivityApply(param) {
         url: '/api/activity/postActApply',
         method: 'post',
         data: param,
-        headers: {
-            TokenValue: '',
-        }
+
     })
 }
 
@@ -143,9 +147,7 @@ export function deleteActivityApply(user_id, activity_id) {
             user_id: user_id,
             activity_id: activity_id
         },
-        headers: {
-            TokenValue: '',
-        }
+
     })
 }
 
@@ -155,9 +157,7 @@ export function patchActStopApply(param) {
         url: '/api/activity/creatorStopApply',
         method: 'patch',
         params: param,
-        headers: {
-            TokenValue: '',
-        }
+
     })
 }
 
@@ -168,9 +168,7 @@ export function patchActFinish(param) {
         url: '/api/activity/creatorFinishAct',
         method: 'patch',
         params: param,
-        headers: {
-            TokenValue: '',
-        }
+
     })
 }
 
@@ -187,9 +185,7 @@ export function deleteActivity(user_id, activity_id) {
             user_id: user_id,
             activity_id: activity_id
         },
-        headers: {
-            TokenValue: '',
-        }
+
     })
 }
 
@@ -206,3 +202,25 @@ export function getActApplicantList(activity_id) {
         },
     })
 }
+
+//获取地图范围内的所有活动
+export function getMapAct(latitudes, longitudes) {
+    return request({
+        url: '/api/activity/getMapAct',
+        method: 'get',
+        params: {
+            latitudes: latitudes.join(","),
+            longitudes: longitudes.join(","),
+        },
+    })
+}
+
+
+export function HelloWorld() {
+    return request({
+        url: '/api/activity/HelloWorld',
+        method: 'get',
+
+    })
+}
+

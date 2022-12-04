@@ -69,24 +69,6 @@
           </el-select>
         </el-form-item>
 
-        <!--标签-->
-        <i class="el-icon-price-tag iconPosition"></i>
-        <el-form-item class="formItem">
-          <el-select
-            v-model="taskInfo.tag"
-            :popper-append-to-body="false"
-          >
-
-            <el-option
-              v-for="item in tagList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
-
         <!--优先级-->
         <i class="iconfont icon-louti iconPosition" />
         <el-form-item class="formItem">
@@ -154,23 +136,20 @@
 <script>
 /* eslint-disable */
 import { postOneNewTask, postOneSonTask } from "@/api/task.js"
-import { getAllClassificationTitle } from '@/api/classification.js'
 export default {
   name: "CreateTaskBox",
   data () {
     return {
-      userId: 1,
       dialogVisible: this.createTaskBoxDialogVisible,
 
       taskInfo: {
         userId: 1,
         taskTitle: '',
         taskDetail: "",//详情的文字
-        classification: '默认分组',
+        classification: '',
         priority: '无优先级',
         timeRange: this.timeRange,
         familyPosition: 'parent',
-        tag: '无',
         familyMembers: [],
       },
       typeList: [{
@@ -182,16 +161,6 @@ export default {
       }, {
         value: '选项3',
         label: '生活'
-      }],
-      tagList: [{
-        value: '室内',
-        label: '室内'
-      }, {
-        value: '户外',
-        label: '户外'
-      }, {
-        value: '无',
-        label: '无'
       }],
       createForm_rules: {
         taskTitle: [
@@ -261,14 +230,13 @@ export default {
           taskDetail: this.taskInfo.taskDetail,
           taskState: 0,
           classificationTitle: this.taskInfo.classification,
-          tag: this.taskInfo.tag,
           priority: _priority,
           startTime: this.taskInfo.timeRange[0],
           endTime: this.taskInfo.timeRange[1],
           isParent: 1,
           //relativeTask: []
         }
-        console.log("kk", backendTaskInfo)
+        console.log("kk",backendTaskInfo)
 
         //发后端请求
         postOneNewTask(backendTaskInfo)
@@ -311,39 +279,12 @@ export default {
           .then((res) => {
             console.log(res);
             this.dialogVisible = false;
-            this.$message({
-              message: "事项创建成功！",
-              type: "success",
-            });
-            this.dialogVisible = false;
           })
           .catch((err) => {
             console.log(err);
             this.dialogVisible = false;
-            this.$message({
-              message: "事项创建失败",
-              type: "danger",
-            });
           })
       }
-    },
-    //获取该用户的所有分组名称
-    setThisUserAllClassificaitonTitle () {
-      this.typeList = []
-
-      //向后端请求该用户的所有分类名
-      getAllClassificationTitle(this.userId)
-        .then((res) => {
-          console.log(res);
-          for (let it of res.data)
-            this.typeList.push({
-              value: it.classificationTitle,
-              label: it.classificationTitle
-            })
-        })
-        .catch((err) => {
-          console.log(err);
-        })
     },
     // //添加子事项
     // addOneSonTask (userId, sonTaskObj) {
@@ -358,7 +299,6 @@ export default {
   },
   mounted: function () {
     this.dialogVisible = this.createTaskBoxDialogVisible;
-    this.setThisUserAllClassificaitonTitle();
   },
   computed: {
     //计算优先级标签的颜色

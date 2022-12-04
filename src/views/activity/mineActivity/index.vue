@@ -136,6 +136,7 @@
   </div>
 </template>
 <script>
+import { getImg } from "@/api/file";
 import { HelloID } from "@/api/user";
 import {
   getActList_All,
@@ -192,17 +193,40 @@ export default {
 
     async GetActivityData_All() {
       let activity_data_all = [];
-      let img_url =
-        "https://ts1.cn.mm.bing.net/th/id/R-C.f4470ef67e6e8803479dc44bb3c66574?rik=FXJkAJS%2fLCy9vg&riu=http%3a%2f%2fwww.szshequ.org%2fuserfiles%2fmanagers%2fdachong%2fimage%2f20191028%2f20191028193129_387.jpg&ehk=8FRYXacd0vDrnp2VfQlyA2xK1jIEETABsKgITDdCJXs%3d&risl=&pid=ImgRaw&r=0";
       // img_url = "";
       await getActList_All(this.user_id, this.state_select_val)
         .then((res) => {
           console.log("user_id:", this.user_id, "getActList_All:", res);
-          res.data.forEach((ele) => {
+
+          res.data.forEach(async (ele, i) => {
+            /*分析images */
+            let image_url;
+            if ("images" in ele) {
+              let image_paths = ele.images.split(":");
+              for (let i = 0; i < image_paths.length; i++) {
+                let image_path = image_paths[i];
+                if (image_path.length > 0) {
+                  let image_bytes;
+                  await getImg(image_path)
+                    .then((res) => {
+                      image_bytes = res.data.bytes;
+                      console.log("image_bytes", image_bytes);
+                    })
+                    .catch((err) => {
+                      console.log("TestGetImg:err", err);
+                    });
+                  image_url = "data:image/png;base64," + image_bytes;
+                  console.log("image_url", image_url);
+                  // console.log("image_bytes", image_bytes);
+                  break;
+                }
+              }
+            }
             activity_data_all.push({
               id: ele.activity_id,
               name: ele.title_name,
-              img: img_url,
+              // img: "https://ts1.cn.mm.bing.net/th/id/R-C.f4470ef67e6e8803479dc44bb3c66574?rik=FXJkAJS%2fLCy9vg&riu=http%3a%2f%2fwww.szshequ.org%2fuserfiles%2fmanagers%2fdachong%2fimage%2f20191028%2f20191028193129_387.jpg&ehk=8FRYXacd0vDrnp2VfQlyA2xK1jIEETABsKgITDdCJXs%3d&risl=&pid=ImgRaw&r=0",
+              img: image_url,
               state: ele.state,
             });
           });
@@ -277,6 +301,17 @@ export default {
         .catch((err) => {
           console.log(err);
         });
+    },
+    //传入活动配图的路径，返回byte[]
+    async GetImgBytes(ImgPath) {
+      await getImg(ImgPath)
+        .then((res) => {
+          return res.data.bytes;
+        })
+        .catch((err) => {
+          console.log("TestGetImg:err", err);
+        });
+      return -1;
     },
 
     //获取模板data

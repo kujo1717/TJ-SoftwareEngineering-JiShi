@@ -68,15 +68,26 @@
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="活动地址" prop="address">
+            <el-form-item label="活动地点" prop="address_name">
               <el-input
-                v-model="newact_form.address"
-                placeholder="请输入活动地址"
+                v-model="newact_form.address_name"
+                placeholder="请输入活动地点"
                 clearable
                 prefix-icon="el-icon-location-information"
                 :style="{ width: '100%' }"
               ></el-input>
             </el-form-item>
+
+            <el-form-item label="详细地址" prop="address_formatted">
+              <el-input
+                v-model="newact_form.address_formatted"
+                placeholder="可以根据地图选择详细地址"
+                clearable
+                prefix-icon="el-icon-location-information"
+                :style="{ width: '100%' }"
+              ></el-input>
+            </el-form-item>
+
             <el-form-item>
               <el-button type="primary" @click="innerVisible = !innerVisible"
                 >选择地图地址</el-button
@@ -84,7 +95,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="" prop="limit_capacity">
+            <!-- <el-form-item label="" prop="limit_capacity">
               <el-radio-group
                 v-model="newact_form.limit_capacity"
                 size="medium"
@@ -97,7 +108,7 @@
                   >{{ item.label }}</el-radio
                 >
               </el-radio-group>
-            </el-form-item>
+            </el-form-item> -->
           </el-col>
           <el-col :span="12">
             <el-form-item
@@ -111,6 +122,24 @@
                 :step="1"
                 :min="2"
               ></el-input-number>
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="24">
+            <el-form-item label="标签" required>
+              <el-checkbox-group
+                v-model="newact_form.tags"
+                @change="TagGroupChange"
+              >
+                <span
+                  v-for="(tag, tag_index) in optional_tags"
+                  :key="tag_index"
+                >
+                  <el-checkbox border :label="tag.tag_id">{{
+                    tag.tag_name
+                  }}</el-checkbox>
+                </span>
+              </el-checkbox-group>
             </el-form-item>
           </el-col>
           <!-- <el-col :span="12">
@@ -158,21 +187,11 @@
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="上传相关图片" prop="file_value">
-              <el-upload
-                ref="file_value"
-                :file-list="file_valuefileList"
-                :action="file_valueAction"
-                multiple
-                :before-upload="file_valueBeforeUpload"
-                list-type="picture-card"
-                accept="image/*"
-              >
-                <i class="el-icon-plus"></i>
-                <div slot="tip" class="el-upload__tip">
-                  只能上传不超过 2MB 的image/*文件
-                </div>
-              </el-upload>
+            <el-form-item label="上传相关图片">
+              <UploadImg
+                @FileChange="HandleUploadImgInput"
+                :limit="3"
+              ></UploadImg>
             </el-form-item>
           </el-col>
         </el-form>
@@ -180,16 +199,8 @@
       <div slot="footer">
         <el-button @click="cancel_CreateAct">取消</el-button>
         <el-button type="primary" @click="confirm_CreateAct">确定</el-button>
+        <!-- <el-button @click="TestTagAPI">Test Tag API</el-button> -->
       </div>
-
-      <!-- 地图选择 -->
-      <!-- <el-dialog
-        width="70%"
-        title="地图选择 Dialog"
-        :visible.sync="innerVisible"
-        append-to-body
-      >
-      </el-dialog> -->
 
       <MapChoose
         :dialogShow.sync="innerVisible"
@@ -201,13 +212,16 @@
 </template>
 <script>
 import { postAct } from "@/api/activity";
+import { postFile } from "@/api/file";
 import { parseTime } from "@/utils";
 import MapChoose from "@/components/MapChoose";
+import UploadImg from "@/components/UploadImg";
+import { getAllTag, postActTags } from "@/api/tag";
 
 export default {
   inheritAttrs: false,
   name: "CreateActivity",
-  components: { MapChoose },
+  components: { MapChoose, UploadImg },
   props: {
     isShow: {
       type: Boolean,
@@ -226,14 +240,19 @@ export default {
         summary: undefined,
         start_time: "2022-11-17 00:00:00",
         end_time: undefined,
-        address: undefined,
+        address_name: undefined,
+        address_formatted: undefined,
+        longitude: undefined,
+        latitude: undefined,
         limit_capacity: 1,
         capacity: 2,
         repeat: false,
         repeat_interval: undefined,
-        is_private: 1,
         intro_text: undefined,
-        file_value: null,
+        file_formData: "",
+        images: "",
+
+        tags: [],
       },
       newact_rules: {
         title_name: [
@@ -258,10 +277,17 @@ export default {
           },
         ],
         end_time: [],
-        address: [
+        address_name: [
           {
             required: true,
-            message: "请输入活动地址",
+            message: "请输入活动地点",
+            trigger: "blur",
+          },
+        ],
+        address_formatted: [
+          {
+            required: false,
+            message: "",
             trigger: "blur",
           },
         ],
@@ -274,17 +300,10 @@ export default {
         ],
         capacity: [],
         repeat_interval: [],
-        is_private: [
-          {
-            required: true,
-            message: "不能为空",
-            trigger: "change",
-          },
-        ],
+
         intro_text: [],
       },
-      file_valueAction: "https://jsonplaceholder.typicode.com/posts/",
-      file_valuefileList: [],
+
       limit_capacityOptions: [
         {
           label: "限制人数",
@@ -295,16 +314,9 @@ export default {
           value: 2,
         },
       ],
-      privateOptions: [
-        {
-          label: "公开",
-          value: 1,
-        },
-        {
-          label: "私密",
-          value: 2,
-        },
-      ],
+
+      //可选标签
+      optional_tags: [],
     };
   },
   computed: {
@@ -333,15 +345,69 @@ export default {
   created() {},
   mounted() {
     this.isShow_ = this.isShow;
-    setTimeout(() => {
-      this.getLngLatLocation();
-    }, 100);
+    this.GetAllTags();
   },
   methods: {
-    //地图
+    /**Tag */
+    GetAllTags() {
+      //get all tags
+      getAllTag()
+        .then((res) => {
+          this.optional_tags = res.data;
+          console.log("getAllTag:res:", res);
+        })
+        .catch((err) => {
+          console.log("getAllTag:err:", err);
+        });
+      setTimeout(() => {
+        this.getLngLatLocation();
+      }, 100);
+    },
+    //check group change event
+    TagGroupChange(val) {
+      // console.log("newact_form.tags:", this.newact_form.tags);
+      console.log("TagGroupChange:", val);
+    },
+    //测试Tag API
+    TestTagAPI() {
+      let tag_list = [
+        {
+          tag_id: 1,
+          name: "tag_1",
+        },
+        {
+          tag_id: 2,
+          name: "tag_2",
+        },
+      ];
+
+      let activity = {
+        act: 1,
+        id: 2,
+      };
+      postActTags(1, tag_list, activity)
+        .then((res) => {
+          console.log("postActTags:res:" + res);
+        })
+        .catch((err) => {
+          console.log("postActTags:err:" + err);
+        });
+    },
+
+    /**图片上传 */
+
+    //接收组件传来的formData
+    HandleUploadImgInput(FormData) {
+      this.newact_form.file_formData = FormData;
+    },
+
+    //接收地图组件返回值，设置form值
     locationSure(val) {
       console.log("val", val);
-      this.newact_form.address = val.address_formatted;
+      this.newact_form.address_formatted = val.address_formatted;
+      this.newact_form.longitude = val.value[0];
+      this.newact_form.latitude = val.value[1];
+
       this.primitiveData = val.value;
       // console.log("primitiveData:", this.primitiveData);
     },
@@ -430,7 +496,8 @@ export default {
 
                 // console.log("create_time", create_time);
                 // let create_time=now.getFullYear()+"-"+(now.getMonth()+1)+"-"+now.getDay()+" "+
-                let post_data = {
+                console.log();
+                let activity = {
                   // activity_id: undefined,
                   title_name: this.newact_form.title_name,
                   detail_text: this.newact_form.intro_text,
@@ -438,33 +505,62 @@ export default {
                   start_time: this.newact_form.start_time,
                   end_time: this.newact_form.end_time,
                   create_time: create_time,
-                  address: this.newact_form.address,
-                  city: "city_default",
+
                   hit_num: 0,
                   //limit_capacity 1限制人数
                   limit_capacity: this.newact_form.limit_capacity,
                   capacity: this.newact_form.capacity,
-                  current_people: 1,
+
                   state: 0,
                   participant_num: 1,
                   applicant_num: 0,
+                  //地址
+                  address_name: this.newact_form.address_name,
+                  address_formatted: this.newact_form.address_formatted,
+                  longitude: this.newact_form.longitude,
+                  latitude: this.newact_form.latitude,
 
                   //前端repeat_interval undefined，后端null空，返回实体不含前端repeat_interval
                   repeat_interval: this.newact_form.repeat
                     ? this.newact_form.repeat_interval
                     : undefined,
                   creator_id: this.user_id,
-                  is_private: this.newact_form.is_private,
                   vote_id: undefined,
+
+                  //图片
+                  images: "",
                 };
-                console.log("post_data", post_data);
-                await postAct(post_data)
-                  .then((res) => {
+                let tag_list = [1, 2, 3];
+                console.log("post:activity", activity);
+                await postAct(activity, this.newact_form.tags)
+                  .then(async (res) => {
                     console.log("postAct,res", res);
                     this.$message({
                       type: "success",
                       message: "创建活动成功!",
                     });
+
+                    //api，post文件列表formData
+                    this.newact_form.file_formData.append(
+                      "folderPath",
+                      "/activity/illus/" + res.data.activity_id + "/"
+                    );
+
+                    this.newact_form.file_formData.append("entity", "activity");
+                    this.newact_form.file_formData.append(
+                      "id",
+                      res.data.activity_id
+                    );
+
+                    //上传文件,并额外传递参数，使得这些文件与活动绑定
+                    await postFile(this.newact_form.file_formData)
+                      .then((res) => {
+                        console.log("postFile:res:", res);
+                      })
+                      .catch((err) => {
+                        console.log("postFile:err:", err);
+                      });
+
                     this.isShow_ = false;
                     this.onClose();
                   })
@@ -487,17 +583,6 @@ export default {
           });
         }
       });
-    },
-    file_valueBeforeUpload(file) {
-      let isRightSize = file.size / 1024 / 1024 < 2;
-      if (!isRightSize) {
-        this.$message.error("文件大小超过 2MB");
-      }
-      let isAccept = new RegExp("image/*").test(file.type);
-      if (!isAccept) {
-        this.$message.error("应该选择image/*类型的文件");
-      }
-      return isRightSize && isAccept;
     },
   },
 };
