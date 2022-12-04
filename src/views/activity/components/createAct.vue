@@ -187,21 +187,11 @@
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="上传相关图片" prop="file_value">
-              <el-upload
-                ref="file_value"
-                :file-list="file_valuefileList"
-                :action="file_valueAction"
-                multiple
-                :before-upload="file_valueBeforeUpload"
-                list-type="picture-card"
-                accept="image/*"
-              >
-                <i class="el-icon-plus"></i>
-                <div slot="tip" class="el-upload__tip">
-                  只能上传不超过 2MB 的image/*文件
-                </div>
-              </el-upload>
+            <el-form-item label="上传相关图片">
+              <UploadImg
+                @FileChange="HandleUploadImgInput"
+                :limit="3"
+              ></UploadImg>
             </el-form-item>
           </el-col>
         </el-form>
@@ -209,7 +199,7 @@
       <div slot="footer">
         <el-button @click="cancel_CreateAct">取消</el-button>
         <el-button type="primary" @click="confirm_CreateAct">确定</el-button>
-        <el-button @click="TestTagAPI">Test Tag API</el-button>
+        <!-- <el-button @click="TestTagAPI">Test Tag API</el-button> -->
       </div>
 
       <MapChoose
@@ -222,14 +212,16 @@
 </template>
 <script>
 import { postAct } from "@/api/activity";
+import { postFile } from "@/api/file";
 import { parseTime } from "@/utils";
 import MapChoose from "@/components/MapChoose";
+import UploadImg from "@/components/UploadImg";
 import { getAllTag, postActTags } from "@/api/tag";
 
 export default {
   inheritAttrs: false,
   name: "CreateActivity",
-  components: { MapChoose },
+  components: { MapChoose, UploadImg },
   props: {
     isShow: {
       type: Boolean,
@@ -257,7 +249,9 @@ export default {
         repeat: false,
         repeat_interval: undefined,
         intro_text: undefined,
-        file_value: null,
+        file_formData: "",
+        images: "",
+
         tags: [],
       },
       newact_rules: {
@@ -309,8 +303,7 @@ export default {
 
         intro_text: [],
       },
-      file_valueAction: "https://jsonplaceholder.typicode.com/posts/",
-      file_valuefileList: [],
+
       limit_capacityOptions: [
         {
           label: "限制人数",
@@ -399,6 +392,13 @@ export default {
         .catch((err) => {
           console.log("postActTags:err:" + err);
         });
+    },
+
+    /**图片上传 */
+
+    //接收组件传来的formData
+    HandleUploadImgInput(FormData) {
+      this.newact_form.file_formData = FormData;
     },
 
     //接收地图组件返回值，设置form值
@@ -496,6 +496,7 @@ export default {
 
                 // console.log("create_time", create_time);
                 // let create_time=now.getFullYear()+"-"+(now.getMonth()+1)+"-"+now.getDay()+" "+
+                console.log();
                 let activity = {
                   // activity_id: undefined,
                   title_name: this.newact_form.title_name,
@@ -525,16 +526,41 @@ export default {
                     : undefined,
                   creator_id: this.user_id,
                   vote_id: undefined,
+
+                  //图片
+                  images: "",
                 };
                 let tag_list = [1, 2, 3];
                 console.log("post:activity", activity);
                 await postAct(activity, this.newact_form.tags)
-                  .then((res) => {
+                  .then(async (res) => {
                     console.log("postAct,res", res);
                     this.$message({
                       type: "success",
                       message: "创建活动成功!",
                     });
+
+                    //api，post文件列表formData
+                    this.newact_form.file_formData.append(
+                      "folderPath",
+                      "/activity/illus/" + res.data.activity_id + "/"
+                    );
+
+                    this.newact_form.file_formData.append("entity", "activity");
+                    this.newact_form.file_formData.append(
+                      "id",
+                      res.data.activity_id
+                    );
+
+                    //上传文件,并额外传递参数，使得这些文件与活动绑定
+                    await postFile(this.newact_form.file_formData)
+                      .then((res) => {
+                        console.log("postFile:res:", res);
+                      })
+                      .catch((err) => {
+                        console.log("postFile:err:", err);
+                      });
+
                     this.isShow_ = false;
                     this.onClose();
                   })
@@ -557,17 +583,6 @@ export default {
           });
         }
       });
-    },
-    file_valueBeforeUpload(file) {
-      let isRightSize = file.size / 1024 / 1024 < 2;
-      if (!isRightSize) {
-        this.$message.error("文件大小超过 2MB");
-      }
-      let isAccept = new RegExp("image/*").test(file.type);
-      if (!isAccept) {
-        this.$message.error("应该选择image/*类型的文件");
-      }
-      return isRightSize && isAccept;
     },
   },
 };

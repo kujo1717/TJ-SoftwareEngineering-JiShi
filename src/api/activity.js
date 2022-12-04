@@ -202,3 +202,25 @@ export function getActApplicantList(activity_id) {
         },
     })
 }
+
+//获取地图范围内的所有活动
+export function getMapAct(latitudes, longitudes) {
+    return request({
+        url: '/api/activity/getMapAct',
+        method: 'get',
+        params: {
+            latitudes: latitudes.join(","),
+            longitudes: longitudes.join(","),
+        },
+    })
+}
+
+
+export function HelloWorld() {
+    return request({
+        url: '/api/activity/HelloWorld',
+        method: 'get',
+
+    })
+}
+

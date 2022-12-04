@@ -1,7 +1,13 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" :class="loginFormClass" auto-complete="on" label-position="top">
-
+    <el-form
+      ref="loginForm"
+      :model="loginForm"
+      :rules="loginRules"
+      :class="loginFormClass"
+      auto-complete="on"
+      label-position="top"
+    >
       <div class="title-container">
         <h3 :class="titleClass">登录</h3>
       </div>
@@ -18,7 +24,6 @@
           type="text"
           tabindex="1"
           auto-complete="on"
-          
         />
       </el-form-item>
 
@@ -38,141 +43,168 @@
           @keyup.enter.native="handleLogin"
         />
         <span class="show-pwd" @click="showPwd">
-          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+          <svg-icon
+            :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
+          />
         </span>
       </el-form-item>
 
-      <div style="display:flex;justify-content:space-around">
-      <el-button type="success" style="width:25%;" @click.native.prevent="handleRegister" >前往注册</el-button>
-      <el-button type="text" @click="handleForget">忘记密码?</el-button>
-      <el-button :loading="loading" type="primary" style="width:25%;" @click.native.prevent="handleLogin" >登录</el-button>
+      <div style="display: flex; justify-content: space-around">
+        <el-button
+          type="success"
+          style="width: 25%"
+          @click.native.prevent="handleRegister"
+          >前往注册</el-button
+        >
+        <el-button type="text" @click="handleForget">忘记密码?</el-button>
+        <el-button
+          :loading="loading"
+          type="primary"
+          style="width: 25%"
+          @click.native.prevent="handleLogin"
+          >登录</el-button
+        >
+        <el-button type="primary" @click="HelloWorldAPI"
+          >HelloWorldAPI</el-button
+        >
       </div>
 
       <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
         <span> password: any</span>
       </div> -->
-
     </el-form>
   </div>
 </template>
 
 <script>
+import { HelloWorld } from "@/api/activity";
 export default {
-  name: 'Login',
+  name: "Login",
   data() {
     const validateUsername = (rule, value, callback) => {
       var reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
-            if(!value)
-            {
-                callback(new Error('请输入邮箱'))
-            }
-            setTimeout(() => {
-                if (value && !reg.test(value)) {
-                    callback(new Error('请输入正确的邮箱'));
-                } else {
-                    callback()
-                }
-            }, 1000);
-    }
+      if (!value) {
+        callback(new Error("请输入邮箱"));
+      }
+      setTimeout(() => {
+        if (value && !reg.test(value)) {
+          callback(new Error("请输入正确的邮箱"));
+        } else {
+          callback();
+        }
+      }, 1000);
+    };
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error("The password can not be less than 6 digits"));
       } else {
-        callback()
+        callback();
       }
-    }
+    };
     return {
       loginForm: {
-        username: 'wyyxyy1@qq.com',
-        password: 'testpass1'
+        username: "wyyxyy1@qq.com",
+        password: "testpass1",
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        username: [
+          { required: true, trigger: "blur", validator: validateUsername },
+        ],
+        password: [
+          { required: true, trigger: "blur", validator: validatePassword },
+        ],
       },
       loading: false,
-      passwordType: 'password',
+      passwordType: "password",
       redirect: undefined,
-      titleClass:'title',
-      loginFormClass: this.$route.query.from ? 'login-form-in-forget':'login-form'
-      
-    }
+      titleClass: "title",
+      loginFormClass: this.$route.query.from
+        ? "login-form-in-forget"
+        : "login-form",
+    };
   },
   watch: {
     $route: {
-      handler: function(route) {
-        this.redirect = route.query && route.query.redirect
+      handler: function (route) {
+        this.redirect = route.query && route.query.redirect;
         //console.log()
       },
-      immediate: true
-    }
+      immediate: true,
+    },
   },
   methods: {
+    HelloWorldAPI() {
+      HelloWorld()
+        .then((res) => {
+          console.log("HelloWorld:res:", res);
+        })
+        .catch((err) => {
+          console.log("HelloWorld:err:", err);
+        });
+    },
     showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
+      if (this.passwordType === "password") {
+        this.passwordType = "";
       } else {
-        this.passwordType = 'password'
+        this.passwordType = "password";
       }
       this.$nextTick(() => {
-        this.$refs.password.focus()
-      })
+        this.$refs.password.focus();
+      });
     },
     handleLogin() {
-      this.loading = true
-      this.$refs.loginForm.validate(valid => {
+      this.loading = true;
+      this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          
-          
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            
-            this.$router.push({ path: this.redirect || '/' })
-            console.log("跳转")
-            this.loading = false
-          }).catch(() => {
-            this.loading = false
-          })
+          this.$store
+            .dispatch("user/login", this.loginForm)
+            .then(() => {
+              this.$router.push({ path: this.redirect || "/" });
+              console.log("跳转");
+              this.loading = false;
+            })
+            .catch(() => {
+              this.loading = false;
+            });
         } else {
-          console.log('error submit!!')
-          return false
+          console.log("error submit!!");
+          return false;
         }
-      })
+      });
     },
-    handleRegister(){
-      this.titleClass='title-leave'
-      setTimeout(()=>{
-        this.loginFormClass='login-form-leave'
-    },500)
-      
-      setTimeout(()=>{
-        this.$router.push('/register')
-        this.loading=false
-    },1000)
-      
+    handleRegister() {
+      this.titleClass = "title-leave";
+      setTimeout(() => {
+        this.loginFormClass = "login-form-leave";
+      }, 500);
+
+      setTimeout(() => {
+        this.$router.push("/register");
+        this.loading = false;
+      }, 1000);
     },
-    handleForget(){
-      this.titleClass='title-leave'
-      setTimeout(()=>{
-        this.loginFormClass='login-form-leave-forget'
-    },500)
-      
-      setTimeout(()=>{
-        this.$router.push('/forget')
-        this.loading=false
-    },1000)
-      
-    }
-  }
-}
+    handleForget() {
+      this.titleClass = "title-leave";
+      setTimeout(() => {
+        this.loginFormClass = "login-form-leave-forget";
+      }, 500);
+
+      setTimeout(() => {
+        this.$router.push("/forget");
+        this.loading = false;
+      }, 1000);
+    },
+  },
+};
 </script>
 
 <style lang="scss">
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
-$bg:#283443;
-$light_gray:#fff;
+$bg: #283443;
+$light_gray: #fff;
 $cursor: #fff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
@@ -215,9 +247,9 @@ $cursor: #fff;
 </style>
 
 <style lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+$bg: #2d3a4b;
+$dark_gray: #889aa4;
+$light_gray: #eee;
 
 .login-container {
   min-height: 100%;
@@ -255,7 +287,7 @@ $light_gray:#eee;
     animation: rotateOutDownLeft; /* referring directly to the animation's @keyframe declaration */
     animation-duration: 1s; /* don't forget to set a duration! */
   }
-  .login-form-leave-forget{
+  .login-form-leave-forget {
     position: relative;
     width: 520px;
     max-width: 100%;
@@ -298,7 +330,7 @@ $light_gray:#eee;
       animation: bounceInLeft; /* referring directly to the animation's @keyframe declaration */
       animation-duration: 1s; /* don't forget to set a duration! */
     }
-    .title-leave{
+    .title-leave {
       font-size: 26px;
       color: $light_gray;
       margin: 0px auto 40px auto;

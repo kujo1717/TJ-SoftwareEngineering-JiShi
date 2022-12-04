@@ -65,7 +65,7 @@
       <div class="images">
         <el-image
           style="margin-right: 1em"
-          v-for="(img, img_i) in act_imgs"
+          v-for="(img, img_i) in image_urlList"
           :key="img_i"
           :src="img"
         >
@@ -638,6 +638,8 @@ import MapChoose from "@/components/MapChoose";
 import { getInfo } from "@/api/user";
 import { getAllTag } from "@/api/tag";
 
+import { getImg } from "@/api/file";
+
 import { getPoll, postPoll } from "@/api/poll";
 import { getoptions, putTotal } from "@/api/vote_option";
 import { CodeToText, regionData } from "element-china-area-data";
@@ -882,8 +884,10 @@ export default {
           value: 2,
         },
       ],
-      // 地区选择数据
-      region_options: regionData,
+      /***图片 */
+      image_baseList: [],
+      image_urlList: [],
+      images: "", //字段值
       file_valueAction: "https://jsonplaceholder.typicode.com/posts/",
       file_valuefileList: [],
       limit_capacityOptions: [
@@ -1145,6 +1149,10 @@ export default {
           // 评价
           // 是否评价过
           this.rated = activity_mark.length != 0;
+          //图片
+          this.images = act_detail.images;
+          console.log("this.images", act_detail.images);
+          this.GetImgByteUrl();
 
           if (this.rated) {
             this.rate_val = activity_mark.mark[0].mark;
@@ -1825,6 +1833,41 @@ export default {
           }
         });
       });
+    },
+
+    /**图片 */
+    //根据this.images，请求后端获取到对应的图片bytes
+    async GetImgByteUrl() {
+      const images = this.images;
+      let image_baseList = [];
+      let image_urlList = [];
+      if (images != "") {
+        let image_paths = images.split(":");
+        for (let i = 0; i < image_paths.length; i++) {
+          let image_path = image_paths[i];
+          if (image_path.length > 0) {
+            let image_bytes;
+            let image_url;
+
+            await getImg(image_path)
+              .then((res) => {
+                image_bytes = res.data.bytes;
+                // console.log("image_bytes", image_bytes);
+                image_url = "data:image/png;base64," + image_bytes;
+                image_baseList.push(image_bytes);
+                image_urlList.push(image_url);
+              })
+              .catch((err) => {
+                console.log("TestGetImg:err", err);
+              });
+
+            console.log("image_url", image_url);
+            // console.log("image_bytes", image_bytes);
+          }
+        }
+      }
+      this.image_baseList = image_baseList;
+      this.image_urlList = image_urlList;
     },
   },
   computed: {
