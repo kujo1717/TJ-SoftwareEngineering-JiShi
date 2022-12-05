@@ -1,9 +1,12 @@
 import request from '@/utils/request'
 
-export function getAllRubbish () {
+export function getAllRubbish (userId) {
   return request({
     url: '/api/dustbin/findAllRubbish',
     method: 'get',
+    params:{
+      userId: userId
+    }
   })
 }
 
@@ -15,10 +18,13 @@ export function smashOneRubbish (id) {
   })
 }
 
-export function smashAllRubbish () {
+export function smashAllRubbish (userId) {
   return request({
     url: '/api/dustbin/clearDustbin',
-    method: 'delete'
+    method: 'delete',
+    params:{
+      userId: userId
+    }
   })
 }
 

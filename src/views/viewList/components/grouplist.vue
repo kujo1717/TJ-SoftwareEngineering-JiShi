@@ -108,7 +108,7 @@ export default {
   },
   data () {
     return {
-      userId: 1,//todo: 从cookie中获取
+      userId: this.$store.getters.id,
       tmpListsData: [],
       /**显示的数据源 */
       listsData: [

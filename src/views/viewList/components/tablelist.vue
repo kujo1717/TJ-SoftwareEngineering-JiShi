@@ -349,7 +349,7 @@ export default {
   components: { draggable, TaskBox, ExportButton },
   data () {
     return {
-      userId: 1,
+      userId: this.$store.getters.id,
       taskBoxDialogVisible: false,
       chosen_taskObj: {},
       chosen_taskId: 0,

@@ -188,7 +188,7 @@ export default {
   components: { CreateTaskBox, },
   data () {
     return {
-      userId: 1,
+      userId: this.$store.getters.id,
       dialogVisible: false,//是否弹出对话框
       createTaskBoxDialogVisible: false,//创建事项组件的显示控制
       isEditting: false,//是否正在编辑，用于动态class

@@ -89,6 +89,7 @@ export default {
   name: 'Dustbin',
   data () {
     return {
+      userId:this.$store.getters.id,
       search: '',
       currentInfoKey: 1,
       show_table: [],//分页实际展示的table
@@ -226,7 +227,7 @@ export default {
       })
         .then(() => {
           //向后端请求删除...
-          smashAllRubbish()
+          smashAllRubbish(this.userId)
             .then((res) => {
               console.log(res);
               //清空前端回收站
@@ -236,7 +237,7 @@ export default {
                 message: '回收站清空成功！'
               });
             })
-            .then((err) => {
+            .catch((err) => {
               console.log(err);
               this.$message({
                 type: 'danger',
@@ -254,7 +255,7 @@ export default {
     getFrontendTaskList () {
       console.log("开始拉取后端数据")
       //从后端拉取数据
-      getAllRubbish()
+      getAllRubbish(this.userId)
         .then((res) => {
           let taskList = []
           //然后要把后端拉回来的task对象转换成前端要用的对象
