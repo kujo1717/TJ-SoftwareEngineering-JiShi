@@ -1,6 +1,5 @@
 package com.example.backend.controller;
 
-import com.baomidou.mybatisplus.extension.api.R;
 import com.example.backend.dto.SortedTask;
 import com.example.backend.common.Result;
 import com.example.backend.entity.Classification;
@@ -13,9 +12,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,15 +40,15 @@ public class ClassificationController {
     public Result<List<Classification>> findOneUserAllClassificationTitle(@ApiParam(name="userId", value="要查找的用户id", required = true)
                                                                               @RequestParam("userId") Long userId)
     {
-        try
-        {
+//        try
+//        {
             List<Classification> classList = classificationService.findOneUserAllClassificationTitle(userId);
             return Result.success(classList);
-        }
-        catch (Exception e)
-        {
-            return Result.fail(500,e.getMessage());
-        }
+//        }
+//        catch (Exception e)
+//        {
+//            return Result.fail(500,e.getMessage());
+//        }
 
     }
 

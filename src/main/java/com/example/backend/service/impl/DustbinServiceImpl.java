@@ -25,8 +25,8 @@ public class DustbinServiceImpl implements DustbinService {
     DustbinMapper dustbinMapper;
 
     @Override
-    public Result<List<DustbinTask>> findAllDustbinTask() {
-        List<DustbinTask> taskList = dustbinMapper.selectAllRubbish();
+    public Result<List<DustbinTask>> findAllDustbinTask(Long userId) {
+        List<DustbinTask> taskList = dustbinMapper.selectAllRubbish(userId);
         Collections.reverse(taskList);
         for(int i=0; i<taskList.size();i++)
         {
@@ -51,8 +51,8 @@ public class DustbinServiceImpl implements DustbinService {
     }
 
     @Override
-    public Result<String> clearDustbin() {
-        int resultCount = dustbinMapper.deleteAllRubbish();
+    public Result<String> clearDustbin(Long userId) {
+        int resultCount = dustbinMapper.deleteAllRubbish(userId);
         if(resultCount == 0)
             return Result.fail(500,"清空回收站失败！");
         return Result.success("清空回收站成功！");
