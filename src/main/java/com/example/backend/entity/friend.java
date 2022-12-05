@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @TableName("friend")
 public class friend {
-    Long userid;
-    Long friendid;
-    Long groupid;
+    Long userId;
+    Long friendId;
+    Long groupId;
     String name;
 }

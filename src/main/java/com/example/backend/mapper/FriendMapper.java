@@ -7,9 +7,10 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface FriendMapper extends BaseMapper<friend> {
-    @Select("select * from friend where userid='$(userid)")
-    List<friend> selectFriend(@Param("userid")Long userid);
+    @Select("select friend.groupid,friend.name,user.name as rootname,user.email,user.avatar,user.age,user.introduce from friend,user where user.id=friend.friendid and friend.userid='${userid}'")
+    List<Map<String,Object>> selectFriend(@Param("userid")Long userid);
 }
