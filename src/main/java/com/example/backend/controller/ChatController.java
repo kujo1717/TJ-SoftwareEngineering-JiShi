@@ -82,11 +82,11 @@ public class ChatController {
         if (Objects.equals(type, "file")) {
             // 是文件消息
             File file = fileService.getFileInfoById(m.getFileId());
-            FormatMessage formatMessage = new FormatMessage(m.getMessageId(), status, type, m.getSendTime(), m.getContent(), file.getFileSize(), file.getFileName(), formatUser, m.getActivityId());
+            FormatMessage formatMessage = new FormatMessage(m.getMessageId(), status, type, m.getSendTime(), m.getContent(), file.getFileSize(), file.getFileName(), formatUser, m.getActivityId().toString());
             return formatMessage;
         } else {
             // 不是文件消息
-            FormatMessage formatMessage = new FormatMessage(m.getMessageId(), status, type, m.getSendTime(), m.getContent(), formatUser, m.getActivityId());
+            FormatMessage formatMessage = new FormatMessage(m.getMessageId(), status, type, m.getSendTime(), m.getContent(), formatUser, m.getActivityId().toString());
             return formatMessage;
         }
     }

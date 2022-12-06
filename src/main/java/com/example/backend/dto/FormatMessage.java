@@ -24,8 +24,8 @@ public class FormatMessage {
     private String fileName;
     private FormatUser fromUser;
 
-    private Long toContactId;
-    public FormatMessage(Long id, String status, String type, Long sendTime, String content, FormatUser fromUser, Long toContactId) {
+    private String toContactId;
+    public FormatMessage(Long id, String status, String type, Long sendTime, String content, FormatUser fromUser, String toContactId) {
         this.id = id;
         this.status = status;
         this.type = type;

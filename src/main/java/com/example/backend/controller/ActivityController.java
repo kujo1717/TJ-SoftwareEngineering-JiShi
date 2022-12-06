@@ -389,7 +389,7 @@ public class ActivityController {
     }
 
     /**
-     * 活动创建人，终止报名
+     * 活动创建人，终止报名，活动开始
      */
     @ApiOperation("活动创建人，终止报名")
     @PatchMapping("/creatorStopApply")
