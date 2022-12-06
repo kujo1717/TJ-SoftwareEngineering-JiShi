@@ -1,22 +1,11 @@
 import request from '@/utils/request'
 
-export function getOneGroupAllUser(groupId, userId) {
+export function getActivityAllPaticipant(activityId) {
     return request({
-        url: '/api/Group/getOneGroupAllUser',
+        url: '/api/activity/getActApplicantList',
         method: 'get',
         params: {
-            groupId: groupId,
-            userId: userId
-        }
-    })
-}
-
-export function getUserInfoById(userId) {
-    return request({
-        url: '/api/user',
-        method: 'get',
-        params: {
-            userId: userId
+            activity_id: activityId
         }
     })
 }
@@ -42,6 +31,29 @@ export function sendMessage(activityId, senderId, status, type, sendTime, conten
             type: type,
             sendTime: sendTime,
             content: content
+        }
+    })
+}
+
+export function getActivityAllMessageBoard(activityId) {
+    return request({
+        url: '/api/chat/getActivityAllMessageBoard',
+        method: 'get',
+        params: {
+            activityId: activityId,
+        }
+    })
+}
+
+export function sendMessageBoard(activityId, userId, content, createTime) {
+    return request({
+        url: '/api/chat/addMessageBoard',
+        method: 'post',
+        params: {
+            activityId: activityId,
+            userId: userId,
+            content:content,
+            createTime:createTime
         }
     })
 }
