@@ -402,28 +402,34 @@ public class ActivityController {
             Integer res = activityService.SetActivityState(activity_id, 1);
             //取所有报名者
             List<ActivityApply> applyList = activityApplyService.GetAllApplicantList(activity_id);
-            //取得活动信息
-            Activity activity = activityService.getAct(activity_id);
-            Integer capacity = activity.getCapacity();
-            Integer participatant_num = activity.getParticipant_num();
-            //按时间排序，最早在前
-            List<ActivityApply> applyList_sort = applyList.stream().sorted
-                    (Comparator.comparingLong(a -> a.getApply_time().getTime())).collect(Collectors.toList());
-//            System.out.println("applyList_sort:"+applyList_sort.toString());
+            if(applyList.size()>0){
+                //取得活动信息
+                Activity activity = activityService.getAct(activity_id);
+                Integer capacity = activity.getCapacity();
+                Integer participatant_num = activity.getParticipant_num();
+                //按时间排序，最早在前
+                List<ActivityApply> applyList_sort = applyList.stream().sorted
+                        (Comparator.comparingLong(a -> a.getApply_time().getTime())).collect(Collectors.toList());
+                System.out.println("applyList:"+applyList.toString());
 
-            //删除所有报名人
-            activityApplyService.DeleteAct(activity_id);
-            //按剩余空位，报名人依次进入参与名单
-            for (int i = 0; i < capacity - participatant_num; i++) {
-                ActivityParticipate participate = new ActivityParticipate();
-                participate.setActivity_id(activity_id);
-                participate.setUser_id(applyList_sort.get(i).getUser_id());
-                activityParticipateService.AddParticipant(participate);
+                System.out.println("applyList_sort:"+applyList_sort.toString());
+
+                //删除所有报名人
+                activityApplyService.DeleteAct(activity_id);
+                //按剩余空位，报名人依次进入参与名单
+                for (int i = 0; i < capacity - participatant_num; i++) {
+                    ActivityParticipate participate = new ActivityParticipate();
+                    participate.setActivity_id(activity_id);
+                    participate.setUser_id(applyList_sort.get(i).getUser_id());
+                    activityParticipateService.AddParticipant(participate);
+                }
             }
+
 
 
             return Result.success("creatorStopApply SUCCESS");
         } catch (Exception e) {
+            e.printStackTrace();
             return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "creatorStopApply FAILED");
 
         }

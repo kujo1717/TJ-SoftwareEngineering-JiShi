@@ -23,4 +23,13 @@ public interface ActivityApplyMapper extends BaseMapper<ActivityApply> {
              "FROM activity_apply " +
              "WHERE activity_id=${activity_id}")
     Integer DeleteAct(@Param("activity_id") Long activity_id);
+
+
+    @Select(
+            "SELECT * " +
+                    "FROM activity inner join activity_apply " +
+                    "ON activity.activity_id = activity_apply.activity_id  " +
+                    "WHERE activity.activity_id=${activity_id}")
+    List<Map<String,Object>> SelectApplicantList(@Param("activity_id") Long activity_id);
+
 }
