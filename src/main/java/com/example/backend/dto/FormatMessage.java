@@ -19,11 +19,9 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FormatMessage {
-//    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     private String status;
     private String type;
-//    @JsonSerialize(using = ToStringSerializer.class)
     private Long sendTime;
     private String content;
     private double fileSize;

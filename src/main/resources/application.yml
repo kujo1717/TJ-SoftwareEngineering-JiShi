@@ -9,7 +9,8 @@ spring:
 #    url: jdbc:mysql://42.192.45.95:3306/jishi
     url: jdbc:mysql://localhost:3306/jishi?
     username: root
-    password: 657826973YANGyan?
+    password: Lyf123456
+#    password: 657826973YANGyan?
 #    username: jishi
 #    password: WeKCSAME52dEdTBL
   mail:

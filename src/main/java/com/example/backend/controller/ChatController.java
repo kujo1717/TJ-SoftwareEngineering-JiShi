@@ -1,16 +1,15 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.FormatMessage;
+import com.example.backend.dto.FormatMessageBoard;
 import com.example.backend.dto.FormatUser;
 import com.example.backend.common.Result;
 import com.example.backend.entity.File;
 import com.example.backend.entity.Message;
+import com.example.backend.entity.MessageBoard;
 import com.example.backend.entity.User;
 import com.example.backend.mapper.MessageMapper;
-import com.example.backend.service.FileService;
-import com.example.backend.service.MessageService;
-import com.example.backend.service.UserService;
-import com.example.backend.service.WebSocket;
+import com.example.backend.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,6 +35,9 @@ public class ChatController {
 
     @Autowired
     MessageService messageService;
+
+    @Autowired
+    MessageBoardService messageBoardService;
 
     @Autowired
     UserService userService;
@@ -70,7 +74,7 @@ public class ChatController {
         return new FormatUser(user.getId(), user.getName(), user.getAvatar());
     }
 
-    private FormatMessage formatMessage(Message m){
+    private FormatMessage formatMessage(Message m) {
         // 获取发送消息的用户的信息
         User user = userService.findUser(m.getSenderId());
         FormatUser formatUser = formatUser(user);
@@ -87,6 +91,12 @@ public class ChatController {
             FormatMessage formatMessage = new FormatMessage(m.getMessageId(), status, type, m.getSendTime(), m.getContent(), formatUser, m.getActivityId());
             return formatMessage;
         }
+    }
+
+    private FormatMessageBoard formatMessageBoard(MessageBoard messageBoard) {
+        // 获取发送消息的用户的信息
+        User user = userService.findUser(messageBoard.getUserId());
+        return new FormatMessageBoard(messageBoard.getMessageBoardId(), messageBoard.getUserId(), user.getName(), messageBoard.getContent(), messageBoard.getCreateTime());
     }
 
     @ApiOperation("获取某个活动的所有消息")
@@ -127,12 +137,53 @@ public class ChatController {
             messageService.addMessage(message);
 
             FormatMessage formatMessage = formatMessage(message);
-            webSocket.sendMessage(formatMessage);
+            webSocket.sendMessage(activityId.toString(), formatMessage);
             return Result.success("yes");
         } catch (Exception e) {
-            return Result.fail(500,e.getMessage());
+            return Result.fail(500, e.getMessage());
         }
 
     }
+
+    @ApiOperation("获取某个活动留言板中的所有消息")
+    @GetMapping("getActivityAllMessageBoard")
+    public Result<List<FormatMessageBoard>> findActivityAllMessageBoard(@ApiParam(name = "activityId", value = "要查找的活动id", required = true)
+                                                                        @RequestParam("activityId") Long activityId) {
+        try {
+            ArrayList<FormatMessageBoard> formatMessageBoards = new ArrayList<>();
+            List<MessageBoard> activityAllMessageBoard = messageBoardService.findActivityAllMessageBoard(activityId);
+            for (MessageBoard mb : activityAllMessageBoard) {
+                FormatMessageBoard formatMessageBoard = formatMessageBoard(mb);
+                formatMessageBoards.add(formatMessageBoard);
+            }
+            return Result.success(formatMessageBoards);
+        } catch (Exception e) {
+            return Result.fail(500, e.getMessage());
+        }
+
+    }
+
+    @ApiOperation("添加留言板消息")
+    @PostMapping("addMessageBoard")
+    public Result<String> addMessageBoard(@ApiParam(name = "activityId", value = "活动ID", required = true)
+                                          @RequestParam() Long activityId,
+                                          @ApiParam(name = "userId", value = "发送者ID", required = true)
+                                          @RequestParam() Long userId,
+                                          @ApiParam(name = "content", value = "内容", required = true)
+                                          @RequestParam() String content,
+                                          @ApiParam(name = "createTime", value = "发送时间", required = true)
+                                          @RequestParam() String createTime) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            Date date = sdf.parse(createTime);
+            MessageBoard messageBoard = new MessageBoard(activityId, userId, content, date);
+            messageBoardService.addMessageBoard(messageBoard);
+            return Result.success("yes");
+        } catch (Exception e) {
+            return Result.fail(500, e.getMessage());
+        }
+
+    }
+
 
 }

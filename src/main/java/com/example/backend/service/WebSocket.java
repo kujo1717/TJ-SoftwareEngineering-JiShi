@@ -1,12 +1,16 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.FormatMessage;
-import com.mysql.jdbc.log.Log;
+import com.example.backend.entity.Group;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -18,20 +22,30 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @ServerEndpoint(value = "/webSocket", encoders = WebSocketCustomEncoding.class)
 public class WebSocket {
     private Session session;
-
-    private static CopyOnWriteArraySet<WebSocket> webSocketSet = new CopyOnWriteArraySet<>();
+    private String group;
+    private static final Map<String, ArrayList<WebSocket>> webSocketMap = new HashMap<>();
 
     @OnOpen
     public void onOpen(Session session) {
         this.session = session;
-        webSocketSet.add(this);
-        System.out.println("有新的连接，总数" + webSocketSet.size());
+        Map<String, List<String>> map = session.getRequestParameterMap();
+        group = map.get("activityId").get(0);
+        // 判断该群聊是否已经在map中存在
+        if (webSocketMap.containsKey(group)) {
+            webSocketMap.get(group).add(this);
+        } else {
+            ArrayList<WebSocket> webSockets = new ArrayList<>();
+            webSockets.add(this);
+            webSocketMap.put(group, webSockets);
+        }
+
+        System.out.println("有新的连接，组号为：" + group + "，当前组中总数为：" + webSocketMap.get(group).size());
     }
 
     @OnClose
     public void onClose() {
-        webSocketSet.remove(this);
-        System.out.println("连接断开，总数" + webSocketSet.size());
+        webSocketMap.get(group).remove(this);
+        System.out.println("断开连接，组号为：" + group + "，当前组中总数为：" + webSocketMap.get(group).size());
     }
 
     @OnMessage
@@ -39,15 +53,20 @@ public class WebSocket {
         System.out.println("收到客户端发来的消息");
     }
 
-    public void sendMessage(FormatMessage formatMessage) {
-        for (WebSocket webSocket : webSocketSet) {
-            System.out.println("广播消息" + formatMessage);
-            try {
-                webSocket.session.getBasicRemote().sendObject(formatMessage);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (EncodeException e) {
-                throw new RuntimeException(e);
+    public void sendMessage(String activityId, FormatMessage formatMessage) {
+        // 只向同组的成员广播消息
+        ArrayList<WebSocket> webSockets = webSocketMap.get(activityId);
+        for (WebSocket webSocket : webSockets) {
+            // 不向自身广播
+            if (webSocket != this) {
+                System.out.println("广播消息" + formatMessage);
+                try {
+                    webSocket.session.getBasicRemote().sendObject(formatMessage);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (EncodeException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
