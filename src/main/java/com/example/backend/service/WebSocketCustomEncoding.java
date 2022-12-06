@@ -1,7 +1,7 @@
 package com.example.backend.service;
 
 import com.alibaba.fastjson.JSON;
-import com.example.backend.Dto.FormatMessage;
+import com.example.backend.dto.FormatMessage;
 
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;

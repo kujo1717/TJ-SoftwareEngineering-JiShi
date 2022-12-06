@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
-import com.example.backend.Dto.SortedTask;
+import com.baomidou.mybatisplus.extension.api.R;
+import com.example.backend.dto.SortedTask;
 import com.example.backend.common.Result;
 import com.example.backend.entity.Classification;
 import com.example.backend.entity.Task;
@@ -12,8 +13,12 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Author hym
@@ -66,9 +71,13 @@ public class ClassificationController {
                 String classificationTitle = classification.getClassificationTitle();
                 List<Task> taskList = taskService.selectOneUserOneSortAllTask(userId, classificationTitle);
 
-                SortedTask newSortedTask = new SortedTask(classificationTitle, taskList);
+                SortedTask newSortedTask = new SortedTask(classificationTitle, taskList, classification.getCreateTime());
                 sortedTaskList.add(newSortedTask);
             }
+
+            //对sortedTaskList按照时间降序排序
+            sortedTaskList = sortedTaskList.stream().sorted(Comparator.comparing(SortedTask::getCreateTime).reversed()).collect(Collectors.toList());
+
             return Result.success(sortedTaskList);
         }
         catch (Exception e)
@@ -93,5 +102,40 @@ public class ClassificationController {
         {
             return Result.fail(500,e.getMessage());
         }
+    }
+
+    @ApiOperation("用户删除一个分组，该分组内的所有事项自动被分到默认分组")
+    @DeleteMapping("deleteOneClassification")
+    public Result<String> deleteOneClassification(@ApiParam(name="userId", value="用户id", required = true)
+                                                      @RequestParam("userId") Long userId,
+                                                  @ApiParam(name="classificationTitle", value="要删除的分组名称", required = true)
+                                                      @RequestParam("classificationTitle") String classificationTitle)
+    {
+        //默认分组不可删除
+        if(classificationTitle.equals("默认分组"))
+            return Result.fail(405,"默认分组不可删除！");
+
+        //先收集准备删除的分类中的所有task
+        List<Task> taskList = taskService.selectOneUserOneSortAllTask(userId, classificationTitle);
+        for(Task t : taskList)
+        {
+            t.setClassificationTitle("默认分组");
+            taskService.patchOneTask(t);
+        }
+
+        //删除分组
+        try {
+            int res = classificationService.deleteOneClassification(userId, classificationTitle);
+        }
+        catch (Exception e){
+            //如果删除分组失败，回滚事项的分组修改
+            for(Task t : taskList)
+            {
+                t.setClassificationTitle(classificationTitle);
+                taskService.patchOneTask(t);
+            }
+            return Result.fail(500,e.getMessage());
+        }
+        return Result.success("删除分组成功！该分组内的所有事项都被自动分配到默认分组！");
     }
 }

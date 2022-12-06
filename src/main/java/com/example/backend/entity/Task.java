@@ -39,12 +39,16 @@ public class Task {
     private Timestamp endTime;
     private short isParent;
     private String isInDustbin;
+    private Timestamp realFinishTime;
+    private String tag;
+    private Timestamp createTime;
 
     @JsonSerialize(using= ToStringSerializer.class)
     private Long userId;
 
     @TableField(exist = false)
     private List<Task> relativeTask;
+
 
     public void addOneRelativeTask(Task task)
     {

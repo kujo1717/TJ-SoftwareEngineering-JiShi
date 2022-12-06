@@ -1,6 +1,6 @@
 package com.example.backend.service;
 
-import com.example.backend.entity.Classification;
+//import com.example.backend.entity.Classification;
 import com.example.backend.entity.ItemNotice;
 import org.springframework.stereotype.Service;
 

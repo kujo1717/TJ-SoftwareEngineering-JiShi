@@ -1,6 +1,6 @@
 package com.example.backend.controller;
 
-import com.example.backend.Dto.ActivityNotice;
+import com.example.backend.dto.ActivityNotice;
 import com.example.backend.Dto.SystemNotice;
 import com.example.backend.common.Result;
 import com.example.backend.entity.ItemNotice;

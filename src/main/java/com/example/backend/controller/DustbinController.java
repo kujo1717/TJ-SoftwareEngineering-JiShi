@@ -26,13 +26,13 @@ public class DustbinController {
     @Autowired
     DustbinService dustbinService;
 
-    @ApiOperation("根据返回所有垃圾桶里的事项")
+    @ApiOperation("返回所有垃圾桶里的事项")
     @GetMapping("findAllRubbish")
     public Result<List<DustbinTask>> findAllRubbish(){
         return dustbinService.findAllDustbinTask();
     }
 
-    @ApiOperation("根据id删除垃圾")
+    @ApiOperation("根据taskId删除垃圾")
     @DeleteMapping("smashOneRubbish")
     public Result<String> smashOneRubbish(@ApiParam(name="id", value="要永久删除的事项id", required = true)
                                               @RequestParam("id") Long id)
@@ -47,7 +47,7 @@ public class DustbinController {
         return dustbinService.clearDustbin();
     }
 
-    @ApiOperation("根据id恢复事项")
+    @ApiOperation("根据taskId恢复事项")
     @PatchMapping("restoreOneRubbish")
     public Result<String> restoreOneRubbish(@ApiParam(name="id", value="要恢复的事项id", required = true)
                                                 @RequestParam("id") Long id)

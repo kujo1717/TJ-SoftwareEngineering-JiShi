@@ -1,6 +1,5 @@
 package com.example.backend.mapper;
 
-import com.example.backend.entity.Group;
 import com.example.backend.entity.ItemNotice;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
