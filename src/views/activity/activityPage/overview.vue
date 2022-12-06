@@ -64,7 +64,7 @@
       <!-- 活动配图展示 -->
       <div class="images">
         <el-image
-          style="margin-right: 1em"
+          style="margin-right: 1em;height:20em;"
           v-for="(img, img_i) in image_urlList"
           :key="img_i"
           :src="img"
@@ -280,18 +280,24 @@
       :showVal="rate_val"
       @MarkActivity="ComponentsMarkActivity"
     ></ActivityMarkCard>
-
     <!-- 活动投票卡片 -->
-    <el-col :span="12" v-if="true">
+    <el-col :span="12" v-if="is_member">
       <!-- 目前活动有投票-->
       <!--span v-if="hasVote"-->
       <!-- 展示投票 -->
       <el-button @click="getPoll">查看本活动投票</el-button>
       <el-card>
-        <div v-for="(poll,index) in Polls" :key="index">
+        <div v-for="(poll, index) in Polls" :key="index">
           <vue-poll :key="index" v-bind="poll.option" @addvote="addVote" />
-          <span>
-            <el-button type="primary" @click="confirmVote">确认</el-button>
+          <span v-if="poll.notCommitted">
+            <el-button
+              type="primary"
+              @click="
+                poll.notCommitted = 0;
+                confirmVote();
+              "
+              >确认</el-button
+            >
             <el-button @click="cancelVote">取消</el-button>
           </span>
         </div>
@@ -299,9 +305,11 @@
       <!--/span-->
 
       <span>
-        <el-card v-if="user_id/*=creator_data.id*/">
+        <el-card v-if="is_creator">
           <!-- 创建人发起投票 -->
-          <el-button @click="clickCreateVote" v-if="true" type="primary">新建投票</el-button>
+          <el-button @click="clickCreateVote" v-if="true" type="primary"
+            >新建投票</el-button
+          >
         </el-card>
       </span>
 
@@ -623,25 +631,26 @@
 import {
   deleteActivity,
   deleteActivityApply,
+  getActApplicantList,
   getActDetail,
   getIsApplicant,
   getIsCreator,
+  getIsMember,
   patchAct,
   patchActFinish,
-  getActApplicantList,
   patchActStopApply,
   postActivityApply,
 } from "@/api/activity";
 import MapChoose from "@/components/MapChoose";
 
-import { getInfo } from "@/api/user";
 import { getAllTag } from "@/api/tag";
+import { getInfo } from "@/api/user";
 
 import { getImg } from "@/api/file";
 
-import { getPoll, postPoll } from "@/api/poll";
+import { getPoll, getVote, postPoll, postVote } from "@/api/poll";
 import { getoptions, putTotal } from "@/api/vote_option";
-import { CodeToText, regionData } from "element-china-area-data";
+import { CodeToText } from "element-china-area-data";
 import VuePoll from "vue-poll";
 import ActivityMarkCard from "./markcard.vue";
 export default {
@@ -652,10 +661,11 @@ export default {
       /**
        * 用户个人信息
        */
-      //creator,member
+      // creator,member
       UserIdentity: "",
       is_creator: false,
       is_applicant: false,
+      is_member: false,
 
       // 用户对这个活动的评价
       rated: false, // 是否评价过
@@ -678,7 +688,7 @@ export default {
       act_introText: "",
       // 一句话介绍
       summary: "",
-      //tags
+      // tags
       tags: [],
       // 配图
       act_imgs: [],
@@ -698,10 +708,10 @@ export default {
        * 参与人data
        */
       participant_list: [],
-      //参与人限制
+      // 参与人限制
       participate_limit: "",
       participant_num: "",
-      //当前报名人数
+      // 当前报名人数
       applicant_num: 0,
       // 当前参与人数
       now_participant_num: 0,
@@ -796,10 +806,10 @@ export default {
       isShow_dialog_edit: false,
       edit_confirm_loading: false,
 
-      //show地图
+      // show地图
       innerVisible: false,
 
-      //map:null,
+      // map:null,
       primitiveData: -1,
       /* 修改活动信息 */
       isShow_: true,
@@ -868,7 +878,7 @@ export default {
 
         detail_text: [],
       },
-      //可选tag
+      // 可选tag
       optional_tags: [],
       file_valueAction: "https://jsonplaceholder.typicode.com/posts/",
       file_valuefileList: [],
@@ -882,10 +892,10 @@ export default {
           value: 2,
         },
       ],
-      /***图片 */
+      /** *图片 */
       image_baseList: [],
       image_urlList: [],
-      images: "", //字段值
+      images: "", // 字段值
       file_valueAction: "https://jsonplaceholder.typicode.com/posts/",
       file_valuefileList: [],
       limit_capacityOptions: [
@@ -900,168 +910,178 @@ export default {
       ],
     };
   },
-  created: function () {
-  },
+  created: function () {},
   methods: {
-
     /** 投票*/
     // api
     // 获取此时的投票信息
     async getPoll() {
-      const polls = []
+      const polls = [];
       await getPoll(this.activity_id)
         .then((res) => {
-          this.canIVote = true
+          this.canIVote = true;
           res.data.forEach((ele) => {
-            const answers = []
+            const answers = [];
+            const optionOfPoll = [];
             getoptions(ele.pollID).then((res) => {
-              console.log(res)
+              console.log(res);
               res.data.forEach((ele) => {
                 answers.push({
                   value: ele.optionID,
                   text: ele.optionName,
-                  votes: ele.voteNum
-                })
-              })
-              const option = []
-              option.push({ question: ele.topicText, answers: answers })
-              polls.push({
-                poll_id: ele.pollId,
-                deadline: ele.deadline,
-                multiple_choice: ele.multipleChoice,
-                option: option,
-                activity_id: this.activity_id
-              })
-            })
-          })
-          this.Polls = polls
+                  votes: ele.voteNum,
+                });
+                optionOfPoll.push(ele.optionID);
+              });
+              let notVoted = 1;
+              getVote(this.user_id).then((res) => {
+                console.log(res);
+                res.data.forEach((ele) => {
+                  if (optionOfPoll.indexOf(ele) != -1) notVoted = 0;
+                });
+                console.log("notVoted", notVoted);
+                if (notVoted) {
+                  const option = [];
+                  option.push({ question: ele.topicText, answers: answers });
+                  polls.push({
+                    poll_id: ele.pollId,
+                    deadline: ele.deadline,
+                    multiple_choice: ele.multipleChoice,
+                    option: option,
+                    activity_id: this.activity_id,
+                    notCommitted: 1,
+                  });
+                }
+              });
+            });
+          });
+          this.Polls = polls;
+          console.log(polls);
         })
         .catch((err) => {
-          console.log('geterr:' + err)
-        })
+          console.log("geterr:" + err);
+        });
     },
     // 暂时投票
     addVote(obj) {
-      this.showVoteButtons = true
-      console.log(obj)
-      this.selectedOption = obj.value
-      console.log('选项的value，目前该选项的票数，本投票的总票数')
+      this.showVoteButtons = true;
+      console.log(obj);
+      this.selectedOption = obj.value;
+      console.log("选项的value，目前该选项的票数，本投票的总票数");
     },
     // 确定投票，api
     confirmVote() {
       // 弹窗确认
-      const h = this.$createElement
+      const h = this.$createElement;
       this.$msgbox({
-        title: '确定本次投票',
-        // message:
-        // h("p", null, [
-        //   h("span", null, "将把管理员 "),
-        //   h("i", { style: "color: teal" }, mem.name),
-        //   h("span", null, " 降级为一般成员"),
-        // ]),
-        // dangerouslyUseHTMLString: true,
+        title: "确定本次投票",
         showCancelButton: true,
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
         beforeClose: (action, instance, done) => {
           // 点击了 确认
-          if (action === 'confirm') {
-            instance.confirmButtonLoading = true
-            instance.confirmButtonText = '执行中...'
+          if (action === "confirm") {
+            instance.confirmButtonLoading = true;
+            instance.confirmButtonText = "执行中...";
             // 向后端接口请求
             putTotal(this.selectedOption)
               .then()
               .catch((err) => {
-                console.log('putTotal:err', err)
-              })
+                console.log("putTotal:err", err);
+              });
+            postVote(this.user_id, this.selectedOption)
+              .then()
+              .catch((err) => {
+                console.log("postVote:err", err);
+              });
             // 静态测试，3s后完成操作
             setTimeout(() => {
-              done()
-              this.canIVote = false
-              this.showVoteButtons = false
+              done();
+              this.canIVote = false;
+              this.showVoteButtons = false;
               setTimeout(() => {
-                instance.confirmButtonLoading = false
-              }, 300)
-            }, 500)
+                instance.confirmButtonLoading = false;
+              }, 300);
+            }, 500);
           } else {
-            done()
+            done();
           }
-        }
+        },
       }).then((action) => {
         this.$message({
-          type: 'info',
-          message: 'action: ' + action
-        })
-      })
+          type: "info",
+          message: "action: " + action,
+        });
+      });
     },
 
     // 撤回临时投票
     cancelVote() {
       this.$nextTick(() => {
-        this.showVoteButtons = true
+        this.showVoteButtons = true;
         // 重新请求api，获取当前的投票情况
 
-        this.VoteOptions = this.getPoll(this.poll_id)
-        this.VotePollKey += 1
+        this.VoteOptions = this.getPoll(this.poll_id);
+        this.VotePollKey += 1;
         // this.$forceUpdate();
-      })
+      });
     },
 
     // 新建投票
     clickCreateVote() {
-      this.isShow_dialog_createVote = true
+      this.isShow_dialog_createVote = true;
     },
     // 新建投票diaglog 关闭前
     handleClose_creatVote() {
-      this.edit_confirm_loading = false
-      this.isShow_dialog_createVote = false
+      this.edit_confirm_loading = false;
+      this.isShow_dialog_createVote = false;
     },
     // 新增选项
     createVote_addOption() {
-      this.newVoteFrom.option.push({ option: '' })
+      this.newVoteFrom.option.push({ option: "" });
     },
     // 删除选项
     createVote_removeOption(option_i) {
-      this.newVoteFrom.option.splice(option_i, 1)
+      this.newVoteFrom.option.splice(option_i, 1);
     },
 
     // 确认新建投票
     confirm_createVote() {
       // api
       // 创建新的投票
-      this.newVoteFrom.activity_id = this.activity_id
-      const post_data = this.newVoteFrom
-      console.log('post_data:', post_data)
+      this.newVoteFrom.activity_id = this.activity_id;
+      const post_data = this.newVoteFrom;
+      console.log("post_data:", post_data);
       postPoll(post_data)
         .then((res) => {
-          console.log('postPoll:res:', res),
-          this.$message({
-            type: 'success',
-            message: '投票创建成功'
-          })
+          console.log("postPoll:res:", res),
+            this.$message({
+              type: "success",
+              message: "投票创建成功",
+            });
         })
         .catch((err) => {
-          console.log('postPoll:err:', err)
-        })
+          console.log("postPoll:err:", err);
+        });
 
-      this.edit_confirm_loading = true
+      this.edit_confirm_loading = true;
       // 全局loading模板
-      const thisContent = this
+      const thisContent = this;
       const edit_loading = thisContent.$loading({
         lock: true,
-        text: '创建新投票，请稍候...',
-        spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.5)'
-      })
+        text: "创建新投票，请稍候...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.5)",
+      });
       setTimeout(() => {
-        this.isShow_dialog_createVote = false
-        this.edit_confirm_loading = false
-        edit_loading.close()
-      }, 1000)
+        this.isShow_dialog_createVote = false;
+        this.edit_confirm_loading = false;
+        edit_loading.close();
+      }, 1000);
     },
     // 取消新建投票
     cancel_createVote() {
-      this.isShow_dialog_createVote = false
+      this.isShow_dialog_createVote = false;
     },
     /**
      * 活动信息
@@ -1095,9 +1115,9 @@ export default {
           console.log("api请求活动详情：", res);
           const act_detail = res.data.activity_detail;
           const activity_mark = res.data.activity_mark;
-          //直接备份
+          // 直接备份
           this.api_activity_detail_bak = act_detail;
-          //活动修改表格的data
+          // 活动修改表格的data
           this.newact_form.title_name = act_detail.title_name;
           this.newact_form.summary = act_detail.summary;
           this.newact_form.start_time = act_detail.start_time;
@@ -1141,10 +1161,11 @@ export default {
           // 评价
           // 是否评价过
           this.rated = activity_mark.length != 0;
-          //图片
+          // 图片
           this.images = act_detail.images;
           console.log("this.images", act_detail.images);
-          this.GetImgByteUrl();
+          // this.GetImgByteUrl()
+          this.GetImgUrl();
 
           if (this.rated) {
             this.rate_val = activity_mark.mark[0].mark;
@@ -1200,7 +1221,7 @@ export default {
 
           this.VoteOptions = this.getActVote(this.activity_id);
 
-          //创建者具体信息
+          // 创建者具体信息
           await getInfo(this.creator_id)
             .then((res) => {
               console.log("creator_info:res:", res);
@@ -1215,7 +1236,7 @@ export default {
           //   avatar: "https://s1.ax1x.com/2022/11/13/zF8nrd.jpg",
           //   role: "creator",
           // };
-          //所有参与人员信息
+          // 所有参与人员信息
           await getActApplicantList(this.activity_id)
             .then((res) => {
               console.log("getActApplicantList:res:", res);
@@ -1383,9 +1404,9 @@ export default {
           // 提交新的活动信息
           this.edit_confirm_loading = true;
 
-          //全局loading模板
-          let thisContent = this;
-          let edit_loading = thisContent.$loading({
+          // 全局loading模板
+          const thisContent = this;
+          const edit_loading = thisContent.$loading({
             lock: true,
             text: "修改中，请稍候...",
             spinner: "el-icon-loading",
@@ -1492,9 +1513,9 @@ export default {
       return isRightSize && isAccept;
     },
 
-    /**Tag */
+    /** Tag */
     GetAllTags() {
-      //get all tags
+      // get all tags
       getAllTag()
         .then((res) => {
           this.optional_tags = res.data;
@@ -1534,6 +1555,18 @@ export default {
         })
         .catch((err) => {
           console.log("Get_isApplicant:err:", err);
+        });
+    },
+    // 用户是不是这个活动的参与者
+    async Get_isMember() {
+      console.log("this.activity_id:", this.activity_id);
+      await getIsMember(this.user_id, this.activity_id)
+        .then((res) => {
+          console.log("IsMember:res:", res);
+          this.is_member = res.data.is_member;
+        })
+        .catch((err) => {
+          console.log("IsMember:err:", err);
         });
     },
 
@@ -1781,8 +1814,8 @@ export default {
       this.getActDetail(this.activity_id);
     },
 
-    /*地图 */
-    //地图
+    /* 地图 */
+    // 地图
     locationSure(val) {
       console.log("val", val);
       this.newact_form.address_formatted = val.address_formatted;
@@ -1792,9 +1825,9 @@ export default {
       this.primitiveData = val.value;
       // console.log("primitiveData:", this.primitiveData);
     },
-    //浏览器IP定位
+    // 浏览器IP定位
     getLngLatLocation() {
-      let that = this;
+      const that = this;
       AMap.plugin("AMap.CitySearch", function () {
         var citySearch = new AMap.CitySearch();
         citySearch.getLocalCity(function (status, result) {
@@ -1806,7 +1839,7 @@ export default {
               (result.bounds.northeast.lat + result.bounds.southwest.lat) / 2,
             ];
             console.log("primitiveData", that.primitiveData);
-            //逆向地理编码
+            // 逆向地理编码
             AMap.plugin("AMap.Geocoder", function () {
               var geocoder = new AMap.Geocoder({
                 // city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
@@ -1827,16 +1860,16 @@ export default {
       });
     },
 
-    /**图片 */
-    //根据this.images，请求后端获取到对应的图片bytes
+    /** 图片 */
+    // 根据this.images，请求后端获取到对应的图片bytes
     async GetImgByteUrl() {
       const images = this.images;
-      let image_baseList = [];
-      let image_urlList = [];
+      const image_baseList = [];
+      const image_urlList = [];
       if (images != "") {
-        let image_paths = images.split(":");
+        const image_paths = images.split(":");
         for (let i = 0; i < image_paths.length; i++) {
-          let image_path = image_paths[i];
+          const image_path = image_paths[i];
           if (image_path.length > 0) {
             let image_bytes;
             let image_url;
@@ -1859,6 +1892,28 @@ export default {
         }
       }
       this.image_baseList = image_baseList;
+      this.image_urlList = image_urlList;
+    },
+
+    //切割images字符串，直接通过url访问图片
+    GetImgUrl() {
+      const images = this.images;
+      let image_urlList = [];
+      if (images != "") {
+        let image_paths = images.split(":");
+
+        for (let i = 0; i < image_paths.length; i++) {
+          /**直接通过url访问图片 */
+          let image_url;
+          let image_path = image_paths[i];
+
+          if (image_path.length > 0) {
+            image_url = "http://localhost:8081/api" + image_path;
+            console.log("image_url", image_url);
+            image_urlList.push(image_url);
+          }
+        }
+      }
       this.image_urlList = image_urlList;
     },
   },
@@ -1896,8 +1951,10 @@ export default {
     // 判断是否为这个活动的创建者
     this.Get_isCreator();
 
-    // 判断是否为参与者
+    // 判断是否为报名者
     this.Get_isApplicant();
+
+    this.Get_isMember();
   },
 };
 </script>

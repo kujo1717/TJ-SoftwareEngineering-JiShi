@@ -251,3 +251,17 @@ export function HelloWorld() {
     })
 }
 
+
+
+//判断用户是不是活动的报名者
+export function getIsMember(user_id, activity_id) {
+    return request({
+        url: '/api/activity/ismember',
+        method: 'get',
+        params: {
+            user_id: user_id,
+            activity_id: activity_id
+        }
+    })
+}
+

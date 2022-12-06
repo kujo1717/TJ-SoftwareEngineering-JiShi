@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function postFile(formData) {
     return request({
-        url: '/api/img/postImgList',
+        url: '/api/file/postImgList',
         method: 'post',
         headers: {
             "Content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryn8D9asOnAnEU4Js0"
@@ -14,10 +14,12 @@ export function postFile(formData) {
 }
 
 
-//获取图片
+
+
+//获取文件，返回二进制对象
 export function getImg(path) {
     return request({
-        url: '/api/img/getImg',
+        url: '/api/file/getFile',
         method: 'get',
         params: {
             path: path,
