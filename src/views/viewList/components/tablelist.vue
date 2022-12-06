@@ -12,7 +12,7 @@
     <div class="drop_down_box">
       <div class="left_box">
         <!--导出按钮-->
-        <ExportButton :taskList="contents_data" />
+        <ExportButton :taskList="tableData" />
         <!-- 左边的下拉框，可快捷筛选，即为表格的筛选器赋值
         <el-select
           @change="TopSelectValChange"
@@ -31,27 +31,27 @@
         <el-checkbox
           label="未开始"
           v-model="bool_showNoStart"
-          @change="postKeyAndFetch()"
+          @change="getPageData()"
         ></el-checkbox>
         <el-checkbox
           label="已完成"
           v-model="bool_showFinished"
-          @change="postKeyAndFetch()"
+          @change="getPageData()"
         ></el-checkbox>
         <el-checkbox
           label="进行中"
           v-model="bool_showDoing"
-          @change="postKeyAndFetch()"
+          @change="getPageData()"
         ></el-checkbox>
         <el-checkbox
           label="延期中"
           v-model="bool_showDelaying"
-          @change="postKeyAndFetch()"
+          @change="getPageData()"
         ></el-checkbox>
         <el-checkbox
           label="延期完成"
           v-model="bool_showDelayedFinished"
-          @change="postKeyAndFetch()"
+          @change="getPageData()"
         ></el-checkbox>
 
       </div>
@@ -66,6 +66,7 @@
             :fetch-suggestions="SearchTaskByKeyWord"
             placeholder="请输入事项关键词"
             @select="SelectTaskSearchSuggestion"
+            @keyup.enter.native="getPageData"
           ></el-autocomplete>
         </div>
         <!-- 表头设置 -->
@@ -144,9 +145,9 @@
     <!-- 表格部分 -->
     <div class="contents_table_box">
       <el-table
-        v-if="contents_data.length > 0"
+        :loading="loading"
         class="contents_table"
-        :data="contents_data"
+        :data="show_table"
         border
         :row-class-name="GetRowClass"
         :show-header="true"
@@ -156,10 +157,9 @@
         @cell-click="
           (row, column, cell, event) => cellClick(row, column, cell, event)
         "
-        :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+        :tree-props="{ children: 'children'}"
         row-key="taskId"
       >
-        <!-- row-key="taskId" -->
         <!-- 列排序，每次表头顺序修改都重新渲染 -->
         <span
           v-for="(head_item, head_index) in head_data_common"
@@ -336,7 +336,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="query.pageNum"
-        :page-sizes="[5, 10, 20, 30]"
+        :page-sizes="[5,10,20,30]"
         :page-size="query.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="query.total"
@@ -381,8 +381,17 @@ export default {
       /**
        * 表格数据
        */
-      contents_data: [],
+      tableData: [],
       init_data: [],
+
+      //分页数据
+      show_table: [],
+      query: {
+        pageNum: 1,
+        pageSize: 10,
+        total: 0
+      },
+      loading: true,
 
       //表格真正使用的表头数据
       head_data_common: [
@@ -569,14 +578,7 @@ export default {
 
 
       ],
-      //分页数据
-      show_table: [],
-      query: {
-        pageNum: 1,
-        pageSize: 10,
-        total: 0
-      },
-      loading: true,
+
       /**
        * 搜索框
        */
@@ -661,10 +663,8 @@ export default {
   mounted () {
     this.$nextTick(() => {
       //contents data 初始化
-      this.SetContentsData()
-        .then(() => {
-          this.initPage();
-        })
+      //***在它的then里调用了初始化分页的函数initPage() */
+      this.SetContentsData();
       //用户的所有项目简洁数据
       this.GetMyProjects();
       //点击表头，使得filter元素出现
@@ -1108,7 +1108,7 @@ export default {
      * 数据初始化与获取
      */
     //表格数据contents data初始化
-    async SetContentsData () {
+    SetContentsData () {
       let backendData = []
       //从后端获取事项列表
       getAllTaskAndRelative(this.userId)
@@ -1116,32 +1116,16 @@ export default {
           console.log("成功获取该用户的后端事项！", res);
           backendData = res.data;
           this.backendData = res.data;
-          this.contents_data = this.getFrontendDataByBackendData(this.backendData);
+          this.tableData = this.getFrontendDataByBackendData(this.backendData);
           this.commonTaskList = this.getcommonTaskList();
+          this.initPage();
         })
         .catch((err) => {
           console.log(err);
         })
     },
     postKeyAndFetch () {
-      console.log("调用postKeyAndFetch！")
-      let new_contents_data = []
-      for (let item of this.init_data) {
-        if (!this.bool_showNoStart && item.state_val == "未开始")
-          continue;
-        if (!this.bool_showDoing && item.state_val == "进行中")
-          continue;
-        if (!this.bool_showFinished && item.state_val == "已完成")
-          continue;
-        if (!this.bool_showDelaying && item.state_val == "延期中")
-          continue;
-        if (!this.bool_showDelayedFinished && item.state_val == "延期完成")
-          continue;
-
-        //没被筛选框筛掉，才放入新的列表中
-        new_contents_data.push(item);
-      }
-      this.contents_data = new_contents_data;
+      this.show_table = this.searchResource();
     },
 
     // 请求某id事项的children事项，
@@ -1352,7 +1336,7 @@ export default {
     //api
     //根据关键词，搜索匹配的事项
     SearchTaskByKeyWord (queryString, cb) {
-      let results = this.contents_data.map((ele) => {
+      let results = this.tableData.map((ele) => {
         return {
           value: ele.name,
           taskId: ele.taskId,
@@ -1433,46 +1417,55 @@ export default {
       //初始化分页
       this.show_table = this.tableData.slice(0, 10);
       this.query.total = this.tableData.length;//总页数设置
+      console.group("tableData")
+      console.log(this.tableData)
+      console.groupEnd("tableData")
+      console.group("query")
+      console.log(this.query)
+      console.groupEnd("query")
+      console.group("total")
+      console.log(this.query.total)
+      console.groupEnd("total")
       this.loading = false;
     },
-    //得到符合条件的信息
-    postKeyAndFetch () {
-      this.show_table = this.searchResource();
-    },
+
     searchResource () {
       this.loading = true;
-      // //函数返回值为筛选后的列表
-      // let search = this.input;
-      // let result = this.order_table.slice(0);//深拷贝
-      // let i = 0;
-      // if (search)//有内容才执行关键字筛选
-      // {
-      //   result = result.filter(data => {
-      //     return Object.keys(data).some(key => {
-      //       return String(data[key]).toLowerCase().indexOf(search) > -1
-      //     })
-      //   })
+      let new_contents_data = this.tableData;
+      const search = this.searchText;
 
-      // }
-      // //复选框筛选
-      // for (i = 0; i < result.length; i++) {
-      //   console.log(result.length);
-      //   console.log(i);
+      //搜索栏筛选
+      if (search)//有内容才执行关键字筛选
+      {
+        new_contents_data = new_contents_data.filter(data => {
+          return Object.keys(data).some(key => {
+            return String(data[key]).toLowerCase().indexOf(search) > -1
+          })
+        })
 
-      //   if ((result[i].role == "进行中 " && !this.bool_showElder) ||
-      //     (result[i].role == "护工" && !this.bool_showCarer) ||
-      //     (result[i].role == "医生" && !this.bool_showDoctor) ||
-      //     (result[i].haveBad == "无" && this.bool_showBadOnly)) {
-      //     //删除不符合条件的项
-      //     result.splice(i, 1);
-      //     i--;//！！！！注意result.length动态变化！
-      //     continue;
-      //   }
-      // }
+      }
 
+      const temp = new_contents_data.slice(0);
+      new_contents_data = []
+      //复选框筛选
+      for (let item of temp) {
+        if (!this.bool_showNoStart && item.state_val == "未开始")
+          continue;
+        if (!this.bool_showDoing && item.state_val == "进行中")
+          continue;
+        if (!this.bool_showFinished && item.state_val == "已完成")
+          continue;
+        if (!this.bool_showDelaying && item.state_val == "延期中")
+          continue;
+        if (!this.bool_showDelayedFinished && item.state_val == "延期完成")
+          continue;
+
+        //没被筛选框筛掉，才放入新的列表中
+        new_contents_data.push(item);
+      }
 
       //分页参数的更改
-      let result = this.show_table;
+      let result = new_contents_data;
       this.query.total = result.length;//总页数设置
       this.loading = false;
       return result;
@@ -1490,8 +1483,14 @@ export default {
       this.getPageData();
     },
     getPageData () {
+      console.log("调用getPageData!")
       this.postKeyAndFetch();
-      const DataAll = this.tableData.slice(0);//深拷贝
+      const DataAll = this.show_table.slice(0);//深拷贝
+      if(DataAll == null || DataAll.length == 0){
+        this.query.total = 0;
+        return;
+      }
+
       //每次执行方法，将展示的数据清空
       this.show_table = [];
       //第一步：当前页的第一条数据在总数据中的位置
@@ -1518,6 +1517,9 @@ export default {
       for (let i = strlength - 1; i < endlength; i++) {
         this.show_table.push(DataAll[i]);
       }
+      console.group("重新搜索后的show_table")
+      console.log(this.show_table)
+      console.groupEnd("重新搜索后的show_table")
       //数据的总条数
       this.query.total = DataAll.length;
     },

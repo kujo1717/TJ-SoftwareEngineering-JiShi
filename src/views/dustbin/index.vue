@@ -319,37 +319,18 @@ export default {
     searchResource () {
       this.loading = true;
       // //函数返回值为筛选后的列表
-      // let search = this.input;
-      // let result = this.order_table.slice(0);//深拷贝
-      // let i = 0;
-      // if (search)//有内容才执行关键字筛选
-      // {
-      //   result = result.filter(data => {
-      //     return Object.keys(data).some(key => {
-      //       return String(data[key]).toLowerCase().indexOf(search) > -1
-      //     })
-      //   })
+      let search = this.input;
+      let result = this.tableData.slice(0);//深拷贝
+      if (search)//有内容才执行关键字筛选
+      {
+        result = result.filter(data => {
+          return Object.keys(data).some(key => {
+            return String(data[key]).toLowerCase().indexOf(search) > -1
+          })
+        })
 
-      // }
-      // //复选框筛选
-      // for (i = 0; i < result.length; i++) {
-      //   console.log(result.length);
-      //   console.log(i);
-
-      //   if ((result[i].role == "进行中 " && !this.bool_showElder) ||
-      //     (result[i].role == "护工" && !this.bool_showCarer) ||
-      //     (result[i].role == "医生" && !this.bool_showDoctor) ||
-      //     (result[i].haveBad == "无" && this.bool_showBadOnly)) {
-      //     //删除不符合条件的项
-      //     result.splice(i, 1);
-      //     i--;//！！！！注意result.length动态变化！
-      //     continue;
-      //   }
-      // }
-
-
+      }
       //分页参数的更改
-      let result = this.show_table;
       this.query.total = result.length;//总页数设置
       this.loading = false;
       return result;
@@ -368,7 +349,7 @@ export default {
     },
     getPageData () {
       this.postKeyAndFetch();
-      const DataAll = this.tableData.slice(0);//深拷贝
+      const DataAll = this.show_table.slice(0);//深拷贝
       //每次执行方法，将展示的数据清空
       this.show_table = [];
       //第一步：当前页的第一条数据在总数据中的位置
