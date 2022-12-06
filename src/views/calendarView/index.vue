@@ -292,7 +292,7 @@ export default {
       }
     },
 
-    getFrontendTaskList () {
+    async getFrontendTaskList () {
 
       //从后端拉取数据
       getAllTaskAndRelative(this.userId)
@@ -350,6 +350,12 @@ export default {
 
           this.taskList = taskList;
           this.calendarOptions.events = this.getEvents();
+          console.group("this.calendarOptions")
+          console.log(res)
+          console.log(taskList)
+          console.log(this.getEvents())
+          console.log(this.calendarOptions)
+          console.groupEnd("this.calendarOptions")
           this.calendarOptions.resources = this.getResources();
           this.displayCalendar = true;
 
@@ -443,6 +449,7 @@ export default {
         for (let dom of domList) {
           dom.addEventListener("click", this.updateHolidayAndLunarDom);
         }
+
       })
     }
   },
@@ -466,7 +473,13 @@ export default {
   },
 
   mounted: function () {
-    this.getFrontendTaskList();
+    console.log("mounted!!!!!!!!!!!!!!!!!!!")
+    this.getFrontendTaskList()
+    .then(()=>{
+      console.group("eventList")
+      console.log(this.getEvents())
+      console.groupEnd("eventList")
+    })
   },
 
 };

@@ -89,7 +89,7 @@ export default {
   name: 'Dustbin',
   data () {
     return {
-      userId:this.$store.getters.id,
+      userId: this.$store.getters.id,
       search: '',
       currentInfoKey: 1,
       show_table: [],//分页实际展示的table
@@ -408,11 +408,11 @@ export default {
     //在这个函数里的then执行了页数初始化
     this.getFrontendTaskList();
   },
-  watch:{
-    tableData:{
-      deep:true,
-      immediate:true,
-      handler(){
+  watch: {
+    tableData: {
+      deep: true,
+      immediate: true,
+      handler () {
         this.initPage();
       }
     }
