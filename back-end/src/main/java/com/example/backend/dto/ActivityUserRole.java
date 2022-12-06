@@ -6,7 +6,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
-
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.Data;
 /**
  * @Author: 杨严
  * @Date: 2022/11/26/12:53 PM
@@ -21,5 +26,7 @@ public class ActivityUserRole {
     private Long user_id;
     private Boolean is_creator;
     private Boolean is_applicant;
+    private Boolean is_member;
 
 }
+
