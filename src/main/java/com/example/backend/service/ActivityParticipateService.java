@@ -1,5 +1,5 @@
 package com.example.backend.service;
-
+import com.example.backend.dto.ActivityUserRole;
 import com.example.backend.entity.Activity;
 import com.example.backend.entity.ActivityParticipate;
 import org.springframework.stereotype.Service;
@@ -41,4 +41,9 @@ public interface ActivityParticipateService {
 
     /**获取活动的所有参与者的用户列表信息*/
     List<Map<String,Object>> SelectActApplicantList(Long activity_id);
+
+
+
+    /*获取用户身份*/
+    ActivityUserRole isMember(Long user_id, Long activity_id);
 }

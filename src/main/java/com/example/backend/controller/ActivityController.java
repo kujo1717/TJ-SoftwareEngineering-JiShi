@@ -50,6 +50,21 @@ public class ActivityController {
     private ModelMapper modelMapper;
 
 
+    @ApiOperation("查询用户是不是这个活动的参与者")
+    @GetMapping("/ismember")
+    public Result<ActivityUserRole> isMember(
+            @ApiParam(name = "id", value = "用户id", required = true)
+            @RequestParam("user_id") Long user_id,
+            @ApiParam(name = "id", value = "活动id", required = true)
+            @RequestParam("activity_id") Long activity_id) {
+        try {
+            return Result.success(activityParticipateService.isMember(user_id, activity_id));
+        } catch (Exception e) {
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "isMember FAILED");
+        }
+
+    }
+
     @ApiOperation("获取可以报名的活动")
     @GetMapping("/getAvailableActs")
     public Result<List<Activity>> getAvailableActs() {

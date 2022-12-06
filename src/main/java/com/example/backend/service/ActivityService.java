@@ -78,4 +78,7 @@ public interface ActivityService {
     /**活动的images，覆盖*/
     String PatchActImages(String images,Long activity_id);
 
+    /**活动hit num ++*/
+    Integer ActivityHitNumPlus(Long activity_id);
+
 }

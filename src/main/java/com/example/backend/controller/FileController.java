@@ -2,14 +2,12 @@ package com.example.backend.controller;
 
 import com.example.backend.Tools.FileUtils;
 import com.example.backend.common.Result;
-import com.example.backend.entity.User;
 import com.example.backend.service.ActivityService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,10 +23,10 @@ import java.util.*;
  * @Date: 2022/12/03/10:32 AM
  * @Description:
  */
-@Api(tags = {"Img"})
+@Api(tags = {"File"})
 @RestController
-@RequestMapping("img")
-public class ImgController {
+@RequestMapping("file")
+public class FileController {
     @Autowired
     ActivityService activityService;
     public static String BASE_FOLDER = "D:/Upload";
@@ -99,6 +97,7 @@ public class ImgController {
             /**图片路径字符串*/
             for (Map<String, Object> file_map:file_list){
                 String name=(String) file_map.get("name");
+
                 String one_imge="/activity/illus/"+id.toString()+"/"+name;
                 images=images+":"+one_imge;
             }
@@ -108,27 +107,71 @@ public class ImgController {
         return Result.success(result_map);
     }
 
-    @ApiOperation("获取对应路径的图片")
-    @GetMapping(value = "/getImg")
+
+    @ApiOperation("上传一个文件")
+    @PostMapping("/postOneFile")
+    public Result<Map<String, Object>> PostOneFile(
+            @ApiParam(name = "uploadFile", value = "uploadFile", required = true)
+            @RequestParam("uploadFile") MultipartFile uploadFile,
+            @ApiParam(name = "folderPath", value = "folderPath", required = true)
+            @RequestParam("folderPath") String folderPath,
+            @ApiParam(name = "entity", value = "entity", required = false)
+            @RequestParam("entity") String entity,
+            @ApiParam(name = "id", value = "id", required = false)
+            @RequestParam("id") Long id
+    ) {
+        folderPath = BASE_FOLDER + folderPath;
+        Map<String, Object> result_map = new HashMap<>();
+
+        //map for one file
+        String file_name = uploadFile.getOriginalFilename();
+        Map<String, Object> file_map = new HashMap<>();
+        file_map.put("name", file_name);
+
+        if (Objects.isNull(uploadFile) || uploadFile.isEmpty()) {
+            file_map.put("isEmpty", true);
+            file_map.put("upLoadSuccess", false);
+        } else {
+            //判断非空
+            file_map.put("isEmpty", false);
+
+            try {
+                byte[] bytes = uploadFile.getBytes();
+                //要存入本地的地址放到path里面
+
+                Path path = Paths.get(folderPath);
+                //如果没有files文件夹，则创建
+                if (!Files.isWritable(path)) {
+                    Files.createDirectories(path);
+                }
+                String extension = FileUtils.getFileExtension(uploadFile);  //获取文件后缀
+                FileUtils.getFileByBytes(bytes, folderPath, file_name);
+                file_map.put("extension", extension);
+
+                file_map.put("upLoadSuccess", true);
+
+            } catch (Exception e) {
+                file_map.put("upLoadSuccess", false);
+                e.printStackTrace();
+            }
+        }
+
+
+
+        result_map.put("file_map:", file_map);
+        System.out.println("result map:" + result_map);
+
+
+        return Result.success(result_map);
+    }
+
+
+    @ApiOperation("获取对应路径的文件")
+    @GetMapping(value = "/getFile")
     public Result<Map<String, Object>> GetImg(
             @ApiParam(name = "path", value = "path", required = true)
             @RequestParam("path") String path
     ) throws IOException {
-//        path=BASE_FOLDER+path;
-//        byte[] bytes=new byte[0];
-//        Map<String,Object> result_map=new HashMap<>();
-//        result_map.put("path",path);
-//        try{
-//            bytes=FileUtils.getBytesByFile(path);
-//            System.out.println("result_map:"+result_map);
-//            System.out.println(bytes);
-//            result_map.put("bytes",bytes);
-//        }catch (Exception e){
-//            return bytes;
-//
-//        }
-//        return bytes;
-
 
         path = BASE_FOLDER + path;
         Map<String, Object> result_map = new HashMap<>();

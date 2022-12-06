@@ -91,7 +91,12 @@ public class ActivityServiceImpl implements ActivityService{
 
     @Override
     public Activity getAct(Long activity_id) {
+        /**
+         * hit_num++
+         * */
+        this.ActivityHitNumPlus(activity_id);
         Activity act=activityMapper.selectById(activity_id);
+
         System.out.println("public Activity getAct(Long activity_id)"+act);
         return act;
     }
@@ -187,5 +192,19 @@ public class ActivityServiceImpl implements ActivityService{
         List<Activity> list=activityMapper.selectList(queryWrapper);
         System.out.println(activityMapper.selectList(queryWrapper));
         return list;
+    }
+
+    @Override
+    public Integer ActivityHitNumPlus(Long activity_id) {
+        Activity act=activityMapper.selectById(activity_id);
+
+
+        activityMapper.update(
+                null,
+                Wrappers.<Activity>lambdaUpdate()
+                        .set(Activity::getHit_num,act.getHit_num()+1)
+                        .eq(Activity::getActivity_id,activity_id)
+        );
+        return act.getHit_num();
     }
 }
