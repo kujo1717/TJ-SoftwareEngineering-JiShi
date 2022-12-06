@@ -543,25 +543,30 @@ export default {
                     });
 
                     //api，post文件列表formData
-                    this.newact_form.file_formData.append(
-                      "folderPath",
-                      "/activity/illus/" + res.data.activity_id + "/"
-                    );
+                    if (this.newact_form.file_formData) {
+                      this.newact_form.file_formData.append(
+                        "folderPath",
+                        "/activity/illus/" + res.data.activity_id + "/"
+                      );
 
-                    this.newact_form.file_formData.append("entity", "activity");
-                    this.newact_form.file_formData.append(
-                      "id",
-                      res.data.activity_id
-                    );
+                      this.newact_form.file_formData.append(
+                        "entity",
+                        "activity"
+                      );
+                      this.newact_form.file_formData.append(
+                        "id",
+                        res.data.activity_id
+                      );
 
-                    //上传文件,并额外传递参数，使得这些文件与活动绑定
-                    await postFile(this.newact_form.file_formData)
-                      .then((res) => {
-                        console.log("postFile:res:", res);
-                      })
-                      .catch((err) => {
-                        console.log("postFile:err:", err);
-                      });
+                      //上传文件,并额外传递参数，使得这些文件与活动绑定
+                      await postFile(this.newact_form.file_formData)
+                        .then((res) => {
+                          console.log("postFile:res:", res);
+                        })
+                        .catch((err) => {
+                          console.log("postFile:err:", err);
+                        });
+                    }
 
                     this.isShow_ = false;
                     this.onClose();

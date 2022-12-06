@@ -140,12 +140,14 @@ export default {
     websocket.onclose = function (event) {
       console.log("连接关闭");
     };
-    websocket.onmessage = function (event) {
+    websocket.onmessage = event => {
       console.log("收到消息");
       //将字符串转为JSON对象
       var message = JSON.parse(event.data);
-      console.log(message);
-      IMUI.appendMessage(message, true);
+      if(message.fromUser.id!=this.userId){
+        IMUI.appendMessage(message, true);
+      }
+      
     };
     websocket.onerror = function (event) {
       console.log("websocket通信发生错误");

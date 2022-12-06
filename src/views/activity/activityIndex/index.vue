@@ -103,6 +103,7 @@
                         <!-- 活动配图展示 -->
                         <div class="images">
                           <el-image
+                            v-if="list.images"
                             style="margin-right: 1em; height: 10em"
                             :src="GetIllusImgUrl(list.images)"
                           >

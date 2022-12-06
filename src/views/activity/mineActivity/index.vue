@@ -39,7 +39,15 @@
             <el-card @click.native="ClickActDetail(act)">
               <span class="ma_act_page_card">
                 <div class="user-select-none">{{ act.name }}</div>
-                <el-image class="el-image-ii" :src="act.img"></el-image>
+                <el-image class="el-image-ii" :src="act.img">
+                  <div slot="error" class="image-slot">
+                    <div class="user-select-none hint">暂无配图</div>
+                    <i
+                      style="font-size: 15em"
+                      class="el-icon-picture-outline"
+                    ></i>
+                  </div>
+                </el-image>
                 <el-tag :type="ActicityState_TagType(act.state)">{{
                   ActicityState_TagLabel(act.state)
                 }}</el-tag>
@@ -57,7 +65,15 @@
             <el-card @click.native="ClickActDetail(act)">
               <span class="ma_act_page_card">
                 <div class="user-select-none">{{ act.name }}</div>
-                <el-image class="el-image-ii" :src="act.img"></el-image>
+                <el-image class="el-image-ii" :src="act.img">
+                  <div slot="error" class="image-slot">
+                    <div class="user-select-none hint">暂无配图</div>
+                    <i
+                      style="font-size: 15em"
+                      class="el-icon-picture-outline"
+                    ></i>
+                  </div>
+                </el-image>
                 <el-tag :type="ActicityState_TagType(act.state)">{{
                   ActicityState_TagLabel(act.state)
                 }}</el-tag>
@@ -75,7 +91,14 @@
             <el-card @click.native="ClickActDetail(act)">
               <span class="ma_act_page_card">
                 <div class="user-select-none">{{ act.name }}</div>
-                <el-image class="el-image-ii" :src="act.img"></el-image>
+                <el-image class="el-image-ii" :src="act.img">
+                  <div slot="error" class="image-slot">
+                    <div class="user-select-none hint">暂无配图</div>
+                    <i
+                      style="font-size: 15em"
+                      class="el-icon-picture-outline"
+                    ></i></div
+                ></el-image>
                 <el-tag :type="ActicityState_TagType(act.state)">{{
                   ActicityState_TagLabel(act.state)
                 }}</el-tag>
@@ -93,7 +116,14 @@
             <el-card @click.native="ClickActDetail(act)">
               <span class="ma_act_page_card">
                 <div class="user-select-none">{{ act.name }}</div>
-                <el-image class="el-image-ii" :src="act.img"></el-image>
+                <el-image class="el-image-ii" :src="act.img">
+                  <div slot="error" class="image-slot">
+                    <div class="user-select-none hint">暂无配图</div>
+                    <i
+                      style="font-size: 15em"
+                      class="el-icon-picture-outline"
+                    ></i></div
+                ></el-image>
                 <el-tag :type="ActicityState_TagType(act.state)">{{
                   ActicityState_TagLabel(act.state)
                 }}</el-tag>
@@ -114,7 +144,14 @@
         <el-card @click.native="ClickModifyTemplate(act)">
           <span class="ma_act_page_card">
             <div class="user-select-none">{{ act.name }}</div>
-            <el-image class="el-image-ii" :src="act.img"></el-image>
+            <el-image class="el-image-ii" :src="act.img">
+              <div slot="error" class="image-slot">
+                <div class="user-select-none hint">暂无配图</div>
+                <i
+                  style="font-size: 15em"
+                  class="el-icon-picture-outline"
+                ></i></div
+            ></el-image>
           </span>
           <div class="bottom clearfix">
             <el-button type="primary" @click.stop="ClickModifyTemplate(act)"
@@ -533,7 +570,10 @@ export default {
   /deep/.el-image-ii {
     width: 20em !important;
     height: 15em !important;
-
+  }
+  .hint {
+    font-size: 0.8em;
+    color: #8f8f8f;
   }
 }
 </style>
