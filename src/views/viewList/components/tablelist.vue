@@ -12,7 +12,7 @@
     <div class="drop_down_box">
       <div class="left_box">
         <!--导出按钮-->
-        <ExportButton :taskList="contents_data" />
+        <ExportButton :taskList="tableData" />
         <!-- 左边的下拉框，可快捷筛选，即为表格的筛选器赋值
         <el-select
           @change="TopSelectValChange"
@@ -31,27 +31,27 @@
         <el-checkbox
           label="未开始"
           v-model="bool_showNoStart"
-          @change="postKeyAndFetch()"
+          @change="getPageData()"
         ></el-checkbox>
         <el-checkbox
           label="已完成"
           v-model="bool_showFinished"
-          @change="postKeyAndFetch()"
+          @change="getPageData()"
         ></el-checkbox>
         <el-checkbox
           label="进行中"
           v-model="bool_showDoing"
-          @change="postKeyAndFetch()"
+          @change="getPageData()"
         ></el-checkbox>
         <el-checkbox
           label="延期中"
           v-model="bool_showDelaying"
-          @change="postKeyAndFetch()"
+          @change="getPageData()"
         ></el-checkbox>
         <el-checkbox
           label="延期完成"
           v-model="bool_showDelayedFinished"
-          @change="postKeyAndFetch()"
+          @change="getPageData()"
         ></el-checkbox>
 
       </div>
@@ -66,6 +66,7 @@
             :fetch-suggestions="SearchTaskByKeyWord"
             placeholder="请输入事项关键词"
             @select="SelectTaskSearchSuggestion"
+            @keyup.enter.native="getPageData"
           ></el-autocomplete>
         </div>
         <!-- 表头设置 -->
@@ -132,10 +133,10 @@
                 确定
               </el-button>
             </div>
-            <el-button
+            <!-- <el-button
               slot="reference"
               size="mini"
-            >表头设置</el-button>
+            >表头设置</el-button> -->
           </el-popover>
         </div>
       </div>
@@ -144,9 +145,9 @@
     <!-- 表格部分 -->
     <div class="contents_table_box">
       <el-table
-        v-if="contents_data.length > 0"
+        :loading="loading"
         class="contents_table"
-        :data="contents_data"
+        :data="show_table"
         border
         :row-class-name="GetRowClass"
         :show-header="true"
@@ -156,11 +157,9 @@
         @cell-click="
           (row, column, cell, event) => cellClick(row, column, cell, event)
         "
-        lazy
-        :load="getTaskChildrenByID"
-        :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+        :tree-props="{ children: 'children'}"
+        row-key="taskId"
       >
-        <!-- row-key="taskId" -->
         <!-- 列排序，每次表头顺序修改都重新渲染 -->
         <span
           v-for="(head_item, head_index) in head_data_common"
@@ -240,7 +239,7 @@
             </template>
           </el-table-column>
 
-          <!-- 分组Col,group -->
+          <!-- 标签Col,group -->
           <el-table-column
             :label="head_data_common_dict['tag'].label"
             class-name="tag_col"
@@ -333,9 +332,17 @@
 
         </span>
       </el-table>
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="query.pageNum"
+        :page-sizes="[5,10,20,30]"
+        :page-size="query.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="query.total"
+      ></el-pagination>
     </div>
 
-    
   </div>
 </template>
 
@@ -349,14 +356,14 @@ export default {
   components: { draggable, TaskBox, ExportButton },
   data () {
     return {
-      userId: 1,
+      userId: this.$store.getters.id,
       taskBoxDialogVisible: false,
       chosen_taskObj: {},
       chosen_taskId: 0,
       backendData: [],
       commonTaskList: [],
 
-      
+
 
       //复选框筛选
       bool_showNoStart: true,
@@ -369,13 +376,22 @@ export default {
       filename: '',
       autoWidth: true,
       bookType: 'xlsx',
-      
+
 
       /**
        * 表格数据
        */
-      contents_data: [],
+      tableData: [],
       init_data: [],
+
+      //分页数据
+      show_table: [],
+      query: {
+        pageNum: 1,
+        pageSize: 10,
+        total: 0
+      },
+      loading: true,
 
       //表格真正使用的表头数据
       head_data_common: [
@@ -497,7 +513,7 @@ export default {
           key: "startTime",
           width: "150rem",
           isShow: true,
-          label: "事项时间",
+          label: "事项开始时间",
           prio: 1,
         },
         //事项结束时间
@@ -552,16 +568,17 @@ export default {
         },
 
         //操作
-        {
-          key: "operation",
-          width: "150rem",
-          isShow: true,
-          label: "操作",
-          prio: 19,
-        },
+        // {
+        //   key: "operation",
+        //   width: "150rem",
+        //   isShow: true,
+        //   label: "操作",
+        //   prio: 19,
+        // },
 
 
       ],
+
       /**
        * 搜索框
        */
@@ -639,13 +656,14 @@ export default {
       //项目下拉选择器的显示
       ShowProjectSelect: false,
 
-     
-      
+
+
     };
   },
   mounted () {
     this.$nextTick(() => {
       //contents data 初始化
+      //***在它的then里调用了初始化分页的函数initPage() */
       this.SetContentsData();
       //用户的所有项目简洁数据
       this.GetMyProjects();
@@ -1031,16 +1049,17 @@ export default {
             childrenList.push({
               taskId: val.taskId,
               name: val.taskTitle,
-              startTime: val.startTime,
-              endTime: val.endTime,
+              startTime: this.GMTToStr(val.startTime),
+              endTime: this.GMTToStr(val.endTime),
               group: val.classificationTitle,
               tag: val.tag,
-              priority: val.priority,
+              priority: this.getPriorityTitle(val.priority),
               state_val: this.getFrontendState(val.taskState),
               state_label: "",
               isdone: this.getFrontendState(val.taskState).indexOf("完成") >= 0 ? true : false,
               childrenNum: 0,
               showChildren: false,
+              isParent: val.isParent
             })
           })
 
@@ -1053,14 +1072,16 @@ export default {
           startTime: this.GMTToStr(value.startTime),
           endTime: this.GMTToStr(value.endTime),
           group: value.classificationTitle,
+          tag: value.tag,
           priority: this.getPriorityTitle(value.priority),
           state_val: this.getFrontendState(value.taskState, value.startTime, value.endTime),
           state_label: "",
           isdone: this.getFrontendState(value.taskState).indexOf("完成") >= 0 ? true : false,
           realFinishTime: this.GMTToStr(value.realFinishTime),
           childrenNum: value.relativeTask == null ? 0 : value.relativeTask.length,
-          showChildren: false,
-          children: childrenList
+          showChildren: true,
+          children: childrenList,
+          isParent: value.isParent
         })
       })
 
@@ -1095,32 +1116,16 @@ export default {
           console.log("成功获取该用户的后端事项！", res);
           backendData = res.data;
           this.backendData = res.data;
-          this.contents_data = this.getFrontendDataByBackendData(this.backendData);
+          this.tableData = this.getFrontendDataByBackendData(this.backendData);
           this.commonTaskList = this.getcommonTaskList();
+          this.initPage();
         })
         .catch((err) => {
           console.log(err);
         })
     },
     postKeyAndFetch () {
-      console.log("调用postKeyAndFetch！")
-      let new_contents_data = []
-      for (let item of this.init_data) {
-        if (!this.bool_showNoStart && item.state_val == "未开始")
-          continue;
-        if (!this.bool_showDoing && item.state_val == "进行中")
-          continue;
-        if (!this.bool_showFinished && item.state_val == "已完成")
-          continue;
-        if (!this.bool_showDelaying && item.state_val == "延期中")
-          continue;
-        if (!this.bool_showDelayedFinished && item.state_val == "延期完成")
-          continue;
-
-        //没被筛选框筛掉，才放入新的列表中
-        new_contents_data.push(item);
-      }
-      this.contents_data = new_contents_data;
+      this.show_table = this.searchResource();
     },
 
     // 请求某id事项的children事项，
@@ -1146,12 +1151,16 @@ export default {
 
       let backendData = {
         taskId: model.taskId,
-        taskState: _currentBackendState
+        taskState: _currentBackendState,
+        isParent: model.isParent
       }
+      console.log(backendData)
       //向后端patch
       patchOneTask(backendData)
         .then((res) => {
+          console.group("backendRes")
           console.log(res);
+          onsole.groupEnd("backendRes")
 
           //改变前端页面
           //通过isdone来获取state
@@ -1327,7 +1336,7 @@ export default {
     //api
     //根据关键词，搜索匹配的事项
     SearchTaskByKeyWord (queryString, cb) {
-      let results = this.contents_data.map((ele) => {
+      let results = this.tableData.map((ele) => {
         return {
           value: ele.name,
           taskId: ele.taskId,
@@ -1400,8 +1409,124 @@ export default {
     },//end of method 
 
 
+    /**
+    * 分页所用函数start
+    */
+    //初始化分页
+    initPage () {
+      //初始化分页
+      this.show_table = this.tableData.slice(0, 10);
+      this.query.total = this.tableData.length;//总页数设置
+      console.group("tableData")
+      console.log(this.tableData)
+      console.groupEnd("tableData")
+      console.group("query")
+      console.log(this.query)
+      console.groupEnd("query")
+      console.group("total")
+      console.log(this.query.total)
+      console.groupEnd("total")
+      this.loading = false;
+    },
 
-   
+    searchResource () {
+      this.loading = true;
+      let new_contents_data = this.tableData;
+      const search = this.searchText;
+
+      //搜索栏筛选
+      if (search)//有内容才执行关键字筛选
+      {
+        new_contents_data = new_contents_data.filter(data => {
+          return Object.keys(data).some(key => {
+            return String(data[key]).toLowerCase().indexOf(search) > -1
+          })
+        })
+
+      }
+
+      const temp = new_contents_data.slice(0);
+      new_contents_data = []
+      //复选框筛选
+      for (let item of temp) {
+        if (!this.bool_showNoStart && item.state_val == "未开始")
+          continue;
+        if (!this.bool_showDoing && item.state_val == "进行中")
+          continue;
+        if (!this.bool_showFinished && item.state_val == "已完成")
+          continue;
+        if (!this.bool_showDelaying && item.state_val == "延期中")
+          continue;
+        if (!this.bool_showDelayedFinished && item.state_val == "延期完成")
+          continue;
+
+        //没被筛选框筛掉，才放入新的列表中
+        new_contents_data.push(item);
+      }
+
+      //分页参数的更改
+      let result = new_contents_data;
+      this.query.total = result.length;//总页数设置
+      this.loading = false;
+      return result;
+    },
+    //切换当前页显示的数据条数，执行方法
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`);
+      this.query.pageSize = val;
+      this.getPageData();
+    },
+    //切换页数，执行方法
+    handleCurrentChange (val) {
+      //console.log(`当前页: ${val}`);
+      this.query.pageNum = val;
+      this.getPageData();
+    },
+    getPageData () {
+      console.log("调用getPageData!")
+      this.postKeyAndFetch();
+      const DataAll = this.show_table.slice(0);//深拷贝
+      if(DataAll == null || DataAll.length == 0){
+        this.query.total = 0;
+        return;
+      }
+
+      //每次执行方法，将展示的数据清空
+      this.show_table = [];
+      //第一步：当前页的第一条数据在总数据中的位置
+      let strlength = (this.query.pageNum - 1) * this.query.pageSize + 1;
+      //第二步：当前页的最后一条数据在总数据中的位置
+      let endlength = this.query.pageNum * this.query.pageSize;
+      //第三步：此判断很重要，执行时机：当分页的页数在最后一页时，进行重新筛选获取数据时
+      //获取本次表格最后一页第一条数据所在的位置的长度
+      let resStrLength = 0;
+      if (DataAll.length % this.query.pageSize == 0) {
+        resStrLength = (parseInt(DataAll.length / this.query.pageSize) - 1) * this.query.pageSize + 1
+      } else {
+        resStrLength = parseInt(DataAll.length / this.query.pageSize) * this.query.pageSize + 1
+      }
+      //如果上一次表格的最后一页第一条数据所在的位置的长度 大于 本次表格最后一页第一条数据所在的位置的长度，则将本次表格的最后一页第一条数据所在的位置的长度 为最后长度
+      if (strlength > resStrLength) {
+        strlength = resStrLength
+      }
+      //第四步：此判断很重要，当分页的页数切换至最后一页，如果最后一页获取到的数据长度不足最后一页设置的长度，则将设置的长度 以 获取到的数据长度 为最后长度
+      if (endlength > DataAll.length) {
+        endlength = DataAll.length;
+      }
+      //第五步：循环获取当前页数的数据，放入展示的数组中
+      for (let i = strlength - 1; i < endlength; i++) {
+        this.show_table.push(DataAll[i]);
+      }
+      console.group("重新搜索后的show_table")
+      console.log(this.show_table)
+      console.groupEnd("重新搜索后的show_table")
+      //数据的总条数
+      this.query.total = DataAll.length;
+    },
+    /**
+     * 分页所用函数end
+     */
+
   },
   computed: {
     //方便直接获取head_data_common的值

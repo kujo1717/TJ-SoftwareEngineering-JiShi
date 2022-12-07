@@ -26,6 +26,15 @@ export default {
       len: false,
     };
   },
+  // props: {
+  //   activityId: {
+  //     type: Number,
+  //     required: true,
+  //     default: () => {
+  //       return -1;
+  //     },
+  //   },
+  // },
   render() {
     return (
       <div class="contain">

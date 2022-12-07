@@ -645,6 +645,7 @@ import MapChoose from "@/components/MapChoose";
 
 import { getAllTag } from "@/api/tag";
 import { getInfo } from "@/api/user";
+import { getAllTag } from "@/api/tag";
 
 import { getImg } from "@/api/file";
 

@@ -108,7 +108,7 @@ export default {
   },
   data () {
     return {
-      userId: 1,//todo: 从cookie中获取
+      userId: this.$store.getters.id,
       tmpListsData: [],
       /**显示的数据源 */
       listsData: [
@@ -190,7 +190,8 @@ export default {
 
       let backendTaskInfo = {
         taskId: model.taskId,
-        taskState: _taskState
+        taskState: _taskState,
+        isParent: model.isParent
       }
       //修改后端
       patchOneTask(backendTaskInfo)
@@ -396,7 +397,8 @@ export default {
       //发patch请求改变事项的分组
       let newTaskObj = {
         taskId: targetTaskId,
-        classificationTitle: dstClassificationTitle
+        classificationTitle: dstClassificationTitle,
+        isParent: 1,
       }
 
       patchOneTask(newTaskObj)

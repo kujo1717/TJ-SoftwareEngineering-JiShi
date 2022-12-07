@@ -177,7 +177,7 @@ export default {
   },
   data () {
     return {
-      userId: 1,
+      userId: this.$store.getters.id,
       bigSize: 3,
       smallSize: 2,
       upLeftPanelRate: 3,
@@ -285,8 +285,6 @@ export default {
       lineXAxisData: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15',
         '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'],
 
-
-
     };
 
 
@@ -349,12 +347,14 @@ export default {
           }
 
           //折线图数据
-          let listData = []
+          let finishListData = []
+          let createListData = []
           for (let i = 1; i <= backendData.daysOfMonth; i++) {
-            listData.push(backendData.oneMonthFinishedNumMap[i.toString()]);
+            finishListData.push(backendData.oneMonthFinishedNumMap[i.toString()]);
+            createListData.push(backendData.oneMonthNewCreatedNumMap[i.toString()])
           }
-          this.lineSeriesData[0].data = listData;
-
+          this.lineSeriesData[0].data = finishListData;
+          this.lineSeriesData[1].data = createListData;
         })
         .catch((err) => {
           console.log(err)

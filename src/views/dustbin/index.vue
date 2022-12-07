@@ -89,6 +89,7 @@ export default {
   name: 'Dustbin',
   data () {
     return {
+      userId: this.$store.getters.id,
       search: '',
       currentInfoKey: 1,
       show_table: [],//分页实际展示的table
@@ -226,7 +227,7 @@ export default {
       })
         .then(() => {
           //向后端请求删除...
-          smashAllRubbish()
+          smashAllRubbish(this.userId)
             .then((res) => {
               console.log(res);
               //清空前端回收站
@@ -236,7 +237,7 @@ export default {
                 message: '回收站清空成功！'
               });
             })
-            .then((err) => {
+            .catch((err) => {
               console.log(err);
               this.$message({
                 type: 'danger',
@@ -254,7 +255,7 @@ export default {
     getFrontendTaskList () {
       console.log("开始拉取后端数据")
       //从后端拉取数据
-      getAllRubbish()
+      getAllRubbish(this.userId)
         .then((res) => {
           let taskList = []
           //然后要把后端拉回来的task对象转换成前端要用的对象
@@ -318,37 +319,18 @@ export default {
     searchResource () {
       this.loading = true;
       // //函数返回值为筛选后的列表
-      // let search = this.input;
-      // let result = this.order_table.slice(0);//深拷贝
-      // let i = 0;
-      // if (search)//有内容才执行关键字筛选
-      // {
-      //   result = result.filter(data => {
-      //     return Object.keys(data).some(key => {
-      //       return String(data[key]).toLowerCase().indexOf(search) > -1
-      //     })
-      //   })
+      let search = this.input;
+      let result = this.tableData.slice(0);//深拷贝
+      if (search)//有内容才执行关键字筛选
+      {
+        result = result.filter(data => {
+          return Object.keys(data).some(key => {
+            return String(data[key]).toLowerCase().indexOf(search) > -1
+          })
+        })
 
-      // }
-      // //复选框筛选
-      // for (i = 0; i < result.length; i++) {
-      //   console.log(result.length);
-      //   console.log(i);
-
-      //   if ((result[i].role == "进行中 " && !this.bool_showElder) ||
-      //     (result[i].role == "护工" && !this.bool_showCarer) ||
-      //     (result[i].role == "医生" && !this.bool_showDoctor) ||
-      //     (result[i].haveBad == "无" && this.bool_showBadOnly)) {
-      //     //删除不符合条件的项
-      //     result.splice(i, 1);
-      //     i--;//！！！！注意result.length动态变化！
-      //     continue;
-      //   }
-      // }
-
-
+      }
       //分页参数的更改
-      let result = this.show_table;
       this.query.total = result.length;//总页数设置
       this.loading = false;
       return result;
@@ -367,7 +349,7 @@ export default {
     },
     getPageData () {
       this.postKeyAndFetch();
-      const DataAll = this.tableData.slice(0);//深拷贝
+      const DataAll = this.show_table.slice(0);//深拷贝
       //每次执行方法，将展示的数据清空
       this.show_table = [];
       //第一步：当前页的第一条数据在总数据中的位置
@@ -407,11 +389,11 @@ export default {
     //在这个函数里的then执行了页数初始化
     this.getFrontendTaskList();
   },
-  watch:{
-    tableData:{
-      deep:true,
-      immediate:true,
-      handler(){
+  watch: {
+    tableData: {
+      deep: true,
+      immediate: true,
+      handler () {
         this.initPage();
       }
     }

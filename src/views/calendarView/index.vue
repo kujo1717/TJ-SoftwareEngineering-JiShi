@@ -46,12 +46,13 @@ import moment from "moment";
 import * as HolidayUtil from "./utils/holiday.js";
 import * as GetdomUtil from "./utils/getdom.js"
 
+
 export default {
   name: "CalenderView",
   components: { FullCalendar, CreateTaskBox, TaskBox },
   data () {
     return {
-      userId: 1,//todo: 从cookie里拿
+      userId: this.$store.getters.id,
       displayCalendar: false,
       fisrt: true,
       chosen_taskId: 0,
@@ -291,7 +292,7 @@ export default {
       }
     },
 
-    getFrontendTaskList () {
+    async getFrontendTaskList () {
 
       //从后端拉取数据
       getAllTaskAndRelative(this.userId)
@@ -349,6 +350,12 @@ export default {
 
           this.taskList = taskList;
           this.calendarOptions.events = this.getEvents();
+          console.group("this.calendarOptions")
+          console.log(res)
+          console.log(taskList)
+          console.log(this.getEvents())
+          console.log(this.calendarOptions)
+          console.groupEnd("this.calendarOptions")
           this.calendarOptions.resources = this.getResources();
           this.displayCalendar = true;
 
@@ -442,8 +449,13 @@ export default {
         for (let dom of domList) {
           dom.addEventListener("click", this.updateHolidayAndLunarDom);
         }
+
       })
     }
+  },
+  beforeDestroy:function(){
+    //页面销毁时移除dom元素监听
+    window.removeEventListener("click", this.updateHolidayAndLunarDom);
   },
 
   watch: {
@@ -461,7 +473,13 @@ export default {
   },
 
   mounted: function () {
-    this.getFrontendTaskList();
+    console.log("mounted!!!!!!!!!!!!!!!!!!!")
+    this.getFrontendTaskList()
+    .then(()=>{
+      console.group("eventList")
+      console.log(this.getEvents())
+      console.groupEnd("eventList")
+    })
   },
 
 };

@@ -98,7 +98,7 @@ taskId: Long 事项id
               <el-form-item class="formItem">
                 <i class="iconfont icon-fenlei"></i>分类：
                 <el-select
-                  v-model="taskInfo.classification"
+                  v-model="taskInfo.classificationTitle"
                   :popper-append-to-body="false"
                 >
 
@@ -111,7 +111,7 @@ taskId: Long 事项id
                   </el-option>
                 </el-select>
               </el-form-item>
-              
+
               <!--标签-->
               <el-form-item class="formItem">
                 <i class="el-icon-price-tag"></i>个性化标签：
@@ -292,7 +292,7 @@ export default {
   components: { CreateTaskBox, SonTaskBox },
   data () {
     return {
-      userId: 1,
+      userId: this.$store.getters.id,
       dialogVisible: this.taskBoxDialogVisible,//是否弹出对话框
       createTaskBoxDialogVisible: false,//创建事项组件的显示控制
       sonTaskBoxDialogVisible: false,//子事项的显示控制
@@ -307,7 +307,7 @@ export default {
         taskDetail: "先背两小时单词",//详情的文字
         isdone: null,//初始时计算得出，不是从后端请求来的
         taskState: '进行中',
-        classification: '学习',
+        classificationTitle: '学习',
         priority: '无优先级',
         timeRange: [new Date(), ''],
         familyPosition: 'parent',
@@ -326,11 +326,15 @@ export default {
         label: '生活'
       }],
       tagList: [{
-        value:'室内',
-        label:'室内'
-      },{
-        value:'户外',
-        label:'户外'
+        value: '室内',
+        label: '室内'
+      }, {
+        value: '户外',
+        label: '户外'
+      },
+      {
+        value: null,
+        label: '无'
       }],
 
       //日历选择
@@ -439,13 +443,23 @@ export default {
           });
         }
       }
+      //向后端发请求，改变state属性
+      let frontendTaskInfo = row == null ? this.taskInfo : row;
+      let backendTaskInfo = this.getBackendTaskInfo(frontendTaskInfo);
+      patchOneTask(backendTaskInfo)
+        .then((res) => {
+          console.log("改变后端isdone成功！", res);
+        })
+        .catch((err) => {
+          console.log("改变后端isdone失败！", err);
+        })
     },
     //处理优先级下拉框的指令
     handlePriorityCommand (command) {
       this.taskInfo.priority = command;
     },
     //确定isdone属性
-    setIsdone () {
+    async setIsdone () {
       //确定父事项属性
       this.taskInfo.isdone = this.taskInfo.taskState.indexOf("完成") >= 0;
 
@@ -549,6 +563,7 @@ export default {
         endTime: taskInfo.timeRange[1],
         isParent: taskInfo.familyPosition == 'parent' ? 1 : 0,
         isInDustbin: taskInfo.isInDustbin,
+        tag: taskInfo.tag,
         relativeTask: []//todo
       }
       return backendTaskInfo;
@@ -556,7 +571,7 @@ export default {
     //获取该用户的所有分组名称
     setThisUserAllClassificaitonTitle () {
       this.typeList = []
-
+    
       //向后端请求该用户的所有分类名
       getAllClassificationTitle(this.userId)
         .then((res) => {
@@ -575,10 +590,13 @@ export default {
     saveTask (msg) {
       let backendFatherTaskInfo = this.getBackendTaskInfo(this.taskInfo);
       let requestList = []
-      for (let item of this.taskInfo.familyMembers) {
-        var request = patchOneTask(this.getBackendTaskInfo(item));
-        requestList.push(request);
+      if (this.taskInfo.familyMembers != null && this.taskInfo.familyMembers != []) {
+        for (let item of this.taskInfo.familyMembers) {
+          var request = patchOneTask(this.getBackendTaskInfo(item));
+          requestList.push(request);
+        }
       }
+
       Axios.all([patchOneTask(backendFatherTaskInfo), ...requestList])
         .then((res) => {
           console.log("saveTask success", res);
@@ -639,7 +657,7 @@ export default {
     //关闭CreateTaskBox的回调
     resetDialogVisible () {
       this.createTaskBoxDialogVisible = false;
-      this.setFrontendTaskObj(this.taskId);
+      this.setFrontendTaskObj(this.taskId, true);
     },
     addOneSonTask () {
       this.createTaskBoxDialogVisible = true;
@@ -660,8 +678,11 @@ export default {
       }
     },
     //根据父页面传来的taskId，向后端获取整套数据
-    setFrontendTaskObj (taskId) {
-      getTaskById(taskId)
+    async setFrontendTaskObj (taskId, forceUpdate) {
+      //如果taskBox组件已经有信息了，就不要重复拉取后端了
+      if (this.taskInfo.id && forceUpdate != true)
+        return;
+      await getTaskById(taskId)
         .then((res) => {
           //然后要把后端拉回来的task对象转换成前端要用的对象
           if (res.data != null || res.data != {}) {
@@ -700,7 +721,7 @@ export default {
                 taskDetail: value.taskDetail,
                 isdone: _isdone,
                 taskState: _taskState,
-                classification: value.classificationTitle,
+                classificationTitle: value.classificationTitle,
                 priority: _priority,
                 timeRange: [value.startTime, value.endTime],
                 familyPosition: value.isParent == 1 ? 'parent' : 'child',
@@ -719,7 +740,7 @@ export default {
                   item['isdone'] = _taskState.indexOf("完成") >= 0 ? true : false;
                   //获取taskState
                   item['taskState'] = this.getFrontendState(item.taskState, item.startTime, item.endTime);
-                  item['classification'] = item['classificationTitle']
+                  item['classificationTitle'] = item['classificationTitle']
                   //获取priority
                   switch (item.priority) {
                     case 0:
@@ -744,13 +765,14 @@ export default {
               }
 
               this.taskInfo = taskInfo;
-
+              this.sonTaskBoxDialogVisible = false;
             }
           }//end of if
 
         })
         .catch((err) => {
           console.log(err);
+          this.sonTaskBoxDialogVisible = false;
         })
     },
     //点击“查看详情”按钮
@@ -759,9 +781,7 @@ export default {
       this.chosen_taskId = row.taskId;
       this.sonTaskBoxDialogVisible = true;
     },
-    resetDialogVisible () {
-      this.sonTaskBoxDialogVisible = false;
-    },
+ 
   },
 
   computed: {
@@ -918,16 +938,17 @@ export default {
   },
   mounted: function () {
     console.log("this.taskId", this.taskId)
-    this.setFrontendTaskObj(this.taskId);//接收从父组件传来的事项信息
     this.setThisUserAllClassificaitonTitle();//获取该用户的所有分组名称
+    this.setFrontendTaskObj(this.taskId)//接收从父组件传来的事项信息
+      .then(() => {//这里涉及到向后端请求数据的异步
+        this.dialogVisible = this.taskBoxDialogVisible;
+        this.setIsdone()
+          .then(() => {//这里涉及到watch的异步
+            this.isSaved = true;
+            console.log("isSaved!")
+          })
 
-
-    this.$nextTick(() => {
-      this.dialogVisible = this.taskBoxDialogVisible;
-      this.setIsdone();
-      this.isSaved = true;
-      console.log("isSaved!")
-    })
+      })
 
   }
 }
