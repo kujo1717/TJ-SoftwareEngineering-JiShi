@@ -79,6 +79,7 @@ public class DataAnalysisController {
                 oneMonthFinishedNumMap.put(day, finishedNumOfOneDay);
             }
 
+
             //3：计算一个月内的事项新建情况
             Map<Integer, Integer> oneMonthNewCreateNumMap = new HashMap<>();
             for(int day=1; day<=dayNumOfMonth; day++)
@@ -130,7 +131,7 @@ public class DataAnalysisController {
             if(t.getTaskState() != 0)
                 finishCount++;
 
-        return finishCount / totalCount;
+        return (float)finishCount / (float)totalCount;
     }
 
     /*
@@ -146,8 +147,7 @@ public class DataAnalysisController {
     {
         int timelyFinishNum = 0;
         int delayedFinishedNum = 0;
-        if(timelyFinishNum + delayedFinishedNum == 0)
-            return 0;
+
 
 
         for(Task t : taskList)
@@ -159,7 +159,9 @@ public class DataAnalysisController {
                 delayedFinishedNum++;
         }
 
-        return timelyFinishNum / (timelyFinishNum + delayedFinishedNum);
+        if(timelyFinishNum + delayedFinishedNum == 0)
+            return 0;
+        return (float)timelyFinishNum / (float)(timelyFinishNum + delayedFinishedNum);
     }
 
     /*
@@ -194,6 +196,6 @@ public class DataAnalysisController {
             }
         }
 
-        return delayCount / totalCount;
+        return (float)delayCount / (float)totalCount;
     }
 }

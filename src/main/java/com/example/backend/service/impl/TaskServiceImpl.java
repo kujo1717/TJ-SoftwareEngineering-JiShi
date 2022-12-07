@@ -162,18 +162,20 @@ public class TaskServiceImpl implements TaskService {
             //更新真实完成时间
             task.setRealFinishTime(DateTimeUtil.getCurrentTimestamp());
 
-            //完成所有孩子（递归）
-            for(Task sonTask : task.getRelativeTask()){
-                //如果及时完成
-                if(DateTimeUtil.getCurrentTimestamp().before(sonTask.getEndTime()))
-                    sonTask.setTaskState((short) 1);
-                //如果没有及时完成
-                else{
-                    sonTask.setTaskState((short) 2);
-                }
+            if(task.getRelativeTask() != null) {
+                //完成所有孩子（递归）
+                for (Task sonTask : task.getRelativeTask()) {
+                    //如果及时完成
+                    if (DateTimeUtil.getCurrentTimestamp().before(sonTask.getEndTime()))
+                        sonTask.setTaskState((short) 1);
+                        //如果没有及时完成
+                    else {
+                        sonTask.setTaskState((short) 2);
+                    }
 
-                //递归更新子事项
-                patchOneTask(sonTask);
+                    //递归更新子事项
+                    patchOneTask(sonTask);
+                }
             }
         }
 
