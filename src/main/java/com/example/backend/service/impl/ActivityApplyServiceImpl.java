@@ -10,10 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Author: 杨严
@@ -86,9 +84,11 @@ public class ActivityApplyServiceImpl implements ActivityApplyService {
 
     @Override
     public List<ActivityApply> GetAllApplicantList(Long activity_id) {
-        QueryWrapper<ActivityApply> queryWrapper=new QueryWrapper<>();
-        queryWrapper.eq("activity_id",activity_id);
-        List<ActivityApply> list=activityApplyMapper.selectList(queryWrapper);
+        List<Map<String,Object>> list_map=activityApplyMapper.SelectApplicantList(activity_id);
+        List<ActivityApply> list=list_map
+                .stream()
+                .map(p->new ActivityApply((Long)p.get("activity_id"),(Long)p.get("user_id"),(Date) p.get("apply_time")))
+                .collect(Collectors.toList());
         return list;
     }
 }

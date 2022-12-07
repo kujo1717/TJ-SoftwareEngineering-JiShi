@@ -29,4 +29,9 @@ public interface ActivityParticipateMapper extends BaseMapper<ActivityParticipat
                     "ON activity_participate.user_id = user.id  " +
                     "WHERE activity_id=${activity_id}")
     List<Map<String,Object>> SelectActApplicantList(@Param("activity_id") Long activity_id);
+
+
+
+    @Select("SELECT activity_id FROM activity_participate WHERE user_id=${user_id}")
+    List<Long> SelectOneUserAllActivityId(@Param("user_id") Long user_id);
 }

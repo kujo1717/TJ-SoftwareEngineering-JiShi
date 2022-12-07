@@ -14,37 +14,29 @@ import java.util.Date;
 
 /**
  * @Author 2051196 刘一飞
- * @Date 2022/11/28
+ * @Date 2022/12/6
  * @JDKVersion 17.0.4
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("notice")
+@TableName("message_board")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Notice {
+public class MessageBoard {
     @JsonSerialize(using= ToStringSerializer.class)
     @TableId(type = IdType.AUTO)
-    private Long noticeId;
+    private Long messageBoardId;
     @JsonSerialize(using= ToStringSerializer.class)
     private Long activityId;
-    private String title;
+    @JsonSerialize(using= ToStringSerializer.class)
+    private Long userId;
     private String content;
     private Date createTime;
-    private int type;
 
-    public Notice(String title, String content, Date createTime, int type) {
-        this.title = title;
-        this.content = content;
-        this.createTime = createTime;
-        this.type = type;
-    }
-
-    public Notice(Long activityId, String title, String content, Date createTime, int type) {
+    public MessageBoard(Long activityId, Long userId, String content, Date createTime) {
         this.activityId = activityId;
-        this.title = title;
+        this.userId = userId;
         this.content = content;
         this.createTime = createTime;
-        this.type = type;
     }
 }

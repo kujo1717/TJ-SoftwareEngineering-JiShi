@@ -233,4 +233,15 @@ public class TaskServiceImpl implements TaskService {
         return taskList;
     }
 
+
+    @Override
+    public List<Task> findAllTask() {
+        List<Task> taskList = taskMapper.selectList(null);
+        return taskList;
+    }
+
+    @Override
+    public int modifyTaskStatus(Long taskId, int status) {
+        return taskMapper.updateTaskRemind(taskId, status);
+    }
 }

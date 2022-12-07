@@ -6,6 +6,8 @@ import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.User;
 import org.apache.ibatis.annotations.*;
 
+import java.util.List;
+
 /**
  * @Author hym
  * @Date 2022/10/29
@@ -19,4 +21,8 @@ public interface UserMapper extends BaseMapper<User> {
     int insertUser(@Param("name") String name,@Param("email") String email,@Param("password")String password);
     @Update("UPDATE user SET name='${name}',age='${age}',introduce='${introduce}',avatar='${imgUrl}' WHERE id='${id}'")
     int updateUser(@Param("id")Long id,@Param("name")String name,@Param("age")int age,@Param("introduce")String introduce,@Param("imgUrl")String imgUrl);
+
+
+    @Select("select * from user")
+    List<User> selectAllUser();
 }

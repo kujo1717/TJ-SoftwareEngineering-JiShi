@@ -50,6 +50,21 @@ public class ActivityController {
     private ModelMapper modelMapper;
 
 
+    @ApiOperation("查询用户是不是这个活动的参与者")
+    @GetMapping("/ismember")
+    public Result<ActivityUserRole> isMember(
+            @ApiParam(name = "id", value = "用户id", required = true)
+            @RequestParam("user_id") Long user_id,
+            @ApiParam(name = "id", value = "活动id", required = true)
+            @RequestParam("activity_id") Long activity_id) {
+        try {
+            return Result.success(activityParticipateService.isMember(user_id, activity_id));
+        } catch (Exception e) {
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "isMember FAILED");
+        }
+
+    }
+
     @ApiOperation("获取可以报名的活动")
     @GetMapping("/getAvailableActs")
     public Result<List<Activity>> getAvailableActs() {
@@ -374,7 +389,7 @@ public class ActivityController {
     }
 
     /**
-     * 活动创建人，终止报名
+     * 活动创建人，终止报名，活动开始
      */
     @ApiOperation("活动创建人，终止报名")
     @PatchMapping("/creatorStopApply")
@@ -387,28 +402,34 @@ public class ActivityController {
             Integer res = activityService.SetActivityState(activity_id, 1);
             //取所有报名者
             List<ActivityApply> applyList = activityApplyService.GetAllApplicantList(activity_id);
-            //取得活动信息
-            Activity activity = activityService.getAct(activity_id);
-            Integer capacity = activity.getCapacity();
-            Integer participatant_num = activity.getParticipant_num();
-            //按时间排序，最早在前
-            List<ActivityApply> applyList_sort = applyList.stream().sorted
-                    (Comparator.comparingLong(a -> a.getApply_time().getTime())).collect(Collectors.toList());
-//            System.out.println("applyList_sort:"+applyList_sort.toString());
+            if(applyList.size()>0){
+                //取得活动信息
+                Activity activity = activityService.getAct(activity_id);
+                Integer capacity = activity.getCapacity();
+                Integer participatant_num = activity.getParticipant_num();
+                //按时间排序，最早在前
+                List<ActivityApply> applyList_sort = applyList.stream().sorted
+                        (Comparator.comparingLong(a -> a.getApply_time().getTime())).collect(Collectors.toList());
+                System.out.println("applyList:"+applyList.toString());
 
-            //删除所有报名人
-            activityApplyService.DeleteAct(activity_id);
-            //按剩余空位，报名人依次进入参与名单
-            for (int i = 0; i < capacity - participatant_num; i++) {
-                ActivityParticipate participate = new ActivityParticipate();
-                participate.setActivity_id(activity_id);
-                participate.setUser_id(applyList_sort.get(i).getUser_id());
-                activityParticipateService.AddParticipant(participate);
+                System.out.println("applyList_sort:"+applyList_sort.toString());
+
+                //删除所有报名人
+                activityApplyService.DeleteAct(activity_id);
+                //按剩余空位，报名人依次进入参与名单
+                for (int i = 0; i < capacity - participatant_num; i++) {
+                    ActivityParticipate participate = new ActivityParticipate();
+                    participate.setActivity_id(activity_id);
+                    participate.setUser_id(applyList_sort.get(i).getUser_id());
+                    activityParticipateService.AddParticipant(participate);
+                }
             }
+
 
 
             return Result.success("creatorStopApply SUCCESS");
         } catch (Exception e) {
+            e.printStackTrace();
             return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "creatorStopApply FAILED");
 
         }

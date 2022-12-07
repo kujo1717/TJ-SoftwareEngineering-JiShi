@@ -14,6 +14,11 @@ import java.util.Locale;
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
 
+    private String locationPath = "D:\\Upload\\"; // 3.文件本地路径
+    private static final String netPath = "/**"; // 映射路径
+
+
+
     /**
      * 添加jwt拦截器，并指定拦截路径
      * */
@@ -26,6 +31,7 @@ public class MvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**") //过滤策略
                 .addResourceLocations("classpath:/static/");  // 静态资源路径
+        registry.addResourceHandler(netPath).addResourceLocations("file:"+locationPath);
     }
 
 

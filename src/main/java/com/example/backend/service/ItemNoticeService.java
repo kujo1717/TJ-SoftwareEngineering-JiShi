@@ -15,4 +15,6 @@ import java.util.List;
 public interface ItemNoticeService {
     List<ItemNotice> findItemNotice(Long userId);
     int modifyItemNoticeStatus(Long itemNoticeId);
+
+    int addItemNotice(ItemNotice itemNotice);
 }

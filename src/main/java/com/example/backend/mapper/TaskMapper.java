@@ -73,4 +73,7 @@ public interface TaskMapper extends BaseMapper<Task> {
     List<Task> selectOneUserOneSortAllTask(@Param("userId") Long userId, @Param("classificationTitle") String classificationTitle);
 
 
+    @Update("UPDATE task set is_remind=${status} WHERE task_id=${taskId}")
+    int updateTaskRemind(@Param("taskId") Long taskId, @Param("status") int status);
+
 }

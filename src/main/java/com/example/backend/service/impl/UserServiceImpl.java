@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -97,6 +98,14 @@ public class UserServiceImpl implements UserService {
         }
         mailSender.send(mimeMessage);
         return Result.success("成功发送邮箱");
+    }
+
+
+
+
+    @Override
+    public List<User> findAllUser() {
+        return userMapper.selectAllUser();
     }
 
 }

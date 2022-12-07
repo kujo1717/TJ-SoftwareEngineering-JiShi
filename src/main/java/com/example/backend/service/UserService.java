@@ -6,6 +6,7 @@ import com.example.backend.entity.User;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
+import java.util.List;
 
 /**
  * @Author hym
@@ -19,4 +20,8 @@ public interface UserService {
     Result<String> registerUser(String email,String password,String name);
     Result<User> putUser(Long id,String name,String introduce,int age,String imgUrl);
     Result<String> email(User user);
+
+    List<User> findAllUser();
+
+
     }

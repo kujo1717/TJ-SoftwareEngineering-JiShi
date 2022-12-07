@@ -27,4 +27,11 @@ public interface TaskService {
     List<Task> selectOneUserOneSortAllTask(Long userId, String classificationTitle);
     List<Task> selectOneDayFinishedTaskList(Long userId, int year, int month, int day);
     List<Task> selectOneDayCreatedTaskList(Long userId, int year, int month, int day);
+
+
+    List<Task> findAllTask();
+
+    int modifyTaskStatus(Long taskId, int status);
+
+
 }

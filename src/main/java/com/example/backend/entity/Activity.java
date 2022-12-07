@@ -99,6 +99,9 @@ public class Activity {
     @TableField( "images")
     private String images;
 
+    @TableField( "is_remind")
+    private int isRemind;
+
 
 
 

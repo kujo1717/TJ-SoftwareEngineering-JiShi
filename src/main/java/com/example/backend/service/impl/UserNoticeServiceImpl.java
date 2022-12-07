@@ -27,4 +27,9 @@ public class UserNoticeServiceImpl implements UserNoticeService {
     public int modifyNoticeStatus(Long userId, Long noticeId) {
         return userNoticeMapper.updateNoticeStatus(userId, noticeId);
     }
+
+    @Override
+    public int addUserNotice(UserNotice userNotice) {
+        return userNoticeMapper.insertUserNotice(userNotice);
+    }
 }

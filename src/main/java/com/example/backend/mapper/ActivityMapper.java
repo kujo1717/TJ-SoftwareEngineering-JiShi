@@ -5,6 +5,7 @@ import com.example.backend.entity.Activity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,12 @@ public interface ActivityMapper extends BaseMapper<Activity> {
             "FROM activity " +
             "WHERE creator_id=${user_id}")
     List<Map<String,Object>> SelectCreateList(@Param("user_id") Long user_id);
+
+
+
+
+    @Update("UPDATE activity set is_remind=${status} WHERE activity_id=${activityId}")
+    int updateActivityRemind(@Param("activityId") Long activityId, @Param("status") int status);
 
 
 }
