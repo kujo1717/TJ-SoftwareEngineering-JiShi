@@ -33,7 +33,7 @@ public class FileController {
 
     @ApiOperation("上传图片集")
     @PostMapping("/postImgList")
-    public Result<Map<String, Object>> postImg(
+    public Result<Map<String, Object>> postImgList(
             @ApiParam(name = "uploadFile", value = "uploadFile", required = true)
             @RequestParam("uploadFile") MultipartFile[] uploadFile,
             @ApiParam(name = "folderPath", value = "folderPath", required = true)
@@ -48,63 +48,70 @@ public class FileController {
         Map<String, Object> result_map = new HashMap<>();
         List<Map<String, Object>> file_list = new ArrayList<>();
 
-        //for every file
-        for (MultipartFile multipartFile : uploadFile) {
-            //map for one file
-            String file_name = multipartFile.getOriginalFilename();
-            Map<String, Object> file_map = new HashMap<>();
-            file_map.put("name", file_name);
+        try{
+            //for every file
+            for (MultipartFile multipartFile : uploadFile) {
+                //map for one file
+                String file_name = multipartFile.getOriginalFilename();
+                Map<String, Object> file_map = new HashMap<>();
+                file_map.put("name", file_name);
 
-            if (Objects.isNull(multipartFile) || multipartFile.isEmpty()) {
-                file_map.put("isEmpty", true);
-                file_map.put("upLoadSuccess", false);
-            } else {
-                //判断非空
-                file_map.put("isEmpty", false);
-
-                try {
-                    byte[] bytes = multipartFile.getBytes();
-                    //要存入本地的地址放到path里面
-
-                    Path path = Paths.get(folderPath);
-                    //如果没有files文件夹，则创建
-                    if (!Files.isWritable(path)) {
-                        Files.createDirectories(path);
-                    }
-                    String extension = FileUtils.getFileExtension(multipartFile);  //获取文件后缀
-                    FileUtils.getFileByBytes(bytes, folderPath, file_name);
-                    file_map.put("extension", extension);
-
-                    file_map.put("upLoadSuccess", true);
-
-                } catch (Exception e) {
+                if (Objects.isNull(multipartFile) || multipartFile.isEmpty()) {
+                    file_map.put("isEmpty", true);
                     file_map.put("upLoadSuccess", false);
-                    e.printStackTrace();
+                } else {
+                    //判断非空
+                    file_map.put("isEmpty", false);
+
+                    try {
+                        byte[] bytes = multipartFile.getBytes();
+                        //要存入本地的地址放到path里面
+
+                        Path path = Paths.get(folderPath);
+                        //如果没有files文件夹，则创建
+                        if (!Files.isWritable(path)) {
+                            Files.createDirectories(path);
+                        }
+                        String extension = FileUtils.getFileExtension(multipartFile);  //获取文件后缀
+                        FileUtils.getFileByBytes(bytes, folderPath, file_name);
+                        file_map.put("extension", extension);
+
+                        file_map.put("upLoadSuccess", true);
+
+                    } catch (Exception e) {
+                        file_map.put("upLoadSuccess", false);
+                        e.printStackTrace();
+                    }
                 }
+
+                file_list.add(file_map);
+
+
             }
 
-            file_list.add(file_map);
+            result_map.put("file_list:", file_list);
+            System.out.println("result map:" + result_map);
 
+            /**活动图片的绑定*/
+            if (entity!=null && entity.equals("activity") && id!=null){
+                String images="";
+                /**图片路径字符串*/
+                for (Map<String, Object> file_map:file_list){
+                    String name=(String) file_map.get("name");
+
+                    String one_imge="/activity/illus/"+id.toString()+"/"+name;
+                    images=images+":"+one_imge;
+                }
+                activityService.PatchActImages(images,id);
+            }
+
+            return Result.success(result_map);
+        }catch (Exception e){
+            e.printStackTrace();
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "postImgList FAILED");
 
         }
 
-        result_map.put("file_list:", file_list);
-        System.out.println("result map:" + result_map);
-
-        /**活动图片的绑定*/
-        if (entity!=null && entity.equals("activity") && id!=null){
-            String images="";
-            /**图片路径字符串*/
-            for (Map<String, Object> file_map:file_list){
-                String name=(String) file_map.get("name");
-
-                String one_imge="/activity/illus/"+id.toString()+"/"+name;
-                images=images+":"+one_imge;
-            }
-            activityService.PatchActImages(images,id);
-        }
-
-        return Result.success(result_map);
     }
 
 
