@@ -9,6 +9,6 @@ import java.time.LocalDateTime;
 
 @Mapper
 public interface VoteOptionMapper extends BaseMapper<VoteOption> {
-  @Update("UPDATE vote_option SET voteNum='${voteNum}+1' WHERE optionID = '${optionID}'")
-  int updateVotes(@Param("optionID") Long optionID);
+  @Update("UPDATE vote_option SET vote_num='${vote_num}+1' WHERE option_id = '${option_id}'")
+  int updateVotes(@Param("option_id") Long option_id);
 }

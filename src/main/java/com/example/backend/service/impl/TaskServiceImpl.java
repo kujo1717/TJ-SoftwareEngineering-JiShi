@@ -1,14 +1,19 @@
 package com.example.backend.service.impl;
 
-import com.example.backend.Tools.DateTimeUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.api.R;
+import com.example.backend.common.DateUtil;
 import com.example.backend.common.Result;
 import com.example.backend.entity.Task;
+import com.example.backend.entity.User;
+import com.example.backend.mapper.RelativeMapper;
 import com.example.backend.mapper.TaskMapper;
+import com.example.backend.mapper.UserMapper;
 import com.example.backend.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,9 +44,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> findTaskByMonth(Long userId, int year, int month) throws ParseException {
-        int daysOfMonth = DateTimeUtil.getDayNumOfMonth(year, month);
-        List<Task> taskList = taskMapper.selectByMonth(userId, year, month, daysOfMonth);
+    public List<Task> findTaskByMonth(Long userId, int year, int month) {
+        List<Task> taskList = taskMapper.selectByMonth(userId, year, month);
         return taskList;
     }
 
@@ -90,59 +94,57 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> findAllTaskAndRelative(Long userId) {
+    public Result<List<Task>> findAllTaskAndRelative(Long userId) {
+        try {
+            List<Task> taskList = taskMapper.selectAllTaskAndRelative(userId);
 
-        List<Task> taskList = taskMapper.selectAllTaskAndRelative(userId);
 
+            List<Task> taskListResult = new ArrayList<>();
+            List<Long> okIdList = new ArrayList<>();
 
-        List<Task> taskListResult = new ArrayList<>();
-        List<Long> okIdList = new ArrayList<>();
-
-        Task currentTask = null;
-        for (Task t : taskList) {
-            if (!okIdList.contains(t.getTaskId())) {
-                if (currentTask != null)
-                    taskListResult.add(currentTask);
-                currentTask = t;
-                okIdList.add(t.getTaskId());
+            Task currentTask = null;
+            for (Task t : taskList) {
+                if (!okIdList.contains(t.getTaskId())) {
+                    if (currentTask != null)
+                        taskListResult.add(currentTask);
+                    currentTask = t;
+                    okIdList.add(t.getTaskId());
+                }
+                //把相同的taskId进行合并，就是合并它们的relativeTask
+                else
+                    currentTask.addOneRelativeTask(t.getRelativeTask().get(0));
             }
-            //把相同的taskId进行合并，就是合并它们的relativeTask
-            //短路运算
-            else if(currentTask != null && t.getRelativeTask() != null && t.getRelativeTask().size() != 0)
-                currentTask.addOneRelativeTask(t.getRelativeTask().get(0));
-        }
 
-        //短路运算
-        if (currentTask != null && currentTask.getRelativeTask() != null) {
-            if (currentTask.getRelativeTask().size() != 0) {
-                //不应该返回已被删除的子事项
-                for (int i = currentTask.getRelativeTask().size() - 1; i >= 0; i--) {
-                    //短路运算
-                    if (currentTask != null && !currentTask.getRelativeTask().get(i).getIsInDustbin().equals("0")) {
-                        currentTask.getRelativeTask().remove(i);
+            if(currentTask.getRelativeTask() != null) {
+                if(currentTask.getRelativeTask().size() != 0) {
+                    //不应该返回已被删除的子事项
+                    for (int i = currentTask.getRelativeTask().size() - 1; i >= 0; i--) {
+                        if (!currentTask.getRelativeTask().get(i).getIsInDustbin().equals("0")) {
+                            currentTask.getRelativeTask().remove(i);
+                        }
                     }
                 }
             }
+
+            if (currentTask != null)
+                taskListResult.add(currentTask);
+            return Result.success(taskListResult);
         }
-
-        if (currentTask != null)
-            taskListResult.add(currentTask);
-        return taskListResult;
-
+        catch (Exception e)
+        {
+            System.out.println(e);
+            return Result.fail(500,"获取用户的所有事项失败！");
+        }
     }
 
     @Override
     public Long insertOneNewTask(Task task) {
         task.setIsInDustbin("0");
-        task.setCreateTime(DateTimeUtil.getCurrentTimestamp());
-        //如果post的事项没有填入分组，则自动归入默认分组
-        if(task.getClassificationTitle() == null || task.getClassificationTitle().equals(""))
-            task.setClassificationTitle("默认分组");
-        //如果post的事项没有填入tag，则置为“无”
-        if(task.getTag() == null || task.getTag().equals(""))
-            task.setTag("无");
         Long newID = Long.valueOf(taskMapper.insert(task));
-
+//        if(newID == Integer.MIN_VALUE + 1001)
+//            return Result.fail(500,"插入数据失败！");
+//
+//        return Result.success("插入数据成功！");
         return newID;
     }
 
@@ -160,29 +162,28 @@ public class TaskServiceImpl implements TaskService {
         //1: 如果之前没完成，更新后完成了：更新真实完成时间，并把所有孩子也完成了
         if(oldTask.getTaskState() == 0 && task.getTaskState() != 0) {
             //更新真实完成时间
-            task.setRealFinishTime(DateTimeUtil.getCurrentTimestamp());
+            task.setRealFinishTime(DateUtil.getCurrentTimestamp());
 
-            if(task.getRelativeTask() != null) {
-                //完成所有孩子（递归）
-                for (Task sonTask : task.getRelativeTask()) {
-                    //如果及时完成
-                    if (DateTimeUtil.getCurrentTimestamp().before(sonTask.getEndTime()))
-                        sonTask.setTaskState((short) 1);
-                        //如果没有及时完成
-                    else {
-                        sonTask.setTaskState((short) 2);
-                    }
-
-                    //递归更新子事项
-                    patchOneTask(sonTask);
+            //完成所有孩子（递归）
+            for(Task sonTask : task.getRelativeTask()){
+                //如果及时完成
+                if(DateUtil.getCurrentTimestamp().before(sonTask.getEndTime()))
+                    sonTask.setTaskState((short) 1);
+                //如果没有及时完成
+                else{
+                    sonTask.setTaskState((short) 2);
                 }
+
+                //递归更新子事项
+                patchOneTask(sonTask);
             }
         }
 
         //2: 如果之前完成了，更新后没完成，删掉真实完成时间
-        else if(oldTask.getTaskState() != 0 && task.getTaskState() == 0)
-            task.setRealFinishTime(null);
+        if(oldTask.getTaskState() != 0 && task.getTaskState() == 0)
+            task.setRelativeTask(null);
 
+        System.out.println(task);
         int resultCount = taskMapper.updateById(task);
         if(resultCount == 0)
             return Result.fail(500,"更新数据失败！");
@@ -195,16 +196,6 @@ public class TaskServiceImpl implements TaskService {
         return taskList;
     }
 
-    /**
-     * @description:获取一个月内完成的事项列表
-     * @author: hym
-     * @date: 2022/11/30 10:32
-     * @param: userId
-     * @param: year
-     * @param: month
-     * @param: day
-     * @return: java.util.List<com.example.backend.entity.Task>
-     **/
     @Override
     public List<Task> selectOneDayFinishedTaskList(Long userId, int year, int month, int day) {
         //保证一位数的日期也是dd格式
@@ -214,23 +205,7 @@ public class TaskServiceImpl implements TaskService {
         return taskList;
     }
 
-    /**
-     * @description:获取一个月内新建的事项列表
-     * @author: hym
-     * @date: 2022/11/30 10:32
-     * @param: userId
-     * @param: year
-     * @param: month
-     * @param: day
-     * @return: java.util.List<com.example.backend.entity.Task>
-     **/
-    @Override
-    public List<Task> selectOneDayCreatedTaskList(Long userId, int year, int month, int day){
-        //保证一位数的日期也是dd格式
-        String dayStr = day < 10 ? "0" + Integer.toString(day) : Integer.toString(day);
 
-        List<Task> taskList = taskMapper.selectOneDayCreatedTaskList(userId, year, month, dayStr);
-        return taskList;
-    }
+
 
 }

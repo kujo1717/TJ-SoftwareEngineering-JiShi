@@ -1,7 +1,6 @@
 package com.example.backend.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -10,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
-import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -25,79 +23,45 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "activity",autoResultMap = true)
+@TableName("activity")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Activity {
 
     @JsonSerialize(using= ToStringSerializer.class)
-    @TableId(type = IdType.ASSIGN_ID, value ="activity_id")
+    @TableId(type = IdType.ASSIGN_ID)
     private Long activity_id;
-
-    @TableField("title_name")
     private String title_name;
-
-    @TableField("detail_text")
     private String detail_text;
-
-    @TableField( "summary")
     private String summary;
 
 
 
     @DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd hh:mm:ss")
-    @TableField( "start_time")
     private Date start_time;
 
     @DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd hh:mm:ss")
-    @TableField( "end_time")
     private Date end_time;
 
     @DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd hh:mm:ss")
-    @TableField( "create_time")
     private Date create_time;
 
-
-    @TableField( "limit_capacity")
-    private Boolean limit_capacity;
-
-    @TableField( "capacity")
-    private Integer capacity;
-
-    @TableField( "participant_num")
-    private Integer participant_num;
-
-    @TableField( "applicant_num")
-    private Integer applicant_num;
-
-    @TableField( "hit_num")
+    private String address;
+    private String city;
     private Integer hit_num;
 
-    @TableField( "mark")
-    private Double mark;
+    private Boolean limit_capacity;
+    private Integer capacity;
 
-    @TableField( "state")
-    private Short state;
-    @TableField( "repeat_interval")
+    private Integer current_people;
+
+    private Short status;
     private Short repeat_interval;
-    @TableField( "creator_id")
     private Long creator_id;
 
-    @TableField( "address_formatted")
-    private String address_formatted;
-    @TableField( "address_name")
-    private String address_name;
 
-    @TableField( "longitude")
-    private Double longitude;
-
-    @TableField( "latitude")
-    private Double latitude;
-
-    @TableField( "images")
-    private String images;
 
 
 

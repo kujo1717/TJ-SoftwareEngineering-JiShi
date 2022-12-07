@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-@MapperScan("com.example.backend.mapper")
+//@EntityScan("com.example.backend.entity")
 public class BackEndApplication {
     @Bean
     public ModelMapper modelMapper(){

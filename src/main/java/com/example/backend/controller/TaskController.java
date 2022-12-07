@@ -33,25 +33,17 @@ public class TaskController {
     @Autowired
     private RelativeService relativeService;
 
+//
 
-
-    @ApiOperation("根据年、月信息返回事项列表（不带亲戚）")
-    @GetMapping("findmonth")
-    public Result<List<Task>> findTaskListByMonth(@ApiParam(name="userId", value="用户id", required = true)
-                                                      @RequestParam("year") Long userId,
-                                                    @ApiParam(name="year", value="事项在某个year能够出现", required = true)
-                                                  @RequestParam("year") int year,
-                                                  @ApiParam(name="month", value="事项在某个month能够出现", required = true)
-                                                  @RequestParam("month") int month)
-    {
-        try {
-            List<Task> taskList = taskService.findTaskByMonth(userId, year, month);
-            return Result.success(taskList);
-        }
-        catch (Exception e){
-            return Result.fail(500, "获取该月份的事项失败！");
-        }
-    }
+//    @ApiOperation("根据年、月信息返回事项列表（不带亲戚）")
+//    @GetMapping("findmonth")
+//    public Result<List<Task>> findTaskListByMonth(@ApiParam(name="year", value="事项在某个year能够出现", required = true)
+//                                                  @RequestParam("year") int year,
+//                                                  @ApiParam(name="month", value="事项在某个month能够出现", required = true)
+//                                                  @RequestParam("month") int month)
+//    {
+//        return taskService.findTaskByMonth(year, month);
+//    }
 
 //    @ApiOperation("返回task表的所有数据（不带亲戚）")
 //    @GetMapping("findall")
@@ -79,13 +71,7 @@ public class TaskController {
     public Result<List<Task>> findAllTaskAndRelative(@ApiParam(name="userId", value="用户id", required = true)
                                                          @PathVariable("userId") Long userId)
     {
-        try {
-            List<Task> taskList = taskService.findAllTaskAndRelative(userId);
-            return Result.success(taskList);
-        }
-        catch (Exception e){
-            return Result.fail(500,e.getMessage());
-        }
+        return taskService.findAllTaskAndRelative(userId);
     }
 
     @ApiOperation("插入一条新的task")

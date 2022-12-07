@@ -41,7 +41,6 @@ public class Task {
     private String isInDustbin;
     private Timestamp realFinishTime;
     private String tag;
-    private Timestamp createTime;
 
     @JsonSerialize(using= ToStringSerializer.class)
     private Long userId;

@@ -19,27 +19,23 @@ public class PollServiceImpl implements PollService {
 
   @Override
   @Transactional
-  public Long createPoll(Long activity_id, String topicText, LocalDateTime deadline, boolean multipleChoice) {
+  public Long createPoll(Long activity_id, String topic_text, LocalDateTime deadline, boolean multiple_choice) {
     Poll poll=new Poll();
-    try{poll.setactivity_id(activity_id);
-      poll.setDeadline(deadline);
-      poll.setmultipleChoice(multipleChoice);
-      poll.settopicText(topicText);
-      int newID=pollMapper.insert(poll);
-      if(newID == Integer.MIN_VALUE + 1001) {
-        return Long.valueOf(0);
-      }
-      return Long.valueOf(poll.getPollID());
-    }
-    catch(Exception e){
+    poll.setActivity_id(activity_id);
+    poll.setDeadline( deadline);
+    poll.setMultiple_choice(multiple_choice);
+    poll.setTopic_text(topic_text);
+    int newID=pollMapper.insert(poll);
+    if(newID == Integer.MIN_VALUE + 1001) {
       return Long.valueOf(0);
     }
+    return Long.valueOf(newID);
   }
   public List<Poll> findPoll(Long activity_id){
 
     QueryWrapper<Poll> queryWrapper=new QueryWrapper<>();
     queryWrapper
-            .eq("activity_id",activity_id);
+      .eq("activity_id",activity_id);
     List<Poll> list=pollMapper.selectList(queryWrapper);
     System.out.println(pollMapper.selectList(queryWrapper));
 

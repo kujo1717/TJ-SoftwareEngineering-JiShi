@@ -17,27 +17,30 @@ import java.util.List;
 public class VoteOptionsImpl implements VoteOptionService{
   @Autowired
   private VoteOptionMapper voteOptionMapper;
-  public List<VoteOption> findVoteOption(Long pollID){
+  public List<VoteOption> findVoteOption(Long poll_id){
 
     QueryWrapper<VoteOption> queryWrapper=new QueryWrapper<>();
     queryWrapper
-            .eq("poll_id",pollID);
+      .eq("poll_id",poll_id);
     List<VoteOption> list=voteOptionMapper.selectList(queryWrapper);
     System.out.println(voteOptionMapper.selectList(queryWrapper));
 
     return list;
   }
-  public int UpdateVotes(Long optionID){
-    VoteOption voteOption =  voteOptionMapper.selectById(optionID);
-    voteOptionMapper.updateById(voteOption);
+  public int UpdateVotes(Long option_id){
+    UpdateWrapper<VoteOption> updateWrapper = new UpdateWrapper<>();
+    VoteOption voteOption = new VoteOption();
+    voteOption.setOption_id(option_id);
+    updateWrapper.setSql("vote_num = vote_num +1");
+    voteOptionMapper.update(voteOption,updateWrapper);
     return 1;
   }
-  public Result<String> createVoteOptions(List<options> voteOptions,Long pollID){
+  public Result<String> createVoteOptions(List<options> voteOptions,Long poll_id){
     for (int i=0;i<voteOptions.size();i++){
       VoteOption voteOption=new VoteOption();
-      voteOption.setOptionName(voteOptions.get(i).getOption());
-      voteOption.setPollID(pollID);
-      voteOption.setVoteNum(0);
+      voteOption.setOption_name(voteOptions.get(i).getOption());
+      voteOption.setPoll_id(poll_id);
+      voteOption.setVote_num(0);
       int newID = voteOptionMapper.insert(voteOption);
       if(newID == Integer.MIN_VALUE + 1001) {
         return Result.fail(500, "插入数据失败！");
