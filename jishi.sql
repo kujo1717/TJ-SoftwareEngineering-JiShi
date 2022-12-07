@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 07/12/2022 19:05:40
+ Date: 07/12/2022 20:45:34
 */
 
 SET NAMES utf8mb4;
@@ -52,7 +52,7 @@ CREATE TABLE `activity`  (
 -- ----------------------------
 -- Records of activity
 -- ----------------------------
-INSERT INTO `activity` VALUES (1600317207164858370, '123123', NULL, '123123', '2022-12-07 13:02:00', NULL, '2022-12-07 10:32:09', 1, 1, 2, 1, NULL, 1, 0, NULL, 0, '123123', NULL, NULL, NULL, ':/activity/illus/1600317207164858370/2021-10-08 (2).png:/activity/illus/1600317207164858370/2021-10-08 (6).png', 2);
+INSERT INTO `activity` VALUES (1600317207164858370, '123123', NULL, '123123', '2022-12-07 01:02:00', NULL, '2022-12-07 10:32:09', 5, 1, 2, 1, NULL, 1, 0, NULL, 0, '123123', '上海市浦东新区花木街道高科西路2599号', '121.545646', '31.191832', ':/activity/illus/1600317207164858370/2021-10-08 (2).png:/activity/illus/1600317207164858370/2021-10-08 (6).png', 0);
 INSERT INTO `activity` VALUES (1600350112419180546, '222', NULL, '222', '2022-12-07 13:02:00', NULL, '2022-12-07 00:42:54', 2, 1, 2, 1, NULL, 1, 0, NULL, 0, '222', NULL, NULL, NULL, ':/activity/illus/1600350112419180546/2021-10-05.png', 2);
 
 -- ----------------------------
@@ -389,9 +389,23 @@ CREATE TABLE `user`  (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1, 'yy', 'yy657826', '657826973@qq.com', NULL, NULL, 'http://localhost:8081/api/static/th.jpg');
+INSERT INTO `user` VALUES (1, 'yy1', 'yy657826', '657826973@qq.com', 0, 'undefined', 'http://localhost:8081/api/static/th.jpg');
 INSERT INTO `user` VALUES (2, 'yy2', 'yy657826', 'm13958790203@163.com', NULL, NULL, 'http://localhost:8081/api/static/th.jpg');
 INSERT INTO `user` VALUES (111, '111', '111', '111', 111, '111', 'http://localhost:8081/api/static/th.jpg');
+
+-- ----------------------------
+-- Table structure for user_forget_request
+-- ----------------------------
+DROP TABLE IF EXISTS `user_forget_request`;
+CREATE TABLE `user_forget_request`  (
+  `id` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '邮箱',
+  `code` varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '验证码',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of user_forget_request
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for user_notice
