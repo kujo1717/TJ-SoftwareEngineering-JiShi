@@ -1,27 +1,29 @@
 <script>
-// import UserData from "@/assets/user";
-import ContactsData from "@/assets/contacts";
-import MessagesData from "@/assets/messages";
 import EmojiData from "@/assets/emoji";
+import py from "pinyin";
 import {
-  getOneGroupAllUser,
-  getUserInfoById,
+  getActivityAllPaticipant,
   getActivityAllMessage,
   sendMessage,
 } from "@/api/chat";
+import messages from "@/assets/messages";
 export default {
   name: "QqImui",
   components: {},
   data() {
     return {
-      GroupMems: null,
-      activityId: 1,
+      Participants: null,
+      currentParticipants: null,
+      activityId: null,
       userData: {
         id: null,
         avatar: null,
         displayName: null,
       },
       messages: [],
+      keyword: "",
+      timer: null,
+      len: false,
     };
   },
   // props: {
@@ -35,7 +37,7 @@ export default {
   // },
   render() {
     return (
-      <div class="qq-lemon-imui">
+      <div class="contain">
         <lemon-imui
           width="100%"
           class="lemon-slot"
@@ -52,41 +54,9 @@ export default {
             "message-title": (contact) => {
               return (
                 <div>
-                  <div style="display:flex;justify-content:space-between">
+                  <div style="display:flex;justify-content:center">
                     <span style="font-size:22px;">{contact.displayName}</span>
-                    <span style="font-size:12px;">
-                      <button
-                        class="cursor:pointer;"
-                        on-click={() => this.openDrawer("center")}
-                      >
-                        居中
-                      </button>
-                    </span>
                   </div>
-                  {contact.isGroup && (
-                    <div class="slot-group-menu">
-                      <button>聊天</button>
-                      <button>公告</button>
-                      <button>相册</button>
-                      <button>文件</button>
-                      <button>活动</button>
-                      <span
-                        v-lemon-contextmenu_click={[
-                          {
-                            text: "操作一",
-                            click(e, instance, hide) {
-                              hide();
-                            },
-                          },
-                          {
-                            text: "操作二",
-                          },
-                        ]}
-                      >
-                        设置(左键弹出菜单)
-                      </span>
-                    </div>
-                  )}
                 </div>
               );
             },
@@ -101,14 +71,17 @@ export default {
               if (contact.isGroup) {
                 return (
                   <div class="slot-group">
-                    <div class="slot-group-title">群通知</div>
-                    <div class="slot-group-notice">
-                      进群请改备注，格式，工作地点-姓名，请大家配合谢谢
+                    <div class="slot-group-title" style="font-size:15px">
+                      群成员
                     </div>
-                    <div class="slot-group-title">群成员</div>
                     <div class="slot-group-panel">
-                      <input class="slot-search" placeholder="搜索群成员" />
-                      {(this.GroupMems || []).map((item) => (
+                      <input
+                        class="slot-search"
+                        placeholder="搜索群成员"
+                        v-model={this.keyword}
+                        on={{ input: this.searchMember }}
+                      />
+                      {(this.currentParticipants || []).map((item) => (
                         <div>{item.name}</div>
                       ))}
                     </div>
@@ -144,14 +117,28 @@ export default {
   watch: {},
   created() {},
   async mounted() {
+    // 获取当前活动ID
     this.activityId = this.$route.query.id;
-    // this.activityId = 1;
     console.log("BigChatBox:this.activityId:", this.activityId);
 
+    // 初始化聊天插件
     const IMUI = this.$refs.IMUI;
+    // IMUI.initEmoji(EmojiData);
+    IMUI.changeContact(this.activityId);
+    IMUI.initContacts([
+      {
+        id: this.activityId,
+        displayName: "活动群",
+        isGroup: true,
+      },
+    ]);
+
+    // 创建WebSocket连接
     var websocket = null;
     if ("WebSocket" in window) {
-      websocket = new WebSocket("ws://localhost:8081/api/webSocket");
+      websocket = new WebSocket(
+        "ws://localhost:8081/api/webSocket?activityId=" + this.activityId
+      );
     } else {
       alert("该浏览器不支持websocket！");
     }
@@ -162,12 +149,14 @@ export default {
     websocket.onclose = function (event) {
       console.log("连接关闭");
     };
-    websocket.onmessage = function (event) {
+    websocket.onmessage = event => {
       console.log("收到消息");
       //将字符串转为JSON对象
       var message = JSON.parse(event.data);
-      console.log(message);
-      IMUI.appendMessage(message, true);
+      if(message.fromUser.id!=this.userId){
+        IMUI.appendMessage(message, true);
+      }
+      
     };
     websocket.onerror = function (event) {
       console.log("websocket通信发生错误");
@@ -177,45 +166,85 @@ export default {
       websocket.close();
     };
 
-    // IMUI.initContacts(ContactsData);
-    IMUI.initContacts([
-      {
-        id: this.activityId,
-        displayName: "活动群",
-        isGroup: true,
-        unread: 0,
-        lastSendTime: 1566047865417,
-        lastContent: "这个咋处理啊？",
-      },
-    ]);
-    IMUI.initEmoji(EmojiData);
-    IMUI.changeContact(this.activityId);
-
+    // 格式化本用户数据
     this.userData.id = this.userId;
     this.userData.avatar = this.user_avatar;
     this.userData.displayName = this.user_name;
     console.log("user_info:", this.userData.displayName);
-    // await getUserInfoById(this.userId)
-    //   .then((res) => {
-    //     let tmp = res.data;
-    //     this.userData.id = tmp.userId;
-    //     this.userData.avatar = tmp.avatar;
-    //     this.userData.displayName = tmp.name;
-    //     console.log("用户数据", this.userData);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
-    // await getOneGroupAllUser(1, this.userId)
-    //   .then((res) => {
-    //     this.GroupMems = res.data;
-    //     console.log("联系人数据", this.GroupMems);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+
+    // 获取该活动的所有参与者
+    await getActivityAllPaticipant(this.activityId)
+      .then((res) => {
+        this.Participants = res.data;
+        this.currentParticipants = this.Participants;
+        console.log("该活动的所有参与者为：", this.Participants);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
+  // updated() {
+  //   // var showContent = $(".lemon-messages");
+    
+  //   console.log("div", div);
+  //   div.scrollTop = div.scrollHeight;
+  // },
   methods: {
+    clearTimer() {
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
+    },
+
+    searchMember() {
+      this.clearTimer();
+      if (this.keyword && this.keyword.length > 0) {
+        this.len = true;
+        this.timer = setTimeout(() => {
+          this.currentParticipants = this.filterMember();
+        }, 500);
+      } else {
+        if (this.len) {
+          this.currentParticipants = this.filterMember();
+        }
+        if (this.keyword === "") {
+          this.len = false;
+          return;
+        }
+      }
+    },
+
+    filterMember() {
+      // 如果关键词为空，则返回所有数据
+      if (this.keyword === "") {
+        return this.Participants;
+      }
+      let results = [];
+      // 将查询字符分解并转为正则表达式，用于模糊搜索
+      let queryStringArr = this.keyword.split("");
+      let str = "(.*?)";
+      let regStr = str + queryStringArr.join(str) + str;
+      let reg = RegExp(regStr, "i"); // 以mh为例生成的正则表达式为/(.*?)m(.*?)h(.*?)/i
+
+      console.log(this.Participants);
+      this.Participants.some((element) => {
+        let name = element.name;
+        console.log("名字为", name);
+        // 获取汉字的拼音，并进行扁平化
+        let pyArr = py(name, {
+          style: py.STYLE_NORMAL, // 设置拼音风格设置为普通风格（不带声调），
+        }).flat();
+        let pyStr = pyArr.join("");
+
+        // 拼音符合正则表达式 || 文字符合正则表达式
+        if (reg.test(pyStr) || reg.test(name)) {
+          // 创建符合组件要求的对象（一定要有value值）
+          results.push(element);
+        }
+      });
+      return results;
+    },
+
     openDrawer(position) {
       const IMUI = this.$refs.IMUI;
       const params = {
@@ -239,22 +268,28 @@ export default {
       IMUI.openDrawer(params);
     },
     async handlePullMessages(contact, next) {
+      const IMUI = this.$refs.IMUI;
       await getActivityAllMessage(this.activityId)
         .then((res) => {
           this.messages = res.data;
+          // 将发送时间变成Number类型
+          this.messages.forEach((element) => {
+            element.sendTime = Number(element.sendTime);
+          });
         })
         .catch((err) => {
           console.log(err);
         });
       console.log("联系人：", contact);
       console.log("所有的聊天信息为", this.messages);
-      next(this.messages, true);
+      await next(this.messages, true);
     },
     handleSend(message, next, file) {
+      console.log("要发送的信息是:", message);
+      console.log("文件为", file);
       if (file == null) {
         // 表明是文本类型
-        console.log(message);
-        console.log(file);
+
         sendMessage(
           this.activityId,
           this.userId,
@@ -268,9 +303,10 @@ export default {
             next();
           })
           .catch((err) => {
-            console.log(err);
+            // console.log(err);
             next({ status: "failed" });
           });
+      } else {
       }
     },
   },
@@ -325,4 +361,9 @@ export default {
 .lemon-sidebar {
   display: none;
 }
+// .lemon-messages {
+//   overflow: auto;
+//   display: flex;
+//   flex-direction: column-reverse;
+// }
 </style>

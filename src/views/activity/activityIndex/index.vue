@@ -83,16 +83,35 @@
                   <div v-for="(list, index) in showData" :key="index">
                     <div style="display: inline-block; width: 800px">
                       <!--el-image v-if="list.showimage.length" style="width: 100px; height: 100px; float: right;margin-right: 100px;" :src="list.showimage" fit="cover" /-->
-                      <div style="display: inline-block">
+                      <div
+                        style="
+                          display: inline-block;
+                          width: 100%;
+                          border-bottom: solid 1px #ebeef5;
+                          padding : 0.5em 0 0.5em 0;
+                        "
+                      >
                         <p>
                           活动名称：{{ list.name }}
                           <el-button
-                            style="float: right; padding: 3px 0"
+                            style="padding: 0 0 0 3em"
                             type="text"
                             @click="ClickActDetail(list.activity_id)"
                             >点击查看</el-button
                           >
                         </p>
+                        <!-- 活动配图展示 -->
+                        <div class="images">
+                          <el-image
+                            v-if="list.images"
+                            style="margin-right: 1em; height: 10em"
+                            :src="GetIllusImgUrl(list.images)"
+                          >
+                            <div slot="error" class="image-slot">
+                              <i class="el-icon-picture-outline"></i>
+                            </div>
+                          </el-image>
+                        </div>
                         <p>活动开始时间： {{ list.start_time }}</p>
                         <div
                           v-for="(tag, indexOfTag) in list.tags"
@@ -168,6 +187,7 @@
 <script>
 import { getAvailableActs, findActTags, getActByTag } from "@/api/activity";
 import ActivityAround from "./components/activityAround";
+import { getAllTag } from "@/api/tag";
 export default {
   name: "ActivityIndex",
   components: { ActivityAround },
@@ -187,9 +207,9 @@ export default {
       searchResult: true,
       dialogFormVisible: false,
 
-      index_tab: "around",
+      index_tab: "index",
 
-      tags: tagOptions,
+      tags: [],
       checkboxGroup1: [],
       region: "",
       date: "",
@@ -203,8 +223,49 @@ export default {
     console.log("gettingAvailableActs");
     this.getAvailableActs();
     console.log("gotAvailableActs");
+    this.GetAllTags();
   },
   methods: {
+    /**activity.images 得出第一张配图的url */
+    GetIllusImgUrl(images) {
+      console.log("image_url iiii", images);
+
+      /*分析images */
+      let image_url;
+      let image_paths = images.split(":");
+      for (let i = 0; i < image_paths.length; i++) {
+        let image_path = image_paths[i];
+        /**直接通过url访问图片 */
+        if (image_path.length > 0) {
+          image_url = "http://localhost:8081/api" + image_path;
+          console.log("image_url iiii", image_url);
+          break;
+        }
+      }
+      return image_url;
+    },
+
+    /**get all tags */
+    GetAllTags() {
+      //get all tags
+      getAllTag()
+        .then((res) => {
+          this.tags = res.data.map((x) => {
+            return {
+              tagID: x.tag_id,
+              name: x.tag_name,
+            };
+          });
+          console.log("this.tags:res:", this.tags);
+        })
+        .catch((err) => {
+          console.log("getAllTag:err:", err);
+        });
+      setTimeout(() => {
+        this.getLngLatLocation();
+      }, 100);
+    },
+
     IndexTabsClick(val) {},
 
     async getAvailableActs() {
@@ -232,6 +293,7 @@ export default {
               start_time: ele.start_time,
               heat: ele.hit_num,
               tags: tags,
+              images: "images" in ele ? ele.images : -1,
             });
           });
           console.log("获取活动：", acts);
@@ -301,7 +363,7 @@ export default {
         const tagIDs = [];
         let i = 0;
         for (i; i < this.checkboxGroup1.length; i++) {
-          tagIDs.push(this.checkboxGroup1[i].tagID + 1);
+          tagIDs.push(this.checkboxGroup1[i].tagID);
         }
         getActByTag(tagIDs).then((res) => {
           const acts = [];

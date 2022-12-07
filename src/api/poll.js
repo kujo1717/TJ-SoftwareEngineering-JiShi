@@ -8,6 +8,13 @@ export function getPoll(acitivity_id) {
     params: {}
   })
 }
+export function getVote(userID) {
+  return request({
+    url: '/api/vote/getvote/' + userID.toString(),
+    method: 'get',
+    params: {}
+  })
+}
 export function postPoll(param) {
   return request({
     url: '/api/poll/postPoll',
@@ -15,3 +22,14 @@ export function postPoll(param) {
     data: param,
   })
 }
+export  function postVote(userId,option_id){
+  return request({
+    url: '/api/vote/postvote',
+    method: 'post',
+    params: {
+      userId: userId,
+      option_id: option_id
+  },
+  })
+}
+

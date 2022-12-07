@@ -1,13 +1,13 @@
 <template>
   <div class="ma_view">
-    <el-radio-group
+    <!-- <el-radio-group
       class="ma_view_redios"
       v-model="ActivityOrTemplate"
       @input="radio_input_change"
     >
       <el-radio-button label="activity">活动</el-radio-button>
       <el-radio-button label="template">模板</el-radio-button>
-    </el-radio-group>
+    </el-radio-group> -->
 
     <div class="ma_activity_page" v-if="ActivityOrTemplate === 'activity'">
       <div class="ma_sort_find_box">
@@ -39,7 +39,15 @@
             <el-card @click.native="ClickActDetail(act)">
               <span class="ma_act_page_card">
                 <div class="user-select-none">{{ act.name }}</div>
-                <el-image style="width: 100%" :src="act.img"></el-image>
+                <el-image class="el-image-ii" :src="act.img">
+                  <div slot="error" class="image-slot">
+                    <div class="user-select-none hint">暂无配图</div>
+                    <i
+                      style="font-size: 15em"
+                      class="el-icon-picture-outline"
+                    ></i>
+                  </div>
+                </el-image>
                 <el-tag :type="ActicityState_TagType(act.state)">{{
                   ActicityState_TagLabel(act.state)
                 }}</el-tag>
@@ -57,7 +65,15 @@
             <el-card @click.native="ClickActDetail(act)">
               <span class="ma_act_page_card">
                 <div class="user-select-none">{{ act.name }}</div>
-                <el-image style="width: 100%" :src="act.img"></el-image>
+                <el-image class="el-image-ii" :src="act.img">
+                  <div slot="error" class="image-slot">
+                    <div class="user-select-none hint">暂无配图</div>
+                    <i
+                      style="font-size: 15em"
+                      class="el-icon-picture-outline"
+                    ></i>
+                  </div>
+                </el-image>
                 <el-tag :type="ActicityState_TagType(act.state)">{{
                   ActicityState_TagLabel(act.state)
                 }}</el-tag>
@@ -75,7 +91,14 @@
             <el-card @click.native="ClickActDetail(act)">
               <span class="ma_act_page_card">
                 <div class="user-select-none">{{ act.name }}</div>
-                <el-image style="width: 100%" :src="act.img"></el-image>
+                <el-image class="el-image-ii" :src="act.img">
+                  <div slot="error" class="image-slot">
+                    <div class="user-select-none hint">暂无配图</div>
+                    <i
+                      style="font-size: 15em"
+                      class="el-icon-picture-outline"
+                    ></i></div
+                ></el-image>
                 <el-tag :type="ActicityState_TagType(act.state)">{{
                   ActicityState_TagLabel(act.state)
                 }}</el-tag>
@@ -93,7 +116,14 @@
             <el-card @click.native="ClickActDetail(act)">
               <span class="ma_act_page_card">
                 <div class="user-select-none">{{ act.name }}</div>
-                <el-image style="width: 100%" :src="act.img"></el-image>
+                <el-image class="el-image-ii" :src="act.img">
+                  <div slot="error" class="image-slot">
+                    <div class="user-select-none hint">暂无配图</div>
+                    <i
+                      style="font-size: 15em"
+                      class="el-icon-picture-outline"
+                    ></i></div
+                ></el-image>
                 <el-tag :type="ActicityState_TagType(act.state)">{{
                   ActicityState_TagLabel(act.state)
                 }}</el-tag>
@@ -114,7 +144,14 @@
         <el-card @click.native="ClickModifyTemplate(act)">
           <span class="ma_act_page_card">
             <div class="user-select-none">{{ act.name }}</div>
-            <el-image style="width: 100%" :src="act.img"></el-image>
+            <el-image class="el-image-ii" :src="act.img">
+              <div slot="error" class="image-slot">
+                <div class="user-select-none hint">暂无配图</div>
+                <i
+                  style="font-size: 15em"
+                  class="el-icon-picture-outline"
+                ></i></div
+            ></el-image>
           </span>
           <div class="bottom clearfix">
             <el-button type="primary" @click.stop="ClickModifyTemplate(act)"
@@ -153,7 +190,7 @@ export default {
   data() {
     return {
       //tab 值
-      ActivityOrTemplate: "",
+      ActivityOrTemplate: "activity",
       activity_tab: "create",
 
       //活动data
@@ -205,19 +242,10 @@ export default {
               let image_paths = ele.images.split(":");
               for (let i = 0; i < image_paths.length; i++) {
                 let image_path = image_paths[i];
+                /**直接通过url访问图片 */
                 if (image_path.length > 0) {
-                  let image_bytes;
-                  await getImg(image_path)
-                    .then((res) => {
-                      image_bytes = res.data.bytes;
-                      console.log("image_bytes", image_bytes);
-                    })
-                    .catch((err) => {
-                      console.log("TestGetImg:err", err);
-                    });
-                  image_url = "data:image/png;base64," + image_bytes;
+                  image_url = "http://localhost:8081/api" + image_path;
                   console.log("image_url", image_url);
-                  // console.log("image_bytes", image_bytes);
                   break;
                 }
               }
@@ -225,7 +253,6 @@ export default {
             activity_data_all.push({
               id: ele.activity_id,
               name: ele.title_name,
-              // img: "https://ts1.cn.mm.bing.net/th/id/R-C.f4470ef67e6e8803479dc44bb3c66574?rik=FXJkAJS%2fLCy9vg&riu=http%3a%2f%2fwww.szshequ.org%2fuserfiles%2fmanagers%2fdachong%2fimage%2f20191028%2f20191028193129_387.jpg&ehk=8FRYXacd0vDrnp2VfQlyA2xK1jIEETABsKgITDdCJXs%3d&risl=&pid=ImgRaw&r=0",
               img: image_url,
               state: ele.state,
             });
@@ -251,19 +278,10 @@ export default {
               let image_paths = ele.images.split(":");
               for (let i = 0; i < image_paths.length; i++) {
                 let image_path = image_paths[i];
+                /**直接通过url访问图片 */
                 if (image_path.length > 0) {
-                  let image_bytes;
-                  await getImg(image_path)
-                    .then((res) => {
-                      image_bytes = res.data.bytes;
-                      console.log("image_bytes", image_bytes);
-                    })
-                    .catch((err) => {
-                      console.log("TestGetImg:err", err);
-                    });
-                  image_url = "data:image/png;base64," + image_bytes;
+                  image_url = "http://localhost:8081/api" + image_path;
                   console.log("image_url", image_url);
-                  // console.log("image_bytes", image_bytes);
                   break;
                 }
               }
@@ -271,7 +289,6 @@ export default {
             activity_data_create.push({
               id: ele.activity_id,
               name: ele.title_name,
-              // img: "https://ts1.cn.mm.bing.net/th/id/R-C.f4470ef67e6e8803479dc44bb3c66574?rik=FXJkAJS%2fLCy9vg&riu=http%3a%2f%2fwww.szshequ.org%2fuserfiles%2fmanagers%2fdachong%2fimage%2f20191028%2f20191028193129_387.jpg&ehk=8FRYXacd0vDrnp2VfQlyA2xK1jIEETABsKgITDdCJXs%3d&risl=&pid=ImgRaw&r=0",
               img: image_url,
               state: ele.state,
             });
@@ -297,19 +314,10 @@ export default {
               let image_paths = ele.images.split(":");
               for (let i = 0; i < image_paths.length; i++) {
                 let image_path = image_paths[i];
+                /**直接通过url访问图片 */
                 if (image_path.length > 0) {
-                  let image_bytes;
-                  await getImg(image_path)
-                    .then((res) => {
-                      image_bytes = res.data.bytes;
-                      console.log("image_bytes", image_bytes);
-                    })
-                    .catch((err) => {
-                      console.log("TestGetImg:err", err);
-                    });
-                  image_url = "data:image/png;base64," + image_bytes;
+                  image_url = "http://localhost:8081/api" + image_path;
                   console.log("image_url", image_url);
-                  // console.log("image_bytes", image_bytes);
                   break;
                 }
               }
@@ -317,7 +325,6 @@ export default {
             activity_data_apply.push({
               id: ele.activity_id,
               name: ele.title_name,
-              // img: "https://ts1.cn.mm.bing.net/th/id/R-C.f4470ef67e6e8803479dc44bb3c66574?rik=FXJkAJS%2fLCy9vg&riu=http%3a%2f%2fwww.szshequ.org%2fuserfiles%2fmanagers%2fdachong%2fimage%2f20191028%2f20191028193129_387.jpg&ehk=8FRYXacd0vDrnp2VfQlyA2xK1jIEETABsKgITDdCJXs%3d&risl=&pid=ImgRaw&r=0",
               img: image_url,
               state: ele.state,
             });
@@ -343,19 +350,10 @@ export default {
               let image_paths = ele.images.split(":");
               for (let i = 0; i < image_paths.length; i++) {
                 let image_path = image_paths[i];
+                /**直接通过url访问图片 */
                 if (image_path.length > 0) {
-                  let image_bytes;
-                  await getImg(image_path)
-                    .then((res) => {
-                      image_bytes = res.data.bytes;
-                      console.log("image_bytes", image_bytes);
-                    })
-                    .catch((err) => {
-                      console.log("TestGetImg:err", err);
-                    });
-                  image_url = "data:image/png;base64," + image_bytes;
+                  image_url = "http://localhost:8081/api" + image_path;
                   console.log("image_url", image_url);
-                  // console.log("image_bytes", image_bytes);
                   break;
                 }
               }
@@ -363,7 +361,6 @@ export default {
             activity_data_involve.push({
               id: ele.activity_id,
               name: ele.title_name,
-              // img: "https://ts1.cn.mm.bing.net/th/id/R-C.f4470ef67e6e8803479dc44bb3c66574?rik=FXJkAJS%2fLCy9vg&riu=http%3a%2f%2fwww.szshequ.org%2fuserfiles%2fmanagers%2fdachong%2fimage%2f20191028%2f20191028193129_387.jpg&ehk=8FRYXacd0vDrnp2VfQlyA2xK1jIEETABsKgITDdCJXs%3d&risl=&pid=ImgRaw&r=0",
               img: image_url,
               state: ele.state,
             });
@@ -569,6 +566,14 @@ export default {
       margin-right: 2em;
       margin-bottom: 2em;
     }
+  }
+  /deep/.el-image-ii {
+    width: 20em !important;
+    height: 15em !important;
+  }
+  .hint {
+    font-size: 0.8em;
+    color: #8f8f8f;
   }
 }
 </style>
