@@ -10,30 +10,9 @@ export function getActivityAllPaticipant(activityId) {
     })
 }
 
-export function getActivityAllMessage(activityId) {
-    return request({
-        url: '/api/chat/getActivityAllMessage',
-        method: 'get',
-        params: {
-            activityId: activityId
-        }
-    })
-}
 
-export function sendMessage(activityId, senderId, status, type, sendTime, content) {
-    return request({
-        url: '/api/chat/addMessage',
-        method: 'post',
-        params: {
-            activityId: activityId,
-            senderId: senderId,
-            status: status,
-            type: type,
-            sendTime: sendTime,
-            content: content
-        }
-    })
-}
+
+
 
 export function getActivityAllMessageBoard(activityId) {
     return request({

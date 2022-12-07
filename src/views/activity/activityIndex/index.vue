@@ -363,7 +363,7 @@ export default {
         const tagIDs = [];
         let i = 0;
         for (i; i < this.checkboxGroup1.length; i++) {
-          tagIDs.push(this.checkboxGroup1[i].tagID + 1);
+          tagIDs.push(this.checkboxGroup1[i].tagID);
         }
         getActByTag(tagIDs).then((res) => {
           const acts = [];

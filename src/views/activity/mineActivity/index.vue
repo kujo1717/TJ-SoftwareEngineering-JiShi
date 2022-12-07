@@ -1,13 +1,13 @@
 <template>
   <div class="ma_view">
-    <el-radio-group
+    <!-- <el-radio-group
       class="ma_view_redios"
       v-model="ActivityOrTemplate"
       @input="radio_input_change"
     >
       <el-radio-button label="activity">活动</el-radio-button>
       <el-radio-button label="template">模板</el-radio-button>
-    </el-radio-group>
+    </el-radio-group> -->
 
     <div class="ma_activity_page" v-if="ActivityOrTemplate === 'activity'">
       <div class="ma_sort_find_box">
@@ -190,7 +190,7 @@ export default {
   data() {
     return {
       //tab 值
-      ActivityOrTemplate: "",
+      ActivityOrTemplate: "activity",
       activity_tab: "create",
 
       //活动data

@@ -4,7 +4,7 @@
       <el-tab-pane label="活动概览" name="overview">
         <ActivityPageOverView></ActivityPageOverView
       ></el-tab-pane>
-      <el-tab-pane label="讨论" name="chat">
+      <el-tab-pane label="讨论" name="chat" v-if="is_member">
         <el-row>
           <el-col :span="16">
             <el-card class="card-item">
@@ -25,6 +25,7 @@
 import ActivityPageOverView from "./overview.vue";
 import Forum from "@/components/forum/index.vue";
 import BigChatBox from "@/components/BigChatBox/index.vue";
+import { getIsMember } from "@/api/activity";
 export default {
   name: "ActivityPage",
   components: { ActivityPageOverView, BigChatBox, Forum },
@@ -32,12 +33,44 @@ export default {
     return {
       activeName: "overview",
       activity_id: -1,
+      is_member: false,
     };
   },
-  methods: {},
-  mounted() {
+  methods: {
+    // 用户是不是这个活动的参与者
+    async Get_isMember() {
+      console.log("this.activity_id:", this.activity_id);
+      await getIsMember(this.user_id, this.activity_id)
+        .then((res) => {
+          console.log("IsMember:res:", res);
+          this.is_member = res.data.is_member;
+        })
+        .catch((err) => {
+          console.log("IsMember:err:", err);
+        });
+    },
+  },
+  async mounted() {
     this.activity_id = this.$route.query.id;
+    await this.Get_isMember();
+
     console.log("activityPage:index:this.activity_id:", this.activity_id);
+  },
+
+  computed: {
+    /**
+     * 用户个人信息
+     */
+    user_id: {
+      get: function () {
+        return this.$store.getters.id;
+      },
+    },
+    user_name: {
+      get: function () {
+        return this.$store.getters.name;
+      },
+    },
   },
 };
 </script>

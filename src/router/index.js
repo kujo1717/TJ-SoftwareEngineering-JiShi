@@ -71,7 +71,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'calendarView',
         component: () => import('@/views/calendarView/index'),
-        meta: { title: '日程', icon: 'form' }
+        meta: { title: '日程', icon: 'schedule' }
       }
     ],
   },
@@ -84,24 +84,12 @@ export const constantRoutes = [
         path: 'index',
         name: 'viewList',
         component: () => import('@/views/viewList/index'),
-        meta: { title: '视图', icon: 'form' }
+        meta: { title: '视图', icon: 'viewlist' }
       }
     ],
   },
 
-  {
-    path: '/viewLog',
-    component: Layout,
-    hidden: true,
-    children: [
-      {
-        path: 'logview',
-        name: 'viewLog',
-        component: () => import('@/views/logviewing/logview'),
-        meta: { title: '日志查看#待删除', icon: 'form' }
-      }
-    ]
-  },
+
   {
     path: '/dataReport',
     component: Layout,
@@ -110,7 +98,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'DataReport',
         component: () => import('@/views/dataReport/index'),
-        meta: { title: '数据分析', icon: 'form' }
+        meta: { title: '数据分析', icon: 'dataanalysis' }
       }
     ],
   },
@@ -122,9 +110,47 @@ export const constantRoutes = [
         path: 'index',
         name: 'Dustbin',
         component: () => import('@/views/dustbin/index'),
-        meta: { title: '回收站', icon: 'form' }
+        meta: { title: '回收站', icon: 'trashbin' }
       }
     ],
+  },
+  {
+    path: '/activity',
+    component: Layout,
+    children: [
+      {
+        path: 'activityIndex',
+        name: 'ActivityIndex',
+        component: () => import('@/views/activity/activityIndex'),
+        meta: { title: '活动广场', icon: 'activityindex' }
+      }
+    ],
+  },
+
+  {
+    path: '/activity',
+    component: Layout,
+    children: [
+      {
+        path: 'mineActivity',
+        name: 'MineActivity',
+        component: () => import('@/views/activity/mineActivity'),
+        meta: { title: '我的活动', icon: 'activity' }
+      }
+    ],
+  },
+  {
+    path: '/activity',
+    component: Layout,
+    children: [
+      {
+        path: 'activityPage',
+        name: 'ActivityPage',
+        component: () => import('@/views/activity/activityPage'),
+        meta: { title: '活动页面', icon: 'activity' }
+      }
+    ],
+    hidden: true,
   },
   {
     path: '/message',
@@ -134,102 +160,12 @@ export const constantRoutes = [
         path: 'index',
         name: 'message',
         component: () => import('@/views/message/index'),
-        meta: { title: '消息', icon: 'form' }
+        meta: { title: '消息', icon: 'message' }
       }
     ],
   },
-  {
-    path: '/activity',
-    component: Layout,
-    redirect: '/activity/activityIndex',
-    name: 'Activity',
-    meta: {
-      title: '活动',
-      icon: 'nested'
-    },
-    children: [
-      {
-        path: 'activityIndex',
-        component: () => import('@/views/activity/activityIndex'),
-        name: 'ActivityIndex',
-        meta: { title: '活动广场' },
-      },
-      {
-        path: 'mineActivity',
-        component: () => import('@/views/activity/mineActivity'),
-        name: 'MineActivity',
-        meta: { title: '我的活动' },
-      },
-      {
-        path: 'activityPage',
-        hidden: true,
-        component: () => import('@/views/activity/activityPage'),
-        name: 'ActivityPage',
-        meta: { title: '测试用活动页面' },
-      },
-      {
-        path: 'template',
-        name: 'TemplateView',
-        hidden: true,
-        component: () => import('@/views/activity/mineActivity/template'),
-        meta: { title: '我的模板', icon: 'form' }
-      },
-
-    ],
-  },
-
-  {
-    path: '/projects',
-    component: Layout,
-    redirect: '/projects/project1',
-    name: 'Projects',
-    hidden: true,
-    meta: {
-      title: '项目#待删除',
-      icon: 'nested'
-    },
-    children: [
-      {
-        path: 'myproject',
-        component: () => import('@/views/projects/MyProject'),
-        name: '我的项目',
-        meta: { title: '我的项目' },
-      },
-      {
-        path: 'project1',
-        component: () => import('@/views/projects/project1'),
-        name: 'project1',
-        meta: { title: '测试用静态项目页面' },
-      }
-    ],
-  },
-  {
-    path: '/teamspace',
-    component: Layout,
-    redirect: '/teamspace/team1',
-    name: 'TeamSpace',
-    hidden: true,
-    meta: {
-      title: '团队',
-      icon: 'nested'
-    },
-    children: [
-      {
-        path: '团队1',
-        component: () => import('@/views/teamspace/team1'),
-        name: '团队1',
-        meta: { title: '团队1' },
-      },
-      {
-        path: '团队2',
-        component: () => import('@/views/teamspace/team2'),
-        name: '团队2',
-        meta: { title: '团队2' },
-      },
 
 
-    ],
-  },
   {
     path: '/user',
     component: Layout,
@@ -241,34 +177,9 @@ export const constantRoutes = [
         meta: { title: 'User', icon: 'user' }
       }
     ],
-    hidden: true
+    // hidden: true
   },
-  {
-    path: '/testAmap',
-    component: Layout,
-    children: [
-      {
-        path: 'testAmap',
-        name: 'testAmap',
-        component: () => import('@/views/testAmap/index'),
-        meta: { title: 'testAmap', icon: 'user' }
-      }
-    ],
 
-  },
-  {
-    path: '/activityAround',
-    component: Layout,
-    children: [
-      {
-        path: 'activityAround',
-        name: 'ActivityAround',
-        component: () => import('@/views/testAmap/activityAround'),
-        meta: { title: 'activityAround', icon: 'user' }
-      }
-    ],
-
-  },
 
 
   // 404 page must be placed at the end !!!
