@@ -127,9 +127,8 @@ const actions = {
         commit('SET_AVATAR', avatar)
         commit('SET_AGE', age)
         commit('SET_INTRODUCE',introduce)
-        commit('SET_ID',id)
         commit('SET_EMAIL',email)
-
+        commit('SET_ID',id)
         resolve(data)
       }).catch(error => {
         reject(error)
