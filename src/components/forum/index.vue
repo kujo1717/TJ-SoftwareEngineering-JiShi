@@ -3,7 +3,7 @@
     <div style="display: flex; justify-content: center">
       <span style="font-size: 16px">留言板</span>
     </div>
-    <div class="form-item" :key="componentsKey">
+    <div class="form-item">
       <el-timeline style="margin-right: 80px">
         <el-timeline-item
           v-for="item in all_message_boards"
@@ -42,10 +42,12 @@ export default {
   components: {},
   data() {
     return {
+      // 活动Id
       activityId: null,
+      // 留言板中消息
       all_message_boards: [],
+      // 留言板输入框中的内容
       message: "",
-      componentsKey:0,
     };
   },
   mounted() {
@@ -56,6 +58,7 @@ export default {
         this.all_message_boards = res.data;
         console.log("留言板中的所有信息为:", this.all_message_boards);
         this.all_message_boards.forEach((element) => {
+          // 将Date格式化
           element.createTime = this.formatDate(element.createTime);
           console.log(element.createTime);
         });
@@ -65,6 +68,7 @@ export default {
       });
   },
   methods: {
+    // 格式化Date方法
     formatDate(time, format = "YY-MM-DD hh:mm:ss") {
       var date = new Date(time);
 
@@ -87,6 +91,7 @@ export default {
 
       return newTime;
     },
+    // 发送留言
     send() {
       sendMessageBoard(
         this.activityId,
@@ -96,6 +101,7 @@ export default {
       )
         .then((res) => {
           console.log(res);
+          // 重新获取数据
           getActivityAllMessageBoard(this.activityId)
           .then((res) => {
             this.all_message_boards = res.data;
@@ -104,7 +110,6 @@ export default {
               element.createTime = this.formatDate(element.createTime);
               console.log(element.createTime);
             });
-            this.componentsKey++;
           })
         })
         .catch((err) => {

@@ -1,12 +1,10 @@
 <script>
-import EmojiData from "@/assets/emoji";
 import py from "pinyin";
 import {
   getActivityAllPaticipant,
   getActivityAllMessage,
   sendMessage,
 } from "@/api/chat";
-import messages from "@/assets/messages";
 export default {
   name: "QqImui",
   components: {},
@@ -26,15 +24,6 @@ export default {
       len: false,
     };
   },
-  // props: {
-  //   activityId: {
-  //     type: Number,
-  //     required: true,
-  //     default: () => {
-  //       return -1;
-  //     },
-  //   },
-  // },
   render() {
     return (
       <div class="contain">
@@ -149,14 +138,13 @@ export default {
     websocket.onclose = function (event) {
       console.log("连接关闭");
     };
-    websocket.onmessage = event => {
+    websocket.onmessage = (event) => {
       console.log("收到消息");
       //将字符串转为JSON对象
       var message = JSON.parse(event.data);
-      if(message.fromUser.id!=this.userId){
+      if (message.fromUser.id != this.userId) {
         IMUI.appendMessage(message, true);
       }
-      
     };
     websocket.onerror = function (event) {
       console.log("websocket通信发生错误");
@@ -183,19 +171,14 @@ export default {
         console.log(err);
       });
   },
-  // updated() {
-  //   // var showContent = $(".lemon-messages");
-    
-  //   console.log("div", div);
-  //   div.scrollTop = div.scrollHeight;
-  // },
   methods: {
+    // 计时器
     clearTimer() {
       if (this.timer) {
         clearTimeout(this.timer);
       }
     },
-
+    // 查找群成员
     searchMember() {
       this.clearTimer();
       if (this.keyword && this.keyword.length > 0) {
@@ -213,7 +196,7 @@ export default {
         }
       }
     },
-
+    // 筛选群成员
     filterMember() {
       // 如果关键词为空，则返回所有数据
       if (this.keyword === "") {
@@ -244,29 +227,7 @@ export default {
       });
       return results;
     },
-
-    openDrawer(position) {
-      const IMUI = this.$refs.IMUI;
-      const params = {
-        position,
-        render: (contact) => {
-          return (
-            <div style="padding:15px">
-              <h5>{contact.displayName}</h5>
-              <button on-click={IMUI.closeDrawer}>关闭抽屉</button>
-            </div>
-          );
-        },
-      };
-      if (position == "center") {
-        params.width = "50%";
-        params.height = "50%";
-      } else if (position == "rightInside") {
-        params.height = "90%";
-        params.offsetY = "10%";
-      }
-      IMUI.openDrawer(params);
-    },
+    // 拉取聊天室中的消息
     async handlePullMessages(contact, next) {
       const IMUI = this.$refs.IMUI;
       await getActivityAllMessage(this.activityId)
@@ -284,6 +245,7 @@ export default {
       console.log("所有的聊天信息为", this.messages);
       await next(this.messages, true);
     },
+    // 发送消息
     handleSend(message, next, file) {
       console.log("要发送的信息是:", message);
       console.log("文件为", file);
@@ -303,7 +265,7 @@ export default {
             next();
           })
           .catch((err) => {
-            // console.log(err);
+            console.log(err);
             next({ status: "failed" });
           });
       } else {
@@ -361,9 +323,7 @@ export default {
 .lemon-sidebar {
   display: none;
 }
-// .lemon-messages {
-//   overflow: auto;
-//   display: flex;
-//   flex-direction: column-reverse;
-// }
+.lemon-editor__tool-item{
+  display: none;
+}
 </style>
