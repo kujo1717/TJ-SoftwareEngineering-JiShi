@@ -96,7 +96,6 @@ public class ActivityServiceImpl implements ActivityService{
          * */
         this.ActivityHitNumPlus(activity_id);
         Activity act=activityMapper.selectById(activity_id);
-
         System.out.println("public Activity getAct(Long activity_id)"+act);
         return act;
     }

@@ -9,8 +9,8 @@ import java.util.List;
 
 @Service
 public interface DustbinService {
-    Result<List<DustbinTask>> findAllDustbinTask();
+    Result<List<DustbinTask>> findAllDustbinTask(Long userId);
     Result<String> smashOneRubbish(Long id);
-    Result<String> clearDustbin();
+    Result<String> clearDustbin(Long userId);
     Result<String> restoreOneRubbish(Long id);
 }

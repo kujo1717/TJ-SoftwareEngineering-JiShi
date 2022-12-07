@@ -1,22 +1,15 @@
 package com.example.backend.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.api.R;
-import com.example.backend.common.DateUtil;
+import com.example.backend.Tools.DateTimeUtil;
 import com.example.backend.common.Result;
 import com.example.backend.entity.Task;
-import com.example.backend.entity.User;
-import com.example.backend.mapper.RelativeMapper;
 import com.example.backend.mapper.TaskMapper;
-import com.example.backend.mapper.UserMapper;
 import com.example.backend.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,7 +40,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<Task> findTaskByMonth(Long userId, int year, int month) throws ParseException {
-        int daysOfMonth = DateUtil.getDayNumOfMonth(year, month);
+        int daysOfMonth = DateTimeUtil.getDayNumOfMonth(year, month);
         List<Task> taskList = taskMapper.selectByMonth(userId, year, month, daysOfMonth);
         return taskList;
     }
@@ -114,15 +107,18 @@ public class TaskServiceImpl implements TaskService {
                 okIdList.add(t.getTaskId());
             }
             //把相同的taskId进行合并，就是合并它们的relativeTask
-            else if(t.getRelativeTask() != null && t.getRelativeTask().size() != 0)
+            //短路运算
+            else if(currentTask != null && t.getRelativeTask() != null && t.getRelativeTask().size() != 0)
                 currentTask.addOneRelativeTask(t.getRelativeTask().get(0));
         }
 
-        if (currentTask.getRelativeTask() != null) {
+        //短路运算
+        if (currentTask != null && currentTask.getRelativeTask() != null) {
             if (currentTask.getRelativeTask().size() != 0) {
                 //不应该返回已被删除的子事项
                 for (int i = currentTask.getRelativeTask().size() - 1; i >= 0; i--) {
-                    if (!currentTask.getRelativeTask().get(i).getIsInDustbin().equals("0")) {
+                    //短路运算
+                    if (currentTask != null && !currentTask.getRelativeTask().get(i).getIsInDustbin().equals("0")) {
                         currentTask.getRelativeTask().remove(i);
                     }
                 }
@@ -133,16 +129,18 @@ public class TaskServiceImpl implements TaskService {
             taskListResult.add(currentTask);
         return taskListResult;
 
-
     }
 
     @Override
     public Long insertOneNewTask(Task task) {
         task.setIsInDustbin("0");
-        task.setCreateTime(DateUtil.getCurrentTimestamp());
+        task.setCreateTime(DateTimeUtil.getCurrentTimestamp());
         //如果post的事项没有填入分组，则自动归入默认分组
-        if(task.getClassificationTitle() == null)
+        if(task.getClassificationTitle() == null || task.getClassificationTitle().equals(""))
             task.setClassificationTitle("默认分组");
+        //如果post的事项没有填入tag，则置为“无”
+        if(task.getTag() == null || task.getTag().equals(""))
+            task.setTag("无");
         Long newID = Long.valueOf(taskMapper.insert(task));
 
         return newID;
@@ -162,28 +160,29 @@ public class TaskServiceImpl implements TaskService {
         //1: 如果之前没完成，更新后完成了：更新真实完成时间，并把所有孩子也完成了
         if(oldTask.getTaskState() == 0 && task.getTaskState() != 0) {
             //更新真实完成时间
-            task.setRealFinishTime(DateUtil.getCurrentTimestamp());
+            task.setRealFinishTime(DateTimeUtil.getCurrentTimestamp());
 
-            //完成所有孩子（递归）
-            for(Task sonTask : task.getRelativeTask()){
-                //如果及时完成
-                if(DateUtil.getCurrentTimestamp().before(sonTask.getEndTime()))
-                    sonTask.setTaskState((short) 1);
-                //如果没有及时完成
-                else{
-                    sonTask.setTaskState((short) 2);
+            if(task.getRelativeTask() != null) {
+                //完成所有孩子（递归）
+                for (Task sonTask : task.getRelativeTask()) {
+                    //如果及时完成
+                    if (DateTimeUtil.getCurrentTimestamp().before(sonTask.getEndTime()))
+                        sonTask.setTaskState((short) 1);
+                        //如果没有及时完成
+                    else {
+                        sonTask.setTaskState((short) 2);
+                    }
+
+                    //递归更新子事项
+                    patchOneTask(sonTask);
                 }
-
-                //递归更新子事项
-                patchOneTask(sonTask);
             }
         }
 
         //2: 如果之前完成了，更新后没完成，删掉真实完成时间
-        if(oldTask.getTaskState() != 0 && task.getTaskState() == 0)
-            task.setRelativeTask(null);
+        else if(oldTask.getTaskState() != 0 && task.getTaskState() == 0)
+            task.setRealFinishTime(null);
 
-        System.out.println(task);
         int resultCount = taskMapper.updateById(task);
         if(resultCount == 0)
             return Result.fail(500,"更新数据失败！");
