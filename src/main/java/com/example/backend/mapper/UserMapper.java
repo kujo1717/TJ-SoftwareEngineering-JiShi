@@ -25,4 +25,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     @Select("select * from user")
     List<User> selectAllUser();
+    
+    @Update("UPDATE user SET password='${pwd}' WHERE email='${email}'")
+    int updateUserPwd(@Param("pwd")String pwd,@Param("email") String email);
 }
