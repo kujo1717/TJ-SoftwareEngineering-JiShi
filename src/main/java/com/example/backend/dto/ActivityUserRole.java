@@ -22,4 +22,7 @@ public class ActivityUserRole {
     private Boolean is_creator;
     private Boolean is_applicant;
 
+    private Boolean is_member;
+
+
 }

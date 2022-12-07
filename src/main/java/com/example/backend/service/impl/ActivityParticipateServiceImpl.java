@@ -1,5 +1,6 @@
 package com.example.backend.service.impl;
-
+import com.example.backend.dto.ActivityUserRole;
+import com.example.backend.entity.Activity;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.backend.entity.ActivityApply;
 import com.example.backend.entity.ActivityParticipate;
@@ -64,5 +65,25 @@ public class ActivityParticipateServiceImpl implements ActivityParticipateServic
         List<Map<String,Object>> list=new ArrayList<>();
         list=activityParticipateMapper.SelectActApplicantList(activity_id);
         return list;
+    }
+    @Override
+    public ActivityUserRole isMember(Long user_id, Long activity_id) {
+        ActivityUserRole role=new ActivityUserRole();
+        role.setActivity_id(activity_id);
+        role.setUser_id(user_id);
+
+        QueryWrapper<ActivityParticipate> queryWrapper=new QueryWrapper<>();
+        queryWrapper
+                .eq("user_id",user_id)
+                .eq("activity_id",activity_id);
+        Integer count=activityParticipateMapper.selectCount(queryWrapper);
+        role.setIs_member(count==1?true:false);
+        return role;
+
+    }
+
+    @Override
+    public List<Long> FindOneUserAllActivityId(Long user_id) {
+        return activityParticipateMapper.SelectOneUserAllActivityId(user_id);
     }
 }

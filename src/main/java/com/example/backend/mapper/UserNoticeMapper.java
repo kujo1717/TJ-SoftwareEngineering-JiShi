@@ -20,4 +20,7 @@ public interface UserNoticeMapper {
 
     @Update("UPDATE user_notice set status=1 WHERE user_id=${userId} AND notice_id=${noticeId}")
     int updateNoticeStatus(@Param("userId") Long userId,@Param("noticeId")Long noticeId);
+
+    @Update("INSERT into user_notice (user_id,notice_id,status) values(#{userId},#{noticeId},#{status})")
+    int insertUserNotice(UserNotice userNotice);
 }

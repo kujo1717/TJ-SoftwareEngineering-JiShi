@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,6 +30,12 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     @Autowired
     JavaMailSenderImpl mailSender;
+
+    @Override
+    public List<User> findAllUser() {
+        return userMapper.selectAllUser();
+    }
+
     public User findUser(Long id){
         User user = userMapper.selectById(id);//利用mybatis-plus的单表查询，自己不用写SQL语句
         //没有找到用户，返回错误码

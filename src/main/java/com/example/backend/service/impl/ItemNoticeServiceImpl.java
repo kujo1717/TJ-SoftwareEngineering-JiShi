@@ -19,6 +19,11 @@ public class ItemNoticeServiceImpl implements ItemNoticeService {
     ItemNoticeMapper itemNoticeMapper;
 
     @Override
+    public int addItemNotice(ItemNotice itemNotice) {
+        return itemNoticeMapper.insertItemNotice(itemNotice);
+    }
+
+    @Override
     public List<ItemNotice> findItemNotice(Long userId) {
         return itemNoticeMapper.selectItemNotice(userId);
     }

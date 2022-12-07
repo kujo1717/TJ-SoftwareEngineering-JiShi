@@ -22,4 +22,9 @@ public class NoticeServiceImpl implements NoticeService {
     public Notice getNoticeById(Long noticeId) {
         return noticeMapper.selectNoticeById(noticeId);
     }
+
+    @Override
+    public int addNotice(Notice notice) {
+        return noticeMapper.insertNotice(notice);
+    }
 }

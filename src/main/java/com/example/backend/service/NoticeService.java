@@ -13,4 +13,5 @@ import java.util.List;
 @Service
 public interface NoticeService {
     Notice getNoticeById(Long noticeId);
+    int addNotice(Notice notice);
 }

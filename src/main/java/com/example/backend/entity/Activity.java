@@ -99,8 +99,5 @@ public class Activity {
     @TableField( "images")
     private String images;
 
-
-
-
-
+    private int isRemind;
 }

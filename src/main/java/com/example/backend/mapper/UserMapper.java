@@ -6,6 +6,8 @@ import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.User;
 import org.apache.ibatis.annotations.*;
 
+import java.util.List;
+
 /**
  * @Author hym
  * @Date 2022/10/29
@@ -13,6 +15,9 @@ import org.apache.ibatis.annotations.*;
  */
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
+
+    @Select("select * from user")
+    List<User> selectAllUser();
     @Select("select * from user where email = '${email}' ")
     User selectByEmail(@Param("email") String email);
     @Insert("insert into user (name,email,password) VALUES ('${name}','${email}','${password}')")

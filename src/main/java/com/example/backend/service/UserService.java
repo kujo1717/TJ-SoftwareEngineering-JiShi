@@ -6,6 +6,7 @@ import com.example.backend.entity.User;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
+import java.util.List;
 
 /**
  * @Author hym
@@ -14,6 +15,9 @@ import javax.mail.MessagingException;
  */
 @Service
 public interface UserService {
+
+    List<User> findAllUser();
+
     User findUser(Long id);
     Result<String> confirmUser(String email, String password);
     Result<String> registerUser(String email,String password,String name);

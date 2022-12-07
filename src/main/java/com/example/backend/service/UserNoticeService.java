@@ -15,4 +15,6 @@ public interface UserNoticeService {
     List<UserNotice> findOneUserAllNotice(Long userId);
 
     int modifyNoticeStatus(Long userId, Long noticeId);
+
+    int addUserNotice(UserNotice userNotice);
 }

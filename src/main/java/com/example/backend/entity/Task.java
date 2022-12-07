@@ -49,6 +49,7 @@ public class Task {
     @TableField(exist = false)
     private List<Task> relativeTask;
 
+    private int isRemind;
 
     public void addOneRelativeTask(Task task)
     {

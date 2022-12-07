@@ -1,10 +1,8 @@
 package com.example.backend.mapper;
 
 import com.example.backend.entity.ItemNotice;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import com.example.backend.entity.Notice;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -20,4 +18,8 @@ public interface ItemNoticeMapper {
 
     @Update("UPDATE item_notice set status=1 WHERE item_notice_id=${itemNoticeId}")
     int modifyItemNoticeStatus(@Param("itemNoticeId")Long itemNoticeId);
+
+    @Insert("INSERT into item_notice (item_notice_id,user_id,title,content,create_time,item_id,status) values(#{itemNoticeId},#{userId},#{title},#{content},#{createTime},#{itemId},#{status})")
+    @Options(useGeneratedKeys = true, keyProperty = "itemNoticeId", keyColumn = "item_notice_id")
+    int insertItemNotice(ItemNotice itemNotice);
 }

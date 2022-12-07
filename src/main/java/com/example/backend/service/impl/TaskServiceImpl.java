@@ -1,22 +1,15 @@
 package com.example.backend.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.api.R;
 import com.example.backend.common.DateUtil;
 import com.example.backend.common.Result;
 import com.example.backend.entity.Task;
-import com.example.backend.entity.User;
-import com.example.backend.mapper.RelativeMapper;
 import com.example.backend.mapper.TaskMapper;
-import com.example.backend.mapper.UserMapper;
 import com.example.backend.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -59,6 +52,13 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public List<Task> findAllTask() {
+        List<Task> taskList = taskMapper.selectList(null);
+        return taskList;
+    }
+
+
+    @Override
     public Task findOneTaskAndRelative(Long task_id)
     {
         //因为做了join，一个task_id会对应好几项，所以这里用的是List
@@ -97,6 +97,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public int modifyTaskStatus(Long taskId, int status) {
+        return taskMapper.updateTaskRemind(taskId, status);
+    }
+
+    @Override
     public List<Task> findAllTaskAndRelative(Long userId) {
 
         List<Task> taskList = taskMapper.selectAllTaskAndRelative(userId);
@@ -118,7 +123,7 @@ public class TaskServiceImpl implements TaskService {
                 currentTask.addOneRelativeTask(t.getRelativeTask().get(0));
         }
 
-        if (currentTask.getRelativeTask() != null) {
+        if (currentTask != null && currentTask.getRelativeTask() != null) {
             if (currentTask.getRelativeTask().size() != 0) {
                 //不应该返回已被删除的子事项
                 for (int i = currentTask.getRelativeTask().size() - 1; i >= 0; i--) {
