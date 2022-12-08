@@ -4,7 +4,9 @@ import com.example.backend.common.Result;
 import com.example.backend.entity.DustbinTask;
 import com.example.backend.entity.Task;
 import com.example.backend.mapper.DustbinMapper;
+import com.example.backend.mapper.RelativeMapper;
 import com.example.backend.service.DustbinService;
+import com.example.backend.service.RelativeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,9 @@ import java.util.List;
 public class DustbinServiceImpl implements DustbinService {
     @Autowired
     DustbinMapper dustbinMapper;
+
+    @Autowired
+    RelativeMapper relativeMapper;
 
     @Override
     public Result<List<DustbinTask>> findAllDustbinTask(Long userId) {
@@ -44,6 +49,14 @@ public class DustbinServiceImpl implements DustbinService {
 
     @Override
     public Result<String> smashOneRubbish(Long id) {
+        //先删除子事项
+        List<Long> sonTaskIdList = relativeMapper.selectAllSonTaskId(id);
+        if(sonTaskIdList.size() > 0){
+            for(Long sonId : sonTaskIdList){
+                dustbinMapper.deleteById(sonId);
+            }
+        }
+
         int resultCount = dustbinMapper.deleteById(id);
         if(resultCount == 0)
             return Result.fail(500,"删除垃圾失败！");
@@ -52,9 +65,23 @@ public class DustbinServiceImpl implements DustbinService {
 
     @Override
     public Result<String> clearDustbin(Long userId) {
-        int resultCount = dustbinMapper.deleteAllRubbish(userId);
-        if(resultCount == 0)
-            return Result.fail(500,"清空回收站失败！");
+        List<DustbinTask> rubbishTaskList = dustbinMapper.selectAllRubbish(userId);
+        if(rubbishTaskList.size() > 0){
+            for(DustbinTask t : rubbishTaskList){
+                Long fatherId = t.getTaskId();
+                //先删除子事项
+                List<Long> sonTaskIdList = relativeMapper.selectAllSonTaskId(fatherId);
+                if(sonTaskIdList.size() > 0){
+                    for(Long sonId : sonTaskIdList){
+                        dustbinMapper.deleteById(sonId);
+                    }
+                }
+                int resultCount = dustbinMapper.deleteById(fatherId);
+                if(resultCount == 0)
+                    return Result.fail(500,"删除垃圾失败！");
+            }
+        }
+
         return Result.success("清空回收站成功！");
     }
 
