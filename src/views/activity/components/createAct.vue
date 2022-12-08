@@ -546,8 +546,9 @@ export default {
                     if (this.newact_form.file_formData) {
                       this.newact_form.file_formData.append(
                         "folderPath",
-                        "/activity/illus/" + res.data.activity_id + "/"
+                        "/activity/illus"
                       );
+                      // res.data.activity_id + "-"
 
                       this.newact_form.file_formData.append(
                         "entity",

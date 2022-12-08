@@ -1,31 +1,53 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">{{date}}</div>
-    <div class="dashboard-box" style="width:100%" direction="vertical">
+    <el-card style="width: 100%">
+      <div class="dashboard-text">{{ date }}</div>
+      <div class="dashboard-box" style="width: 100%" direction="vertical">
+        <div style="font-size: 20px">
+          {{ welcome }}!{{ name }}! 欢迎使用济时系统!
+        </div>
+        <div style="font-size: 15px">下面一些内容将帮助您快速开始:</div>
 
-      <div style="font-size: 20px;">{{welcome}}!{{name}}! 欢迎使用济时系统!</div>
-      <div style="font-size:15px;">下面一些内容将帮助您快速开始:</div>
-      <div class="dashboard-boxinsidehor">
-        <div class="dashboard-boxinsidever" >
-          <div >新手上路</div>
-          <el-button type="success" style="margin-top: 20px;" @click.native.prevent="userForm">完善个人信息</el-button>
-        </div>
-        <div class="dashboard-boxinsidever" >
-          <div >日程管理</div>
-          <el-link type="primary" icon="el-icon-date">编辑</el-link>
-          <el-link type="primary" icon="el-icon-date">查看</el-link>
-        </div>
-        <div class="dashboard-boxinsidever">
-          <div>事项管理</div>
-          <el-link type="primary" icon="el-icon-date">编辑</el-link>
-        </div>
-        <div class="dashboard-boxinsidever">
-          <div>团队管理</div>
-          <el-link type="primary" icon="el-icon-date">编辑</el-link>
+        <div class="dashboard-boxinsidehor">
+          <div class="dashboard-boxinsidever">
+            <div>新手上路</div>
+            <el-button
+              type="primary"
+              style="margin-top: 20px"
+              @click.native.prevent="userForm"
+              >完善个人信息</el-button
+            >
+          </div>
+          <div class="dashboard-boxinsidever">
+            <div>日程管理</div>
+            <el-link
+              type="primary"
+              icon="el-icon-date"
+              @click="routerPush('calendarView')"
+              >查看</el-link
+            >
+          </div>
+          <div class="dashboard-boxinsidever">
+            <div>事项管理</div>
+            <el-link
+              type="primary"
+              icon="el-icon-date"
+              @click="routerPush('viewList')"
+              >编辑</el-link
+            >
+          </div>
+          <div class="dashboard-boxinsidever">
+            <div>活动管理</div>
+            <el-link
+              type="primary"
+              icon="el-icon-date"
+              @click="routerPush('MineActivity')"
+              >编辑</el-link
+            >
+          </div>
         </div>
       </div>
-    </div>
-    <div class="dashboard-box" style="width:50%">
+      <!-- <div class="dashboard-box" style="width:50%">
       <div>个人日程</div>
       <hr width="100%"></hr>
     </div>
@@ -36,7 +58,8 @@
     <div class="dashboard-box" style="width:50%">
       <div>信息通知</div>
       <hr></hr>
-    </div>
+    </div> -->
+    </el-card>
   </div>
 </template>
 
@@ -63,6 +86,10 @@ export default {
       this.$router.push({ path: this.redirect || "/user/index" });
       this.loading = false;
     },
+    /* router push  */
+    routerPush(name) {
+      this.$router.push({ name: name });
+    },
   },
 };
 </script>
@@ -80,7 +107,7 @@ export default {
     line-height: 46px;
   }
   &-box {
-    border-style: groove;
+    // border-style: groove;
     height: auto;
     margin-top: 20px;
     padding: 20px;

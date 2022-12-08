@@ -59,9 +59,9 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: '首页', icon: 'dashboard' }
     }],
-    hidden: true
+    hidden: false
   },
   {
     path: '/calendarView',
@@ -174,7 +174,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'User',
         component: () => import('@/views/user/index'),
-        meta: { title: 'User', icon: 'user' }
+        meta: { title: '用户', icon: 'user' }
       }
     ],
     // hidden: true

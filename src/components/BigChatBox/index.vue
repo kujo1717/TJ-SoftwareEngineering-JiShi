@@ -126,7 +126,9 @@ export default {
     var websocket = null;
     if ("WebSocket" in window) {
       websocket = new WebSocket(
-        "ws://localhost:8081/api/webSocket?activityId=" + this.activityId
+        // "ws://localhost:8081/api/webSocket?activityId=" + this.activityId
+        // "ws://42.192.45.95:8081/api/webSocket?activityId=" + this.activityId
+        "ws://"+process.env.VUE_APP_BASE_IP_PORT+"/api/webSocket?activityId="+this.activityId
       );
     } else {
       alert("该浏览器不支持websocket！");

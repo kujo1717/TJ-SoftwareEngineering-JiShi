@@ -64,9 +64,9 @@
           @click.native.prevent="handleLogin"
           >登录</el-button
         >
-        <el-button type="primary" @click="HelloWorldAPI"
+        <!-- <el-button type="primary" @click="HelloWorldAPI"
           >HelloWorldAPI</el-button
-        >
+        > -->
       </div>
 
       <!-- <div class="tips">

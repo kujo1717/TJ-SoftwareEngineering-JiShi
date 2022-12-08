@@ -237,7 +237,10 @@ export default {
         let image_path = image_paths[i];
         /**直接通过url访问图片 */
         if (image_path.length > 0) {
-          image_url = "http://localhost:8081/api" + image_path;
+
+
+          image_url = process.env.VUE_APP_BASE_API+"/api"+image_path;
+
           console.log("image_url iiii", image_url);
           break;
         }

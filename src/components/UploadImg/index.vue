@@ -20,9 +20,9 @@
     <el-dialog :visible.sync="dialogVisible" top="2vh" append-to-body>
       <img width="100%" :src="dialogImageUrl" alt="" />
     </el-dialog>
-    <el-button @click="UploadFileList"
+    <!-- <el-button @click="UploadFileList"
       >子组件内按钮：确认上传图片list</el-button
-    >
+    > -->
   </div>
 </template>
 

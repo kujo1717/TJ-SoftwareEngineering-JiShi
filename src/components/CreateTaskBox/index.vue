@@ -196,10 +196,10 @@ export default {
       createForm_rules: {
         taskTitle: [
           { required: true, message: "请输入事项名称", trigger: "blur" },
-          { max: 10, message: "事项名称最多不超过10个字符", trigger: "blur" },
+          { max: 30, message: "事项名称最多不超过30个字符", trigger: "blur" },
         ],
         taskDetail: [
-          { max: 50, message: "事项详述最多不超过50个字符", trigger: "blur" },
+          { max: 200, message: "事项详述最多不超过200个字符", trigger: "blur" },
         ],
       },
     };
