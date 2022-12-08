@@ -170,31 +170,31 @@ export default {
     ShowDetails(index) {
       console.log(index);
       if(this.tab_name=="sys"){
-        this.check_info = this.system_infos[0];
+        this.check_info = this.system_infos[index];
       }
       else if(this.tab_name=="act"){
-        this.check_info = this.activity_infos[0];
+        this.check_info = this.activity_infos[index];
       }
       else if(this.tab_name=="item"){
-        this.check_info = this.item_infos[0];
+        this.check_info = this.item_infos[index];
       }
       this.dialogVisible = true;
       // 更新消息状态
       if(this.check_info.status == 0){
         if(this.tab_name == "sys"){
-          this.system_infos[0].status = 1;
+          this.system_infos[index].status = 1;
           this.sys_unread_num--;
-          modifyNoticeStatus(this.user_id, this.system_infos[0].noticeId);
+          modifyNoticeStatus(this.user_id, this.system_infos[index].noticeId);
         }
         else if(this.tab_name == "act"){
-          this.activity_infos[0].status = 1;
+          this.activity_infos[index].status = 1;
           this.act_unread_num--;
-          modifyNoticeStatus(this.user_id, this.activity_infos[0].noticeId);
+          modifyNoticeStatus(this.user_id, this.activity_infos[index].noticeId);
         }
         else if(this.tab_name == "item"){
-          this.item_infos[0].status = 1;
+          this.item_infos[index].status = 1;
           this.item_unread_num--;
-          modifyItemNoticeStatus(this.user_id, this.item_infos[0].itemNoticeId);
+          modifyItemNoticeStatus(this.item_infos[index].itemNoticeId);
         }
       }
     },

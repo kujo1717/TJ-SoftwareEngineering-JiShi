@@ -347,7 +347,7 @@ export default {
           showShadow: false,
           visible: false, // 初始是否显示
           address: item.address,
-          title: item.title_name,
+          title_name: item.title_name,
           activity_id: item.activity_id,
         });
       });
