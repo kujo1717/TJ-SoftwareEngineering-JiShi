@@ -84,7 +84,7 @@ public class DataAnalysisController {
             Map<Integer, Integer> oneMonthNewCreateNumMap = new HashMap<>();
             for(int day=1; day<=dayNumOfMonth; day++)
             {
-                List<Task> oneDayTaskList = taskService.selectOneDayFinishedTaskList(userId, year, month, day);
+                List<Task> oneDayTaskList = taskService.selectOneDayCreatedTaskList(userId, year, month, day);
                 int createdNumOfOneDay = oneDayTaskList.size();
                 oneMonthNewCreateNumMap.put(day, createdNumOfOneDay);
             }

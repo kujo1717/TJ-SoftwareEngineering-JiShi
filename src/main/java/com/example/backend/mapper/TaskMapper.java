@@ -20,11 +20,11 @@ public interface TaskMapper extends BaseMapper<Task> {
     List<Task> selectByMonth(@Param("userId") Long userId, @Param("year") int year, @Param("month") int month, @Param("daysOfMonth") int daysOfMonth);
 
     //查询某一天完成的事项
-    @Select("SELECT * FROM task WHERE user_id=${userId} AND real_finish_time like ('${year}-${month}-${day}%') AND is_in_dustbin='0'")
+    @Select("SELECT * FROM task WHERE user_id=${userId} AND real_finish_time like ('${year}-${month}-${day}%') AND is_in_dustbin='0' AND is_parent=1")
     List<Task> selectOneDayFinishedTaskList(@Param("userId") Long userId, @Param("year") int year, @Param("month") int month, @Param("day") String day);
 
     //查询某一天新建的事项
-    @Select("SELECT * FROM task WHERE user_id=${userId} AND create_time like ('${year}-${month}-${day}%') AND is_in_dustbin='0'")
+    @Select("SELECT * FROM task WHERE user_id=${userId} AND create_time like ('${year}-${month}-${day}%') AND is_in_dustbin='0' AND is_parent=1")
     List<Task> selectOneDayCreatedTaskList(@Param("userId") Long userId, @Param("year") int year, @Param("month") int month, @Param("day") String day);
 
     @Select("SELECT * FROM task LEFT OUTER JOIN relativetask using(task_id) WHERE task_id=${id} AND is_in_dustbin='0'")
@@ -69,7 +69,7 @@ public interface TaskMapper extends BaseMapper<Task> {
     )
     List<Task> selectAllTaskAndRelative(@Param("userId") Long userId);
 
-    @Select("SELECT * FROM task WHERE user_id=${userId} AND classification_title='${classificationTitle}'")
+    @Select("SELECT * FROM task WHERE user_id=${userId} AND classification_title='${classificationTitle}' AND is_in_dustbin='0' AND is_parent=1")
     List<Task> selectOneUserOneSortAllTask(@Param("userId") Long userId, @Param("classificationTitle") String classificationTitle);
 
 
