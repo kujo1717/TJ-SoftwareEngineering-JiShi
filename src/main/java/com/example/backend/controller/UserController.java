@@ -36,34 +36,39 @@ public class UserController {
     @Autowired
     JavaMailSenderImpl mailSender;
     JwtUtil jwtUtil;
+
     @ApiOperation("根据id返回指定用户")
     @GetMapping("")
-    public Result<User> findUser(){
+    public Result<User> findUser() {
         //System.out.println(jwtUtil.getUserId(request.getHeader("token")));
         Long userid = Long.valueOf(jwtUtil.getUserId(request.getHeader("token")));
         return Result.success(userService.findUser(userid));
     }
+
     @GetMapping("logout")
-    public Result<String> logout(){
+    public Result<String> logout() {
         return Result.success("success");
     }
+
     @PostMapping("login")
-    public Result<String> login(@RequestBody User user){
+    public Result<String> login(@RequestBody User user) {
         //System.out.println("111");
-        return userService.confirmUser(user.getEmail(),user.getPassword());
+        return userService.confirmUser(user.getEmail(), user.getPassword());
     }
+
     @GetMapping("email")
-    public Result<String> email(@RequestParam("user")String user, @RequestParam("code")String code){
+    public Result<String> email(@RequestParam("user") String user, @RequestParam("code") String code) {
 
         Base64.Decoder decoder = Base64.getDecoder();
-        String str=new String(decoder.decode(code));
+        String str = new String(decoder.decode(code));
         String[] strings = str.split("/");
-        if (Long.valueOf(strings[2])-System.currentTimeMillis()>60*60*24){
-            return Result.fail(10001,"验证超时了!");
+        if (Long.valueOf(strings[2]) - System.currentTimeMillis() > 60 * 60 * 24) {
+            return Result.fail(10001, "验证超时了!");
         }
-        return userService.registerUser(user,strings[1],strings[0]);
+        return userService.registerUser(user, strings[1], strings[0]);
 
     }
+
     @PostMapping("register")
     public Result<String> register(@RequestBody User user) throws MessagingException {
 
@@ -71,24 +76,36 @@ public class UserController {
         return userService.email(user);
         //return userService.registerUser(user.getEmail(),user.getPassword(),user.getName());
     }
+
     @PutMapping("")
     @ResponseBody
-    public Result<User> updateUser( UserDTO user){
+    public Result<User> updateUser(UserDTO user) {
         Long userid = Long.valueOf(jwtUtil.getUserId(request.getHeader("token")));
         String imgUrl;
         System.out.println(user);
         ApplicationHome applicationHome = new ApplicationHome(this.getClass());
-        String path = applicationHome.getDir().getParentFile()
-                .getParentFile().getAbsolutePath() + "\\src\\main\\resources\\static";
-        if (user.getAvatarFile()!=null) {
+//        String path = applicationHome.getDir().getParentFile()
+//                .getParentFile().getAbsolutePath() + "\\src\\main\\resources\\static";
+
+        String path =
+                System.getProperty("file.separator") +
+                        "file" +
+                        System.getProperty("file.separator") +
+                        "user" +
+                        System.getProperty("file.separator") +
+                        "avatar" ;
+        if (user.getAvatarFile() != null) {
 
             var file = user.getAvatarFile();
-            String fileName = UUID.randomUUID() + "." + file.getContentType()
+//            String fileName = UUID.randomUUID() + "." + file.getContentType()
+//                    .substring(file.getContentType().lastIndexOf("/") + 1);
+
+            String fileName = userid.toString()+"." + file.getContentType()
                     .substring(file.getContentType().lastIndexOf("/") + 1);
             try {
                 // 获取保存路径
-
-                File files = new File(path+'/'+userid, fileName);
+//                File files = new File(path + System.getProperty("file.separator") + userid, fileName);
+                File files = new File(path, fileName);
                 File parentFile = files.getParentFile();
                 if (!parentFile.exists()) {
                     parentFile.mkdir();
@@ -97,12 +114,14 @@ public class UserController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            imgUrl="http://localhost:8081/api/static/"+userid+"/"+fileName;
-        }
-        else {
-            imgUrl="http://localhost:8081/api/static/th.jpg";
+//            imgUrl = "http://localhost:8081/api/static/" + userid + "/" + fileName;
+            imgUrl="http://42.192.45.95:8081/api/user/avatar/"+fileName;
+
+        } else {
+            imgUrl="http://42.192.45.95:8081/api/user/avatar.jpg";
+
         }
         //System.out.println(imgUrl);
-        return userService.putUser(userid,user.getName(),user.getIntroduce(),user.getAge(),imgUrl);
+        return userService.putUser(userid, user.getName(), user.getIntroduce(), user.getAge(), imgUrl);
     }
 }

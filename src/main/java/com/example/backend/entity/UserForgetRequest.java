@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("userForgetRequest")
+@TableName("user_forget_request")
 public class UserForgetRequest {
     @TableId(type = IdType.ASSIGN_ID)
     private String id;

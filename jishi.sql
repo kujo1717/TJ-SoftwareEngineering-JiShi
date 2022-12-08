@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 07/12/2022 20:45:34
+ Date: 08/12/2022 08:50:31
 */
 
 SET NAMES utf8mb4;
@@ -150,19 +150,17 @@ CREATE TABLE `activity_tag`  (
 DROP TABLE IF EXISTS `classification`;
 CREATE TABLE `classification`  (
   `classification_title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `user_id` int(0) NOT NULL,
+  `user_id` bigint(0) NOT NULL,
   `create_time` datetime(0) NULL DEFAULT NULL,
-  PRIMARY KEY (`classification_title`, `user_id`) USING BTREE
+  PRIMARY KEY (`classification_title`, `user_id`) USING BTREE,
+  INDEX `classification_title`(`classification_title`) USING BTREE,
+  INDEX `classification_ibfk_1`(`user_id`) USING BTREE,
+  CONSTRAINT `classification_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of classification
 -- ----------------------------
-INSERT INTO `classification` VALUES ('c1', 1, '2022-11-23 19:15:36');
-INSERT INTO `classification` VALUES ('c2', 1, '2022-11-23 20:05:56');
-INSERT INTO `classification` VALUES ('c3', 1, '2022-11-23 20:09:57');
-INSERT INTO `classification` VALUES ('默认分组', 1, '2022-11-24 22:06:15');
-INSERT INTO `classification` VALUES ('默认分组', 2, '2022-12-07 09:45:42');
 
 -- ----------------------------
 -- Table structure for item_notice
@@ -177,7 +175,7 @@ CREATE TABLE `item_notice`  (
   `item_id` bigint(0) NULL DEFAULT NULL COMMENT '事项ID',
   `status` tinyint(0) NULL DEFAULT NULL COMMENT '1为已读，0为未读',
   PRIMARY KEY (`item_notice_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of item_notice
@@ -202,7 +200,7 @@ CREATE TABLE `message`  (
   `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '消息内容，如果为image则为URL地址',
   `file_id` bigint(0) NULL DEFAULT NULL COMMENT '消息对应的文件ID',
   PRIMARY KEY (`message_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 43 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 54 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of message
@@ -235,7 +233,7 @@ CREATE TABLE `message_board`  (
   `content` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '留言内容',
   `create_time` datetime(0) NULL DEFAULT NULL COMMENT '留言时间',
   PRIMARY KEY (`message_board_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of message_board
@@ -269,7 +267,7 @@ CREATE TABLE `notice`  (
   `create_time` datetime(0) NULL DEFAULT NULL,
   `type` tinyint(0) NULL DEFAULT NULL COMMENT '1为系统通知，2为活动通知\r\n',
   PRIMARY KEY (`notice_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of notice
@@ -311,14 +309,15 @@ DROP TABLE IF EXISTS `relativetask`;
 CREATE TABLE `relativetask`  (
   `task_id` bigint(0) NOT NULL,
   `relative_task_id` bigint(0) NOT NULL,
-  PRIMARY KEY (`task_id`, `relative_task_id`) USING BTREE
+  PRIMARY KEY (`task_id`, `relative_task_id`) USING BTREE,
+  INDEX `relative_task_id`(`relative_task_id`) USING BTREE,
+  CONSTRAINT `relativetask_ibfk_1` FOREIGN KEY (`task_id`) REFERENCES `task` (`task_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `relativetask_ibfk_2` FOREIGN KEY (`relative_task_id`) REFERENCES `task` (`task_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of relativetask
 -- ----------------------------
-INSERT INTO `relativetask` VALUES (1597049239446257666, 1597115538444771330);
-INSERT INTO `relativetask` VALUES (1597049239446257666, 1597116493529649153);
 
 -- ----------------------------
 -- Table structure for tag
@@ -357,19 +356,16 @@ CREATE TABLE `task`  (
   `tag` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `create_time` datetime(0) NULL DEFAULT NULL,
   `is_remind` tinyint(0) NOT NULL,
-  PRIMARY KEY (`task_id`) USING BTREE
+  PRIMARY KEY (`task_id`) USING BTREE,
+  INDEX `task_ibfk_1`(`classification_title`) USING BTREE,
+  INDEX `task_ibfk_2`(`user_id`) USING BTREE,
+  CONSTRAINT `task_ibfk_1` FOREIGN KEY (`classification_title`) REFERENCES `classification` (`classification_title`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `task_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of task
 -- ----------------------------
-INSERT INTO `task` VALUES (1597049239446257666, '父事项', '', '0', '', 1, '2022-12-07 13:00:00', '2022-11-17 00:00:00', 1, '0', 1, NULL, NULL, '2022-11-29 10:44:33', 2);
-INSERT INTO `task` VALUES (1597793663394557953, '6', '', '0', '', 0, '2022-11-10 00:00:00', '2022-11-11 00:00:00', 1, '0', 1, NULL, NULL, '1970-01-20 15:49:39', 0);
-INSERT INTO `task` VALUES (1597794384445829121, '7', '', '0', '', 0, '2022-11-11 00:00:00', '2022-11-12 00:00:00', 1, '2022-11-30T03:27:36.325Z', 1, NULL, NULL, '1970-01-20 15:49:39', 0);
-INSERT INTO `task` VALUES (1597794824507891713, '5', '', '0', '', 0, '2022-11-09 00:00:00', '2022-11-10 00:00:00', 1, '0', 1, NULL, NULL, '1970-01-20 15:49:39', 0);
-INSERT INTO `task` VALUES (1597795136580898817, '9', '', '0', '', 0, '2022-11-17 00:00:00', '2022-11-18 00:00:00', 1, '0', 1, NULL, NULL, '1970-01-20 15:49:39', 0);
-INSERT INTO `task` VALUES (1600351476016771074, '时间测试', '时间测试', '0', '默认分组', 0, '2022-12-07 13:00:00', '2022-12-07 00:00:00', 1, '0', 1, NULL, '无', '2022-12-07 12:48:20', 2);
-INSERT INTO `task` VALUES (1600351795803090946, 'test', '', '0', '默认分组', 0, '2022-12-07 13:00:00', '2022-12-08 00:00:00', 1, '0', 1, NULL, '无', '2022-12-07 12:49:36', 2);
 
 -- ----------------------------
 -- Table structure for user
@@ -384,7 +380,7 @@ CREATE TABLE `user`  (
   `introduce` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   `avatar` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'http://localhost:8081/api/static/th.jpg' COMMENT '头像',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1147 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 111 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user

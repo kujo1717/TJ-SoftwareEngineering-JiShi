@@ -29,7 +29,8 @@ import java.util.*;
 public class FileController {
     @Autowired
     ActivityService activityService;
-    public static String BASE_FOLDER = "D:/Upload";
+//    public static String BASE_FOLDER = "D:/Upload";
+    public static String BASE_FOLDER = "/file";
 
     @ApiOperation("上传图片集")
     @PostMapping("/postImgList")
@@ -52,7 +53,7 @@ public class FileController {
             //for every file
             for (MultipartFile multipartFile : uploadFile) {
                 //map for one file
-                String file_name = multipartFile.getOriginalFilename();
+                String file_name = id.toString()+"-"+multipartFile.getOriginalFilename();
                 Map<String, Object> file_map = new HashMap<>();
                 file_map.put("name", file_name);
 
@@ -99,7 +100,7 @@ public class FileController {
                 for (Map<String, Object> file_map:file_list){
                     String name=(String) file_map.get("name");
 
-                    String one_imge="/activity/illus/"+id.toString()+"/"+name;
+                    String one_imge="/activity/illus/"+name;
                     images=images+":"+one_imge;
                 }
                 activityService.PatchActImages(images,id);
