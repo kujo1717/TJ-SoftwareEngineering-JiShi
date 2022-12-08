@@ -730,13 +730,14 @@ export default {
               if (taskInfo.familyMembers != null && taskInfo.familyMembers != []) {
                 //获取familyMembers
                 for (let item of taskInfo.familyMembers) {
+                  let _sonTaskState = this.getFrontendState(item.taskState, item.startTime, item.endTime);
                   item['id'] = item['taskId'];
                   item['taskTitle'] = item['taskTitle']
                   item['taskDetail'] = item['taskDetail']
                   //获取isdone
-                  item['isdone'] = _taskState.indexOf("完成") >= 0 ? true : false;
+                  item['isdone'] = _sonTaskState.indexOf("完成") >= 0 ? true : false;
                   //获取taskState
-                  item['taskState'] = this.getFrontendState(item.taskState, item.startTime, item.endTime);
+                  item['taskState'] = _sonTaskState
                   item['classificationTitle'] = item['classificationTitle']
                   //获取priority
                   switch (item.priority) {
