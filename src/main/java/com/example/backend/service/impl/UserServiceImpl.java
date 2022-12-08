@@ -90,7 +90,8 @@ public class UserServiceImpl implements UserService {
 
             helper.setSubject("济时:请验证您的邮箱");
 
-            helper.setText("尊敬的" + user.getName() + "您好！\n" + "请点击下方链接验证您的邮箱:\n" + "        http://localhost:8081/api/user/email?user=" + user.getEmail() + "&code=" + code);
+//            helper.setText("尊敬的" + user.getName() + "您好！\n" + "请点击下方链接验证您的邮箱:\n" + "        http://localhost:8081/api/user/email?user=" + user.getEmail() + "&code=" + code);
+            helper.setText("尊敬的" + user.getName() + "您好！\n" + "请点击下方链接验证您的邮箱:\n" + "        http://42.192.45.95:8081/api/user/email?user=" + user.getEmail() + "&code=" + code);
             helper.setTo(user.getEmail());
             helper.setFrom("417695971@qq.com");
         } catch (MessagingException e) {

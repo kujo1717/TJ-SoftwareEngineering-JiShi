@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 08/12/2022 08:50:31
+ Date: 08/12/2022 09:59:15
 */
 
 SET NAMES utf8mb4;
@@ -71,22 +71,6 @@ CREATE TABLE `activity_apply`  (
 
 -- ----------------------------
 -- Records of activity_apply
--- ----------------------------
-
--- ----------------------------
--- Table structure for activity_invite
--- ----------------------------
-DROP TABLE IF EXISTS `activity_invite`;
-CREATE TABLE `activity_invite`  (
-  `activity_id` bigint(0) NOT NULL,
-  `invitee_id` bigint(0) NOT NULL,
-  `state` tinyint(1) NULL DEFAULT NULL,
-  `invite_time` datetime(0) NULL DEFAULT NULL,
-  PRIMARY KEY (`activity_id`, `invitee_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of activity_invite
 -- ----------------------------
 
 -- ----------------------------
@@ -378,7 +362,7 @@ CREATE TABLE `user`  (
   `email` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '邮箱',
   `age` int(0) NULL DEFAULT NULL,
   `introduce` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
-  `avatar` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'http://localhost:8081/api/static/th.jpg' COMMENT '头像',
+  `avatar` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'http://42.192.45.95:8081/api/user/avatar.jpg' COMMENT '头像',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 111 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
