@@ -54,7 +54,8 @@ public class UserForgetRequestServiceImpl implements UserForgetRequestService {
             helper.setTo(user.getEmail());
             helper.setFrom("417695971@qq.com");
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+//            throw new RuntimeException(e);
         }
         mailSender.send(mimeMessage);
         return Result.success(re);

@@ -142,7 +142,7 @@ public class SendNoticeUtil {
             }
             if (task_num > 0) {
                 System.out.println("发送事项通知");
-                Notice notice = new Notice(formatDay(Now) + "事项提醒", "您今天有" + Integer.toString(task_num) + "项要完成的事项哦，请注意及时参加", Now, 2);
+                Notice notice = new Notice(formatDay(Now) + "事项提醒", "您今天有" + Integer.toString(task_num) + "项要完成的事项哦，请注意及时参加", Now, 1);
                 noticeService.addNotice(notice);
                 UserNotice userNotice = new UserNotice(user.getId(), notice.getNoticeId(), 0);
                 userNoticeService.addUserNotice(userNotice);
@@ -221,5 +221,10 @@ public class SendNoticeUtil {
             }
         }
     }
+
+
+
+
+
 
 }

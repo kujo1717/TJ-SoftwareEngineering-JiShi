@@ -18,6 +18,7 @@ public class UserForgetRequestController {
     @PostMapping("forget")
     public Result<UserForgetRequest> forget(@RequestBody UserForgetRequest userForgetRequest)
     {
+//        System.out.println("@PostMapping(\"forget\")");
         return userForgetRequestService.forgetRequest(userForgetRequest);
     }
     @PutMapping("forget")

@@ -16,12 +16,16 @@ import java.util.List;
 @Service
 public interface UserService {
     User findUser(Long id);
+
+    User getUserByEmail(String email);
     Result<String> confirmUser(String email, String password);
     Result<String> registerUser(String email,String password,String name);
     Result<User> putUser(Long id,String name,String introduce,int age,String imgUrl);
     Result<String> email(User user);
 
     List<User> findAllUser();
+
+
 
 
     }

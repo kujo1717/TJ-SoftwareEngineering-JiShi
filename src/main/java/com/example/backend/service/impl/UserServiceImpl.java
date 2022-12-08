@@ -1,6 +1,7 @@
 package com.example.backend.service.impl;
 
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.backend.Tools.JwtUtil;
 import com.example.backend.common.Result;
 import com.example.backend.dto.UserDTO;
@@ -40,7 +41,20 @@ public class UserServiceImpl implements UserService {
         //找到用户，返回正确信息
         return user;
     }
-    public Result<String> confirmUser(String email,String password){
+
+    @Override
+    public User getUserByEmail(String email) {
+        User user = userMapper.selectByEmail(email);
+        //没有找到用户，返回错误码
+        if(user == null){
+            return null;
+        }
+
+        //找到用户，返回正确信息
+        return user;
+    }
+
+    public Result<String> confirmUser(String email, String password){
         User user=userMapper.selectByEmail(email);
         if (user==null){
             return Result.fail(10001,"用户不存在");
@@ -67,7 +81,30 @@ public class UserServiceImpl implements UserService {
         return Result.fail(10001,"验证失败");
     }
     public Result<User> putUser(Long id,String name,String introduce,int age,String imgUrl){
-        int i=userMapper.updateUser(id,name,age,introduce,imgUrl);
+//        int i=userMapper.updateUser(id,name,age,introduce,imgUrl);
+//        Usesr user=userMapper.selectById(id);
+        int i=userMapper.update(
+                null,
+                Wrappers.<User>lambdaUpdate()
+                        .set(User::getName,name)
+                        .set(User::getIntroduce,introduce)
+                        .set(User::getAge,age)
+                        .eq(User::getId,id)
+        );
+        if (imgUrl!=null)
+        {
+            userMapper.update(
+                    null,
+                    Wrappers.<User>lambdaUpdate()
+                            .set(User::getName,name)
+                            .set(User::getIntroduce,introduce)
+                            .set(User::getAge,age)
+                            .set(User::getAvatar,imgUrl)
+                            .eq(User::getId,id)
+            );
+        }
+
+
         if (i>0){
             return Result.success(userMapper.selectById(id));
         }

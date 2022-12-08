@@ -2,9 +2,14 @@ package com.example.backend.controller;
 
 
 import com.example.backend.Tools.JwtUtil;
+import com.example.backend.Tools.SendNoticeUtil;
 import com.example.backend.common.Result;
 import com.example.backend.dto.UserDTO;
+import com.example.backend.entity.Notice;
 import com.example.backend.entity.User;
+import com.example.backend.entity.UserNotice;
+import com.example.backend.service.NoticeService;
+import com.example.backend.service.UserNoticeService;
 import com.example.backend.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,7 +23,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Date;
 import java.util.UUID;
+
+import static com.example.backend.Tools.SendNoticeUtil.formatDay;
 
 /**
  * @Author hym
@@ -29,6 +37,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("user")
 public class UserController {
+
+    @Autowired
+    NoticeService noticeService;
+    @Autowired
+    UserNoticeService userNoticeService;
+
+
     @Autowired
     private UserService userService;
     @Autowired
@@ -50,11 +65,17 @@ public class UserController {
         return Result.success("success");
     }
 
+
     @PostMapping("login")
     public Result<String> login(@RequestBody User user) {
         //System.out.println("111");
+        User user_whole=userService.getUserByEmail(user.getEmail());
+        SendUserNotice(user_whole.getId(),"系统记录","成功登录");
         return userService.confirmUser(user.getEmail(), user.getPassword());
     }
+
+
+
 
     @GetMapping("email")
     public Result<String> email(@RequestParam("user") String user, @RequestParam("code") String code) {
@@ -65,6 +86,7 @@ public class UserController {
         if (Long.valueOf(strings[2]) - System.currentTimeMillis() > 60 * 60 * 24) {
             return Result.fail(10001, "验证超时了!");
         }
+
         return userService.registerUser(user, strings[1], strings[0]);
 
     }
@@ -81,7 +103,7 @@ public class UserController {
     @ResponseBody
     public Result<User> updateUser(UserDTO user) {
         Long userid = Long.valueOf(jwtUtil.getUserId(request.getHeader("token")));
-        String imgUrl;
+        String imgUrl=null;
         System.out.println(user);
         ApplicationHome applicationHome = new ApplicationHome(this.getClass());
 //        String path = applicationHome.getDir().getParentFile()
@@ -117,11 +139,25 @@ public class UserController {
 //            imgUrl = "http://localhost:8081/api/static/" + userid + "/" + fileName;
             imgUrl="http://42.192.45.95:8081/api/user/avatar/"+fileName;
 
-        } else {
-            imgUrl="http://42.192.45.95:8081/api/user/avatar.jpg";
-
         }
         //System.out.println(imgUrl);
         return userService.putUser(userid, user.getName(), user.getIntroduce(), user.getAge(), imgUrl);
+    }
+
+
+
+    /**发送系统通知的接口
+     * */
+    public Integer SendUserNotice(Long user_id,String title,String content)
+    {
+        Integer i;
+
+        // 获取当前的时间
+        var Now = new Date();
+        Notice notice = new Notice(formatDay(Now)+":"+title, content, Now, 1);
+        noticeService.addNotice(notice);
+        UserNotice userNotice = new UserNotice(user_id, notice.getNoticeId(), 0);
+        i=userNoticeService.addUserNotice(userNotice);
+        return i;
     }
 }
