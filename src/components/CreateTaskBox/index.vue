@@ -31,7 +31,7 @@
           <el-input
             v-model="taskInfo.taskTitle"
             placeholder="事项名称"
-            maxlength="10"
+            maxlength="30"
             show-word-limit
           ></el-input>
         </el-form-item>
@@ -45,8 +45,8 @@
             type="textarea"
             placeholder="背景/信息说明"
             v-model="taskInfo.taskDetail"
-            :autosize="{ minRows: 3, maxRows: 5 }"
-            maxlength="30"
+            :autosize="{ minRows: 3, maxRows: 8 }"
+            maxlength="200"
             show-word-limit
           ></el-input>
         </el-form-item>

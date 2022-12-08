@@ -11,14 +11,14 @@ export function login(data) {
 
 export function forget(data){
   return request({
-      url:'/user/forget',
+      url:'/api/user/forget',
       method:'post',
       data
   })
 }
 export function reset(data){
   return request({
-    url:'/user/forget',
+    url:'/api/user/forget',
     method:'put',
     data
   })
