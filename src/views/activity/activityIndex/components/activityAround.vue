@@ -71,7 +71,7 @@
       >
         <el-card id="info-window">
           <div>
-            <p>{{ window.address }}</p>
+            <p>{{ window.title_name }}</p>
             <el-button type="text" @click="ClickActDetail(window.activity_id)"
               >查看详情</el-button
             >
@@ -296,6 +296,7 @@ export default {
               position: [x.longitude, x.latitude],
               address: x.address_name,
               activity_id: x.activity_id,
+              title_name: x.title_name,
             };
           });
         })
@@ -346,6 +347,7 @@ export default {
           showShadow: false,
           visible: false, // 初始是否显示
           address: item.address,
+          title: item.title_name,
           activity_id: item.activity_id,
         });
       });
