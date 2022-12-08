@@ -10,7 +10,7 @@
         <el-container>
           <el-main>
             <div style="display: inline-block">
-              <el-col style="width: 800px; padding-left: 20px">
+              <el-col style="width: 700px; padding-left: 20px">
                 <el-card class="box-card" style="width: 100%">
                   <div
                     slot="header"
@@ -127,7 +127,7 @@
                   </div>
                 </el-card>
               </el-col>
-              <el-col style="width: 500px; padding-left: 50px">
+              <el-col style="width: 400px; padding-left: 50px">
                 <el-card class="box-card" style="width: 100%">
                   <div
                     slot="header"
