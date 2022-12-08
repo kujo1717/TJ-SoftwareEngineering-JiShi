@@ -100,6 +100,7 @@ taskId: Long 事项id
                 <el-select
                   v-model="taskInfo.classificationTitle"
                   :popper-append-to-body="false"
+                  
                 >
 
                   <el-option
@@ -629,10 +630,6 @@ export default {
           cancelButtonText: '放弃修改'
         })
           .then(() => {
-            this.$message({
-              type: 'success',
-              message: '保存修改'
-            });
             this.isSaved = true;
             this.dialogVisible = false;
           })

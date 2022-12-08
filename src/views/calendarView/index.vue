@@ -95,12 +95,11 @@ export default {
           month: "月",
           week: "周",
           day: "日",
-          resourceTimeline: "子任务列表",
         },
         headerToolbar: {
           left: "prev,next today",
           center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay resourceTimeline",
+          right: "dayGridMonth,timeGridWeek,timeGridDay",
         },
         initialView: "dayGridMonth",
         //themeSystem: 'bootstrap5',

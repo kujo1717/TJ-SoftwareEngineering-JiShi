@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import $ from 'jquery'
 
+//引入iconfont
+import '@/assets/css/icon/iconfont.css'
+
 //kanban组件
 import vueKanban from 'vue-kanban'
 Vue.use(vueKanban)

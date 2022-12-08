@@ -1417,15 +1417,6 @@ export default {
       //初始化分页
       this.show_table = this.tableData.slice(0, 10);
       this.query.total = this.tableData.length;//总页数设置
-      console.group("tableData")
-      console.log(this.tableData)
-      console.groupEnd("tableData")
-      console.group("query")
-      console.log(this.query)
-      console.groupEnd("query")
-      console.group("total")
-      console.log(this.query.total)
-      console.groupEnd("total")
       this.loading = false;
     },
 

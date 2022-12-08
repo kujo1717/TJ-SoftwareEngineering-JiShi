@@ -84,6 +84,7 @@ taskId: Long 事项id
                 <el-select
                   v-model="taskInfo.classification"
                   :popper-append-to-body="false"
+                  
                 >
 
                   <el-option
@@ -221,11 +222,11 @@ export default {
         label: '生活'
       }],
       tagList: [{
-        value:'室内',
-        label:'室内'
-      },{
-        value:'户外',
-        label:'户外'
+        value: '室内',
+        label: '室内'
+      }, {
+        value: '户外',
+        label: '户外'
       }],
 
       //日历选择
@@ -303,7 +304,7 @@ export default {
       this.taskInfo.priority = command;
     },
     //确定isdone属性
-    setIsdone () {
+    async setIsdone () {
       this.taskInfo.isdone = this.taskInfo.taskState.indexOf("完成") >= 0;
     },
     timeTrans (time, type) {
@@ -335,6 +336,7 @@ export default {
                 message: "事项删除成功！",
                 type: "success",
               });
+              this.isSaved = true;
               this.dialogVisible = false;
             })
             .catch((err) => {
@@ -344,6 +346,7 @@ export default {
                 message: "事项删除失败！",
                 type: "danger",
               });
+              this.isSaved = true;
               this.dialogVisible = false;
             })
         })
@@ -512,9 +515,9 @@ export default {
       }
     },
     //根据父页面传来的taskId，向后端获取整套数据
-    setFrontendTaskObj (taskId) {
+    async setFrontendTaskObj (taskId) {
       console.log("向后端请求儿子数据！")
-      getTaskById(taskId)
+      await getTaskById(taskId)
         .then((res) => {
           console.log("儿子数据的事项获取成功！", res)
           //然后要把后端拉回来的task对象转换成前端要用的对象
@@ -729,8 +732,9 @@ export default {
       immediate: true
     },
     taskInfo: {
-      handler (newVal) {
+      handler () {
         this.isSaved = false;
+        console.log("子事项：检测到事项信息修改！")
       },
       deep: true,
       immediate: true
@@ -765,16 +769,18 @@ export default {
   },
   mounted: function () {
     console.log("儿子this.taskId")
-    this.setFrontendTaskObj(this.taskId);//接收从父组件传来的事项信息
+
     this.setThisUserAllClassificaitonTitle();//获取该用户的所有分组名称
+    this.setFrontendTaskObj(this.taskId)//接收从父组件传来的事项信息
+      .then(() => {
+        this.dialogVisible = this.taskBoxDialogVisible;
+        this.setIsdone()
+          .then(() => {
+            this.isSaved = true;
+            console.log("isSaved!")
+          })
+      })
 
-
-    this.$nextTick(() => {
-      this.dialogVisible = this.taskBoxDialogVisible;
-      this.setIsdone();
-      this.isSaved = true;
-      console.log("isSaved!")
-    })
 
   }
 }
