@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 08/12/2022 09:59:15
+ Date: 08/12/2022 10:24:28
 */
 
 SET NAMES utf8mb4;
@@ -52,8 +52,6 @@ CREATE TABLE `activity`  (
 -- ----------------------------
 -- Records of activity
 -- ----------------------------
-INSERT INTO `activity` VALUES (1600317207164858370, '123123', NULL, '123123', '2022-12-07 01:02:00', NULL, '2022-12-07 10:32:09', 5, 1, 2, 1, NULL, 1, 0, NULL, 0, '123123', '上海市浦东新区花木街道高科西路2599号', '121.545646', '31.191832', ':/activity/illus/1600317207164858370/2021-10-08 (2).png:/activity/illus/1600317207164858370/2021-10-08 (6).png', 0);
-INSERT INTO `activity` VALUES (1600350112419180546, '222', NULL, '222', '2022-12-07 13:02:00', NULL, '2022-12-07 00:42:54', 2, 1, 2, 1, NULL, 1, 0, NULL, 0, '222', NULL, NULL, NULL, ':/activity/illus/1600350112419180546/2021-10-05.png', 2);
 
 -- ----------------------------
 -- Table structure for activity_apply
@@ -108,8 +106,6 @@ CREATE TABLE `activity_participate`  (
 -- ----------------------------
 -- Records of activity_participate
 -- ----------------------------
-INSERT INTO `activity_participate` VALUES (1600317207164858370, 1);
-INSERT INTO `activity_participate` VALUES (1600350112419180546, 1);
 
 -- ----------------------------
 -- Table structure for activity_tag
@@ -164,11 +160,6 @@ CREATE TABLE `item_notice`  (
 -- ----------------------------
 -- Records of item_notice
 -- ----------------------------
-INSERT INTO `item_notice` VALUES (1, 1, '事项开始提醒111', '您的事项要开始了', '2022-11-28 18:06:20', 1, 1);
-INSERT INTO `item_notice` VALUES (2, 1, '父事项事项开始提醒', '该事项还有一小时就要开始了，请注意及时参加哦', '2022-12-07 12:40:35', 1597049239446257666, 0);
-INSERT INTO `item_notice` VALUES (3, 1, '父事项事项开始提醒', '该事项还有十分钟就要开始了，请注意及时参加哦', '2022-12-07 12:49:00', 1597049239446257666, 0);
-INSERT INTO `item_notice` VALUES (4, 1, '时间测试事项开始提醒', '该事项还有十分钟就要开始了，请注意及时参加哦', '2022-12-07 12:49:05', 1600351476016771074, 0);
-INSERT INTO `item_notice` VALUES (5, 1, 'test事项开始提醒', '该事项还有十分钟就要开始了，请注意及时参加哦', '2022-12-07 12:49:40', 1600351795803090946, 0);
 
 -- ----------------------------
 -- Table structure for message
@@ -189,22 +180,6 @@ CREATE TABLE `message`  (
 -- ----------------------------
 -- Records of message
 -- ----------------------------
-INSERT INTO `message` VALUES (1, 1599231060451835906, 1, 1, 0, 1566047865417, 'test', NULL);
-INSERT INTO `message` VALUES (40, 1599384406513020929, 1, 1, 0, 1670159424087, '123', NULL);
-INSERT INTO `message` VALUES (41, 1599384406513020929, 2, 1, 0, 1670159438437, '222', NULL);
-INSERT INTO `message` VALUES (42, 1599384406513020929, 1, 1, 0, 1670159455175, '111\n\n', NULL);
-INSERT INTO `message` VALUES (43, 1599996338710360066, 1, 1, 0, 1670334409307, '123', NULL);
-INSERT INTO `message` VALUES (44, 1599996338710360066, 2, 1, 0, 1670334454611, 'yy2', NULL);
-INSERT INTO `message` VALUES (45, 1599996338710360066, 2, 1, 0, 1670334479563, 'yy22\n\n', NULL);
-INSERT INTO `message` VALUES (46, 1599996338710360066, 2, 1, 0, 1670334659363, '222', NULL);
-INSERT INTO `message` VALUES (47, 1599996338710360066, 1, 1, 0, 1670334666779, '111\n\n', NULL);
-INSERT INTO `message` VALUES (48, 1599996338710360066, 1, 1, 0, 1670334683707, '1', NULL);
-INSERT INTO `message` VALUES (49, 1600130693369806850, 1, 1, 0, 1670335937229, '123', NULL);
-INSERT INTO `message` VALUES (50, 1600130693369806850, 2, 1, 0, 1670335948611, '333', NULL);
-INSERT INTO `message` VALUES (51, 1600130693369806850, 1, 1, 0, 1670338691923, '1', NULL);
-INSERT INTO `message` VALUES (52, 1600130693369806850, 2, 1, 0, 1670338726707, '222', NULL);
-INSERT INTO `message` VALUES (53, 1600130693369806850, 1, 1, 0, 1670338736491, '111', NULL);
-INSERT INTO `message` VALUES (54, 1600303714969612290, 2, 1, 0, 1670378171041, 'yy2', NULL);
 
 -- ----------------------------
 -- Table structure for message_board
@@ -222,22 +197,6 @@ CREATE TABLE `message_board`  (
 -- ----------------------------
 -- Records of message_board
 -- ----------------------------
-INSERT INTO `message_board` VALUES (1, 1599384406513020929, 1, '大家别忘记来参加活动', '2022-12-06 11:10:42');
-INSERT INTO `message_board` VALUES (2, 1599384406513020929, 1, '时间为12月8日', '2022-12-06 11:12:27');
-INSERT INTO `message_board` VALUES (3, 1599384406513020929, 1, '1', '2022-11-17 00:00:00');
-INSERT INTO `message_board` VALUES (4, 1599384406513020929, 1, 'test', '2022-12-06 20:05:41');
-INSERT INTO `message_board` VALUES (5, 1599384406513020929, 1, '111', '2022-12-06 21:07:35');
-INSERT INTO `message_board` VALUES (6, 1599384406513020929, 1, 'qweqw\n', '2022-12-06 21:08:12');
-INSERT INTO `message_board` VALUES (7, 1599384406513020929, 1, '111', '2022-12-06 21:09:28');
-INSERT INTO `message_board` VALUES (8, 1599384406513020929, 1, 'qqqq', '2022-12-06 21:10:44');
-INSERT INTO `message_board` VALUES (9, 1599384406513020929, 1, 'qqqq', '2022-12-06 21:10:54');
-INSERT INTO `message_board` VALUES (10, 1599384406513020929, 1, 'wewew', '2022-12-06 21:11:02');
-INSERT INTO `message_board` VALUES (11, 1599384406513020929, 1, 'qweqweq', '2022-12-06 21:11:23');
-INSERT INTO `message_board` VALUES (12, 1599384406513020929, 1, 'asdadasd', '2022-12-06 21:11:44');
-INSERT INTO `message_board` VALUES (13, 1599384406513020929, 1, 'wqeq', '2022-12-06 21:13:02');
-INSERT INTO `message_board` VALUES (14, 1599384406513020929, 1, 'test\n', '2022-12-06 21:13:44');
-INSERT INTO `message_board` VALUES (15, 1600130693369806850, 1, 'google check', '2022-12-06 22:12:57');
-INSERT INTO `message_board` VALUES (16, 1600130693369806850, 2, '111', '2022-12-06 22:59:38');
 
 -- ----------------------------
 -- Table structure for notice
@@ -256,12 +215,6 @@ CREATE TABLE `notice`  (
 -- ----------------------------
 -- Records of notice
 -- ----------------------------
-INSERT INTO `notice` VALUES (1, NULL, '您的账号被勒索了', 'All your data was backed up from your server. You need to email us at rambler+2vdlm@onionmail.org to recover your data. If you dont contact us we will reach the General Data Protection Regulation, GDPR,\r\nand notify them that you store user data in an open form that is not safe. Under the rules of the law, you face a heavy fine or arrest and your database dump will be deleted from our server forever!', '2022-11-28 11:09:22', 1);
-INSERT INTO `notice` VALUES (2, 1, '活动开始提醒', '您的活动要开始了，请安排好您的时间', '2022-11-28 16:38:48', 2);
-INSERT INTO `notice` VALUES (3, 1600317207164858370, '123123活动开始提醒', '该活动还有一小时就要开始了，请注意及时参加哦', '2022-12-07 12:39:10', 2);
-INSERT INTO `notice` VALUES (4, 1600350112419180546, '222活动开始提醒', '该活动还有一小时就要开始了，请注意及时参加哦', '2022-12-07 12:47:35', 2);
-INSERT INTO `notice` VALUES (5, 1600317207164858370, '123123活动开始提醒', '该活动还有十分钟就要开始了，请注意及时参加哦', '2022-12-07 12:51:00', 2);
-INSERT INTO `notice` VALUES (6, 1600350112419180546, '222活动开始提醒', '该活动还有十分钟就要开始了，请注意及时参加哦', '2022-12-07 12:51:00', 2);
 
 -- ----------------------------
 -- Table structure for poll
@@ -279,12 +232,6 @@ CREATE TABLE `poll`  (
 -- ----------------------------
 -- Records of poll
 -- ----------------------------
-INSERT INTO `poll` VALUES (1599385924670713857, 1599384406513020929, '\"user_id\"', '2022-12-04 20:51:34', 0);
-INSERT INTO `poll` VALUES (1599387527733702657, 1599384406513020929, '\"http://localhost:9528/#/activity/activityPage?id=1599384406513020929\"', '2022-12-04 20:57:56', 0);
-INSERT INTO `poll` VALUES (1599962268185919489, 1599956939733733377, '\"GetImgUrl\"', '2022-12-06 11:01:45', 0);
-INSERT INTO `poll` VALUES (1599962979116253186, 1599962780151054337, '\"POLL1\"', '2022-12-06 11:04:35', 0);
-INSERT INTO `poll` VALUES (1600304111083876353, 1600303714969612290, '\"activity_id\"', '2022-12-07 09:40:07', 0);
-INSERT INTO `poll` VALUES (1600307925945970690, 1600303714969612290, '\"poll\"', '2022-12-07 09:55:16', 0);
 
 -- ----------------------------
 -- Table structure for relativetask
@@ -319,6 +266,15 @@ CREATE TABLE `tag`  (
 -- ----------------------------
 INSERT INTO `tag` VALUES (1, '学习', 0);
 INSERT INTO `tag` VALUES (2, '工作', 0);
+INSERT INTO `tag` VALUES (3, '户外', 0);
+INSERT INTO `tag` VALUES (4, '室内', 0);
+INSERT INTO `tag` VALUES (5, '运动', 0);
+INSERT INTO `tag` VALUES (6, '娱乐', 0);
+INSERT INTO `tag` VALUES (7, '游戏', 0);
+INSERT INTO `tag` VALUES (8, '开黑', 0);
+INSERT INTO `tag` VALUES (9, '技术', 0);
+INSERT INTO `tag` VALUES (10, '艺术', 0);
+INSERT INTO `tag` VALUES (11, '专业', 0);
 
 -- ----------------------------
 -- Table structure for task
@@ -369,9 +325,6 @@ CREATE TABLE `user`  (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1, 'yy1', 'yy657826', '657826973@qq.com', 0, 'undefined', 'http://localhost:8081/api/static/th.jpg');
-INSERT INTO `user` VALUES (2, 'yy2', 'yy657826', 'm13958790203@163.com', NULL, NULL, 'http://localhost:8081/api/static/th.jpg');
-INSERT INTO `user` VALUES (111, '111', '111', '111', 111, '111', 'http://localhost:8081/api/static/th.jpg');
 
 -- ----------------------------
 -- Table structure for user_forget_request
@@ -401,12 +354,6 @@ CREATE TABLE `user_notice`  (
 -- ----------------------------
 -- Records of user_notice
 -- ----------------------------
-INSERT INTO `user_notice` VALUES (1, 1, 1);
-INSERT INTO `user_notice` VALUES (1, 2, 1);
-INSERT INTO `user_notice` VALUES (1, 3, 0);
-INSERT INTO `user_notice` VALUES (1, 4, 0);
-INSERT INTO `user_notice` VALUES (1, 5, 0);
-INSERT INTO `user_notice` VALUES (1, 6, 0);
 
 -- ----------------------------
 -- Table structure for vote
@@ -421,11 +368,6 @@ CREATE TABLE `vote`  (
 -- ----------------------------
 -- Records of vote
 -- ----------------------------
-INSERT INTO `vote` VALUES (1, 1599962268206891009);
-INSERT INTO `vote` VALUES (1, 1600304111150985219);
-INSERT INTO `vote` VALUES (1, 1600307925945970692);
-INSERT INTO `vote` VALUES (2, 1600304111150985218);
-INSERT INTO `vote` VALUES (2, 1600307925945970692);
 
 -- ----------------------------
 -- Table structure for vote_option
@@ -442,17 +384,5 @@ CREATE TABLE `vote_option`  (
 -- ----------------------------
 -- Records of vote_option
 -- ----------------------------
-INSERT INTO `vote_option` VALUES (1599385924670713858, 'user_id', 1599385924670713857, 3);
-INSERT INTO `vote_option` VALUES (1599385924670713859, 'user_id', 1599385924670713857, 4);
-INSERT INTO `vote_option` VALUES (1599387527800811522, 'http://localhost:9528/#/activity/activityPage?id=1599384406513020929', 1599387527733702657, 0);
-INSERT INTO `vote_option` VALUES (1599387527800811523, 'http://localhost:9528/#/activity/activityPage?id=1599384406513020929', 1599387527733702657, 0);
-INSERT INTO `vote_option` VALUES (1599962268206891009, 'GetImgUrl', 1599962268185919489, 1);
-INSERT INTO `vote_option` VALUES (1599962268206891010, 'GetImgUrl', 1599962268185919489, 0);
-INSERT INTO `vote_option` VALUES (1599962979116253187, 'OPTION1', 1599962979116253186, 0);
-INSERT INTO `vote_option` VALUES (1599962979116253188, 'OPTION2', 1599962979116253186, 0);
-INSERT INTO `vote_option` VALUES (1600304111150985218, 'activity_id', 1600304111083876353, 2);
-INSERT INTO `vote_option` VALUES (1600304111150985219, 'activity_22222', 1600304111083876353, 1);
-INSERT INTO `vote_option` VALUES (1600307925945970691, '1', 1600307925945970690, 0);
-INSERT INTO `vote_option` VALUES (1600307925945970692, '2', 1600307925945970690, 2);
 
 SET FOREIGN_KEY_CHECKS = 1;
