@@ -208,7 +208,7 @@
             </template>
           </el-table-column>
 
-          <!-- 事项完成时间Col,endTime -->
+          <!-- 事项结束时间Col,endTime -->
           <el-table-column
             :label="head_data_common_dict['endTime'].label"
             class-name="taskDoneTime_col"
@@ -351,6 +351,7 @@ import { getAllTaskAndRelative, patchOneTask } from '@/api/task.js'
 import TaskBox from '@/components/TaskBox'
 import ExportButton from './ExportButton'
 import draggable from "vuedraggable";
+import moment from "moment";
 export default {
   name: "tablelist",
   components: { draggable, TaskBox, ExportButton },
@@ -456,7 +457,7 @@ export default {
         //我的完成时间
         {
           key: "realFinishTime",
-          width: "150rem",
+          width: "200rem",
           isShow: true,
           label: "我的完成时间",
           prio: 10,
@@ -1059,7 +1060,8 @@ export default {
               isdone: this.getFrontendState(val.taskState).indexOf("完成") >= 0 ? true : false,
               childrenNum: 0,
               showChildren: false,
-              isParent: val.isParent
+              isParent: val.isParent,
+              realFinishTime: this.GMTToStr(val.realFinishTime),
             })
           })
 
@@ -1139,6 +1141,9 @@ export default {
      * 改变勾选框勾选状态
      */
     onTaskDoneRadioChange (model) {
+      console.group("勾选框行为！")
+      console.log(model)
+      console.groupEnd("勾选框行为！");
       model.isdone = !model.isdone;
 
       let _currentBackendState = 0;
@@ -1160,11 +1165,13 @@ export default {
         .then((res) => {
           console.group("backendRes")
           console.log(res);
-          onsole.groupEnd("backendRes")
+          console.groupEnd("backendRes")
 
           //改变前端页面
           //通过isdone来获取state
+          
           if (model.isdone) {
+            
             if (new Date() > new Date(model.endTime) && model.endTime != null && model.endTime != "无") {
               model.state_val = '延期完成';
               this.$message({
@@ -1179,6 +1186,16 @@ export default {
                 type: "success",
               });
             }
+
+            console.group("断点")
+          console.log("断点")
+          console.groupEnd("断点")
+
+            //前端记录我的完成时间
+            model.realFinishTime = moment().format('YYYY-MM-DD HH:mm:ss');
+            console.group("time")
+            console.log(model.realFinishTime)
+            console.groupEnd("time")
           }
           else {
             if (new Date() > new Date(model.endTime) && model.endTime != null && model.endTime != "无")
@@ -1191,6 +1208,9 @@ export default {
               message: "取消事项完成",
               type: "info",
             });
+
+            //前端删除我的完成时间
+            model.realFinishTime = null
           }
         })
         .catch((err) => {

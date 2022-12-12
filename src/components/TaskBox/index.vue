@@ -415,6 +415,7 @@ export default {
       else {
         row.isdone = !row.isdone;
 
+        //如果是完成事项
         if (row.isdone) {
           if (new Date() > new Date(this.taskInfo.timeRange[1])) {
             row.taskState = '延期完成';
@@ -431,6 +432,8 @@ export default {
             });
           }
         }
+
+        //如果是取消完成
         else {
           if (new Date() > this.taskInfo.timeRange[1])
             row.taskState = '延期中';
@@ -948,6 +951,40 @@ export default {
 
       })
 
+
+    // 创建WebSocket连接
+    var websocket = null;
+    if ("WebSocket" in window) {
+      websocket = new WebSocket(
+        // "ws://localhost:8081/api/webSocket?activityId=" + this.activityId
+        // "ws://42.192.45.95:8081/api/webSocket?activityId=" + this.activityId
+        "ws://"+process.env.VUE_APP_BASE_IP_PORT+"/api/webSocket?activityId="+this.activityId
+      );
+    } else {
+      alert("该浏览器不支持websocket！");
+    }
+
+    websocket.onopen = function (event) {
+      console.log("建立连接");
+    };
+    websocket.onclose = function (event) {
+      console.log("连接关闭");
+    };
+    websocket.onmessage = (event) => {
+      console.log("收到消息");
+      //将字符串转为JSON对象
+      var message = JSON.parse(event.data);
+      if (message.fromUser.id != this.userId) {
+        IMUI.appendMessage(message, true);
+      }
+    };
+    websocket.onerror = function (event) {
+      console.log("websocket通信发生错误");
+    };
+
+    window.onbeforeunload = function () {
+      websocket.close();
+    };
   }
 }
 </script>
