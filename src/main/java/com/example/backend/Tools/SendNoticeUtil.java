@@ -6,12 +6,15 @@ package com.example.backend.Tools;
  * @JDKVersion 17.0.4
  */
 
+import com.example.backend.dto.LiveWeatherDto;
 import com.example.backend.entity.*;
 import com.example.backend.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -100,7 +103,7 @@ public class SendNoticeUtil {
 
     // 每天早上八点触发
     @Scheduled(cron = "0 0 8 * * ? ")
-    private void checkActivityDaily() {
+    private void checkActivityDaily() throws IOException {
         List<User> allUser = userService.findAllUser();
         for (User user : allUser) {
             // 获取当前的时间
@@ -117,7 +120,11 @@ public class SendNoticeUtil {
             }
             if (activity_num > 0) {
                 System.out.println("发送活动提醒消息");
-                Notice notice = new Notice(formatDay(Now) + "活动提醒", "您今天有" + Integer.toString(activity_num) + "项要参加的活动哦，请注意及时参加", Now, 1);
+
+                //获取今天一整天的预测天气
+                String weatherText = GaodeUtil.getForecastWeatherText();
+                Notice notice = new Notice(formatDay(Now) + "活动提醒", "您今天有" + Integer.toString(activity_num) + "项要参加的活动哦，请注意及时参加" + "\n" + weatherText, Now, 1);
+
                 noticeService.addNotice(notice);
                 UserNotice userNotice = new UserNotice(user.getId(), notice.getNoticeId(), 0);
                 userNoticeService.addUserNotice(userNotice);
@@ -150,9 +157,19 @@ public class SendNoticeUtil {
         }
     }
 
-    // 每一分钟执行一次
+    //每5秒钟执行一次
     @Scheduled(cron = "*/5 * * * * ?")
-    private void checkActivityTime() {
+    private void checkTaskExpire(){
+        //获取当前时间
+        Timestamp currentTimestamp = DateTimeUtil.getCurrentTimestamp();
+
+        //获取所有事项
+        List<Task> allTaskList = taskService.findAllTask();
+    }
+
+    // 每5秒钟执行一次
+    @Scheduled(cron = "*/5 * * * * ?")
+    private void checkActivityTime() throws IOException {
         // 获取当前的时间
         var Now = new Date();
         // 获取所有活动
@@ -161,11 +178,15 @@ public class SendNoticeUtil {
             var s_time = activity.getStart_time();
             // 当前活动还没开始
             if (s_time.getTime() > Now.getTime()) {
+                /*生成天气报表，因为马上要出门了，所以要根据实时天气生成提醒*/
+                /*调用天气API*/
+                String weatherText = GaodeUtil.getLiveWeatherText();
+
                 var isRemind = activity.getIsRemind();
                 if (timeMinuteDiff(s_time, Now) <= 10 && (isRemind == 0 || isRemind == 1)) {
-                    System.out.println("活动还有十分钟开始" + activity.getActivity_id());
+                    System.out.println("活动还有十分钟开始" + activity.getActivity_id() + "\n" + weatherText);
                     // 生成消息
-                    Notice notice = new Notice(activity.getActivity_id(), activity.getTitle_name() + "活动开始提醒", "该活动还有十分钟就要开始了，请注意及时参加哦", Now, 2);
+                    Notice notice = new Notice(activity.getActivity_id(), activity.getTitle_name() + "活动开始提醒", "该活动还有十分钟就要开始了，请注意及时参加哦" + "\n" + weatherText, Now, 2);
                     // 添加活动提醒消息
                     noticeService.addNotice(notice);
                     List<Map<String, Object>> userMaps = activityParticipateService.SelectActApplicantList(activity.getActivity_id());
@@ -179,7 +200,7 @@ public class SendNoticeUtil {
                 } else if (timeHourDiff(s_time, Now) <= 1 && isRemind == 0) {
                     System.out.println("活动还有一个小时开始" + activity.getActivity_id());
                     // 生成消息
-                    Notice notice = new Notice(activity.getActivity_id(), activity.getTitle_name() + "活动开始提醒", "该活动还有一小时就要开始了，请注意及时参加哦", Now, 2);
+                    Notice notice = new Notice(activity.getActivity_id(), activity.getTitle_name() + "活动开始提醒", "该活动还有一小时就要开始了，请注意及时参加哦" + "\n" + weatherText, Now, 2);
                     // 添加活动提醒消息
                     noticeService.addNotice(notice);
                     List<Map<String, Object>> userMaps = activityParticipateService.SelectActApplicantList(activity.getActivity_id());
@@ -197,7 +218,7 @@ public class SendNoticeUtil {
 
     // 每一分钟执行一次
     @Scheduled(cron = "*/5 * * * * ?")
-    private void checkTaskTime() {
+    private void checkTaskTime() throws IOException {
         // 获取当前的时间
         var Now = new Date();
         // 获取所有事项
@@ -207,24 +228,44 @@ public class SendNoticeUtil {
             // 当前活动还没开始
             if (s_time.getTime() > Now.getTime()) {
                 var isRemind = task.getIsRemind();
+
+                //还有十分钟开始
                 if (timeMinuteDiff(s_time, Now) <= 10 && (isRemind == 0 || isRemind == 1)) {
                     System.out.println("事项还有十分钟开始" + task.getTaskId());
-                    ItemNotice itemNotice = new ItemNotice(task.getUserId(), task.getTaskTitle() + "事项开始提醒", "该事项还有十分钟就要开始了，请注意及时参加哦", Now, task.getTaskId(), 0);
+
+                    String tagText = null;
+                    //根据个性化标签tag生成不同的语音播报
+                    if(task.getTag() == "室内"){
+                        tagText = "这是一个室内事项。";
+                    }
+                    else if (task.getTag() == "户外") {
+                        tagText = "这是一个户外事项。" + GaodeUtil.getLiveWeatherText();
+                    }
+
+                    ItemNotice itemNotice = new ItemNotice(task.getUserId(), task.getTaskTitle() + "事项开始提醒", "该事项还有十分钟就要开始了，请注意及时参加哦" + tagText, Now, task.getTaskId(), 0);
                     itemNoticeService.addItemNotice(itemNotice);
                     taskService.modifyTaskStatus(task.getTaskId(), 2);
-                } else if (timeHourDiff(s_time, Now) <= 1 && isRemind == 0) {
+                }
+
+                //还有一小时开始
+                else if (timeHourDiff(s_time, Now) <= 1 && isRemind == 0) {
                     System.out.println("事项还有一个小时开始" + task.getTaskId());
-                    ItemNotice itemNotice = new ItemNotice(task.getUserId(), task.getTaskTitle() + "事项开始提醒", "该事项还有一小时就要开始了，请注意及时参加哦", Now, task.getTaskId(), 0);
+
+                    String tagText = null;
+                    //根据个性化标签tag生成不同的语音播报
+                    if(task.getTag() == "室内"){
+                        tagText = "这是一个室内事项。";
+                    }
+                    else if (task.getTag() == "户外") {
+                        tagText = "这是一个户外事项。" + GaodeUtil.getLiveWeatherText();
+                    }
+
+                    ItemNotice itemNotice = new ItemNotice(task.getUserId(), task.getTaskTitle() + "事项开始提醒", "该事项还有一小时就要开始了，请注意及时参加哦" + tagText, Now, task.getTaskId(), 0);
                     itemNoticeService.addItemNotice(itemNotice);
                     taskService.modifyTaskStatus(task.getTaskId(), 1);
                 }
             }
         }
     }
-
-
-
-
-
 
 }
