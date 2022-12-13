@@ -2,15 +2,15 @@ package com.example.backend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.backend.entity.ActivityApply;
 import com.example.backend.entity.Report;
 import com.example.backend.mapper.ReportMapper;
 import com.example.backend.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Author: 杨严
@@ -23,7 +23,7 @@ public class ReportServiceImpl implements ReportService {
     private ReportMapper reportMapper;
 
     @Override
-    public Map<String, Object> getReportList(String state, String target_type) {
+    public Map<String, Object> getReportList(String state, String target_type,String sortByTime) {
         Map<String, Object> map = new HashMap<>();
         QueryWrapper<Report> queryWrapper = new QueryWrapper<>();
         queryWrapper
@@ -31,6 +31,22 @@ public class ReportServiceImpl implements ReportService {
                 .eq(target_type != null, "target_type", target_type);
         List<Report> reports = reportMapper
                 .selectList(queryWrapper);
+        // 按创建时间排序
+        if (sortByTime.equals("asc")){
+            List<Report> reports_sort = reports.stream().sorted
+                    (Comparator.comparing(Report::getReportTime)).collect(Collectors.toList());
+
+            reports=reports_sort;
+        }
+        else if  (sortByTime.equals("desc")){
+            List<Report> reports_sort_reverse = reports.stream().sorted
+                    (Comparator.comparing(Report::getReportTime).reversed()).collect(Collectors.toList());
+            reports=reports_sort_reverse;
+
+        }
+
+
+
         map.put("reports", reports);
         return map;
     }
@@ -45,13 +61,14 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Map<String, Object> changeReportState(String state, Long report_id) {
+    public Map<String, Object> changeReportState(String state, Long report_id,Date handle_time) {
         Map<String, Object> map = new HashMap<>();
         Integer i = reportMapper.update(
                 null,
                 Wrappers.<Report>lambdaUpdate()
                         .eq(Report::getReportId, report_id)
                         .set(Report::getState, state)
+                        .set(Report::getHandleTime,handle_time)
         );
         map.put("i", i);
         map.put("state", state);

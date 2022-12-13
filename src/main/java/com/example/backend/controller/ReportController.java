@@ -10,6 +10,8 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,9 +65,21 @@ public class ReportController {
             @ApiParam(name = "state", value = "举报单的状态,0是未审核，1是已审核，2是全部", required = true)
             @RequestParam("state") String state,
             @ApiParam(name = "target_type", value = "举报单对象,0是活动，1是用户，2是全部", required = true)
-            @RequestParam("target_type") String target_type
+            @RequestParam("target_type") String target_type,
+            @ApiParam(name = "sortByTime", value = "按照举报单的创建时间排序,取值desc/asc", required = false)
+            @RequestParam("sortByTime") String sortByTime
     ) {
         Map<String,Object> map=new HashMap<>();
+        map.put("sortByTime",sortByTime);
+
+        String default_sortByTime="desc";
+
+        if (sortByTime!=null&&(sortByTime.equals("desc")||sortByTime.equals("asc"))){
+
+        }
+        else {
+            sortByTime=default_sortByTime;
+        }
         String s=null;
         if (state.equals("0")||state.equals("1")){
             s=state;
@@ -88,7 +102,7 @@ public class ReportController {
         }
 
         try{
-            Map<String, Object> res_map=reportService.getReportList(s,t);
+            Map<String, Object> res_map=reportService.getReportList(s,t,sortByTime);
             map.put("reports",res_map.get("reports"));
             map.put("state",state);
             map.put("target_type",target_type);
@@ -141,8 +155,14 @@ public class ReportController {
             return Result.fail(2001,"请输入正确的state 0,1");
         }
 
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:ss");
+        System.out.println("当前时间：" + sdf.format(now));
+
+
+
         try{
-            Map<String, Object> res_map=reportService.changeReportState(state,report_id);
+            Map<String, Object> res_map=reportService.changeReportState(state,report_id,now);
             map=res_map;
             if (map.get("i").equals(1)){
                 return Result.success(map);
@@ -167,6 +187,13 @@ public class ReportController {
     ){
         Map<String,Object> map=new HashMap<>();
 
+        Date d = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:ss");
+        System.out.println("当前时间：" + sdf.format(d));
+
+        if (report.getReportTime()==null){
+            report.setReportTime(d);
+        }
 
         try{
             Map<String, Object> res_map=reportService.addReport(report);
