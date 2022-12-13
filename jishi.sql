@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 13/12/2022 10:35:03
+ Date: 13/12/2022 13:08:45
 */
 
 SET NAMES utf8mb4;
@@ -298,17 +298,17 @@ CREATE TABLE `report`  (
   `state` varchar(1) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0',
   `image` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `target_type` varchar(1) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0',
+  `report_time` datetime(0) NULL DEFAULT NULL,
+  `handle_time` datetime(0) NULL DEFAULT NULL,
   PRIMARY KEY (`report_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of report
 -- ----------------------------
-INSERT INTO `report` VALUES (1, NULL, '举报活动1', 1, 11, NULL, '1', NULL, '0');
-INSERT INTO `report` VALUES (2, NULL, '举报活动2', 2, 22, NULL, '0', NULL, '0');
-INSERT INTO `report` VALUES (3, NULL, '举报用户33', 3, 33, NULL, '0', NULL, '1');
-INSERT INTO `report` VALUES (4, NULL, '举报用户44', 4, 44, NULL, '0', NULL, '1');
-INSERT INTO `report` VALUES (1602491764843810818, 'string', 'string', 0, 0, 0, '0', 'string', '0');
+INSERT INTO `report` VALUES (1602528309579710466, 'string', 'string', 0, 0, 0, '1', 'string', '0', '2022-12-13 12:58:17', '2022-12-13 13:00:55');
+INSERT INTO `report` VALUES (1602528844957478914, 'string', 'string', 1110, 0, 0, '0', 'string', '0', '2022-12-13 13:00:25', NULL);
+INSERT INTO `report` VALUES (1602529505048625154, 'string', 'string', 1111110, 0, 0, '0', 'string', '0', '2022-12-13 13:03:02', NULL);
 
 -- ----------------------------
 -- Table structure for tag
