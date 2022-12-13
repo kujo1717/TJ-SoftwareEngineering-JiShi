@@ -26,6 +26,9 @@ public interface ReportService {
     /** 修改举报单状态 */
     Map<String,Object> changeReportState(String state,Long report_id);
 
+    /**获取具体状态的举报单数量 */
+    Map<String,Object> getReportListNumByState(String state);
+
 
 
 }
