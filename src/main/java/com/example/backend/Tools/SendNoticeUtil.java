@@ -6,6 +6,9 @@ package com.example.backend.Tools;
  * @JDKVersion 17.0.4
  */
 
+import com.example.backend.controller.ChatController;
+import com.example.backend.dto.FormatMessage;
+import com.example.backend.dto.FormatUser;
 import com.example.backend.dto.LiveWeatherDto;
 import com.example.backend.entity.*;
 import com.example.backend.service.*;
@@ -19,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 定时任务 静态定时任务
@@ -37,6 +41,8 @@ import java.util.Map;
  */
 @Component
 public class SendNoticeUtil {
+    @Autowired
+    TaskExpireWebSocket taskExpireWebSocket;
 
     @Autowired
     ActivityParticipateService activityParticipateService;
@@ -157,7 +163,7 @@ public class SendNoticeUtil {
         }
     }
 
-    //每5秒钟执行一次
+    //每5秒钟执行一次，看看前端目前的事项状态有没有失效
     @Scheduled(cron = "*/5 * * * * ?")
     private void checkTaskExpire(){
         //获取当前时间
@@ -165,6 +171,40 @@ public class SendNoticeUtil {
 
         //获取所有事项
         List<Task> allTaskList = taskService.findAllTask();
+        for(Task t : allTaskList)
+        {
+            //检测前端状态转变：未开始->进行中
+            if(t.getIsRemind() < 3 && t.getStartTime().before(DateTimeUtil.getCurrentTimestamp()))
+            {
+                Message message = new Message(t.getTaskId(),t.getUserId(),t.getTaskState(),0,null,"未开始->进行中");
+                System.out.println("aaaaaaaaaaaaaa"+message);
+                FormatMessage formatMessage = formatMessage(message);
+                boolean isSend = taskExpireWebSocket.sendMessage(t.getTaskId().toString(), formatMessage);
+
+                //isRemind++
+                if(isSend) {
+                    int isRemind = t.getIsRemind();
+                    t.setIsRemind(isRemind + 1);
+                    taskService.patchOneTask(t);
+                }
+            }
+
+            //检测前端状态转变：进行中->延期中
+            else if(t.getIsRemind() < 4 && t.getEndTime().before(DateTimeUtil.getCurrentTimestamp()))
+            {
+                Message message = new Message(t.getTaskId(),t.getUserId(),t.getTaskState(),0,null,"进行中->延期中");
+                FormatMessage formatMessage = formatMessage(message);
+                boolean isSend = taskExpireWebSocket.sendMessage(t.getTaskId().toString(), formatMessage);
+
+                //isRemind++
+                if(isSend) {
+                    int isRemind = t.getIsRemind();
+                    t.setIsRemind(isRemind + 1);
+                    taskService.patchOneTask(t);
+                }
+            }
+
+        }
     }
 
     // 每5秒钟执行一次
@@ -216,7 +256,7 @@ public class SendNoticeUtil {
         }
     }
 
-    // 每一分钟执行一次
+    // 每5秒钟执行一次
     @Scheduled(cron = "*/5 * * * * ?")
     private void checkTaskTime() throws IOException {
         // 获取当前的时间
@@ -266,6 +306,46 @@ public class SendNoticeUtil {
                 }
             }
         }
+    }
+
+    public FormatMessage formatMessage(Message m) {
+        // 获取发送消息的用户的信息
+        User user = userService.findUser(m.getSenderId());
+        FormatUser formatUser = formatUser(user);
+        // 格式化信息的状态和类型
+        String status = formatStatus(m.getStatus());
+        String type = formatType(m.getType());
+
+
+        FormatMessage formatMessage = new FormatMessage(m.getMessageId(), status, type, m.getSendTime(), m.getContent(), formatUser, m.getActivityId().toString());
+        return formatMessage;
+
+    }
+
+    private String formatType(int status) {
+        if (status == 0) {
+            return "text";
+        } else if (status == 1) {
+            return "image";
+        } else if (status == 2) {
+            return "file";
+        }
+        return null;
+    }
+
+    private String formatStatus(int status) {
+        if (status == 0) {
+            return "going";
+        } else if (status == 1) {
+            return "succeed";
+        } else if (status == 2) {
+            return "failed";
+        }
+        return null;
+    }
+
+    private FormatUser formatUser(User user) {
+        return new FormatUser(user.getId(), user.getName(), user.getAvatar());
     }
 
 }

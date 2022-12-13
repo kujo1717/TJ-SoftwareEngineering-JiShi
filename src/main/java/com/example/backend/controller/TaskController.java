@@ -138,7 +138,6 @@ public class TaskController {
             //先拿到父事项
             Task fatherTask = taskService.findOneTaskAndRelative(taskId);
 
-            System.out.println("aaaaaaaaaaa"+ sonTask.toString());
             //post新的子事项
             Long aaa = taskService.insertOneNewTask(sonTask);
             Long sonId = sonTask.getTaskId();

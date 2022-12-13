@@ -72,7 +72,7 @@ public class ChatController {
         return new FormatUser(user.getId(), user.getName(), user.getAvatar());
     }
 
-    private FormatMessage formatMessage(Message m) {
+    public FormatMessage formatMessage(Message m) {
         // 获取发送消息的用户的信息
         User user = userService.findUser(m.getSenderId());
         FormatUser formatUser = formatUser(user);

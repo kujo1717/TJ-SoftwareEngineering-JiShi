@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -39,6 +40,9 @@ public class Task {
     private Timestamp endTime;
     private short isParent;
     private String isInDustbin;
+
+    //允许将字段更新为空的注解
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Timestamp realFinishTime;
     private String tag;
     private Timestamp createTime;
@@ -49,7 +53,7 @@ public class Task {
     @TableField(exist = false)
     private List<Task> relativeTask;
 
-    @TableField( "is_remind")
+    @TableField("is_remind")
     private int isRemind;
 
 

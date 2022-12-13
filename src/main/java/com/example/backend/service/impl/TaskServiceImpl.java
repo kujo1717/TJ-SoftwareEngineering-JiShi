@@ -183,6 +183,8 @@ public class TaskServiceImpl implements TaskService {
         else if(oldTask.getTaskState() != 0 && task.getTaskState() == 0)
             task.setRealFinishTime(null);
 
+        System.out.println("aaaaaaaaaaaaaaaaaaaaaa"+task);
+
         int resultCount = taskMapper.updateById(task);
         if(resultCount == 0)
             return Result.fail(500,"更新数据失败！");
