@@ -14,7 +14,7 @@ import java.net.URL;
  * @Author hym
  * @Date $ $
  * @MethodName $
- * @Description $
+ * @Description $调用高德API，用于获取天气情况
  * @Return $
  * @Throw $
  */
