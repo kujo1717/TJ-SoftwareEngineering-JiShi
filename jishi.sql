@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 08/12/2022 10:24:28
+ Date: 13/12/2022 10:35:03
 */
 
 SET NAMES utf8mb4;
@@ -52,6 +52,7 @@ CREATE TABLE `activity`  (
 -- ----------------------------
 -- Records of activity
 -- ----------------------------
+INSERT INTO `activity` VALUES (1601588170238038017, '111', NULL, '111', '2022-11-17 00:00:00', NULL, '2022-12-10 22:42:30', 1, 1, 2, 1, NULL, 1, 0, NULL, 0, '111', '111', NULL, NULL, '', 0);
 
 -- ----------------------------
 -- Table structure for activity_apply
@@ -106,6 +107,7 @@ CREATE TABLE `activity_participate`  (
 -- ----------------------------
 -- Records of activity_participate
 -- ----------------------------
+INSERT INTO `activity_participate` VALUES (1601588170238038017, 1);
 
 -- ----------------------------
 -- Table structure for activity_tag
@@ -123,6 +125,22 @@ CREATE TABLE `activity_tag`  (
 -- ----------------------------
 -- Records of activity_tag
 -- ----------------------------
+INSERT INTO `activity_tag` VALUES (1601588170238038017, 2);
+
+-- ----------------------------
+-- Table structure for administrator
+-- ----------------------------
+DROP TABLE IF EXISTS `administrator`;
+CREATE TABLE `administrator`  (
+  `admin_id` bigint(0) NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  PRIMARY KEY (`admin_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of administrator
+-- ----------------------------
+INSERT INTO `administrator` VALUES (1, '1');
 
 -- ----------------------------
 -- Table structure for classification
@@ -154,8 +172,12 @@ CREATE TABLE `item_notice`  (
   `create_time` datetime(0) NULL DEFAULT NULL,
   `item_id` bigint(0) NULL DEFAULT NULL COMMENT '事项ID',
   `status` tinyint(0) NULL DEFAULT NULL COMMENT '1为已读，0为未读',
-  PRIMARY KEY (`item_notice_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`item_notice_id`) USING BTREE,
+  INDEX `item_notice_user_id`(`user_id`) USING BTREE,
+  INDEX `item_notice_item_id`(`item_id`) USING BTREE,
+  CONSTRAINT `item_notice_item_id` FOREIGN KEY (`item_id`) REFERENCES `task` (`task_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `item_notice_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of item_notice
@@ -174,8 +196,12 @@ CREATE TABLE `message`  (
   `send_time` bigint(0) NULL DEFAULT NULL COMMENT '消息发送时间，13位毫秒',
   `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '消息内容，如果为image则为URL地址',
   `file_id` bigint(0) NULL DEFAULT NULL COMMENT '消息对应的文件ID',
-  PRIMARY KEY (`message_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 54 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`message_id`) USING BTREE,
+  INDEX `message_activity_id`(`activity_id`) USING BTREE,
+  INDEX `message_sender_id`(`sender_id`) USING BTREE,
+  CONSTRAINT `message_activity_id` FOREIGN KEY (`activity_id`) REFERENCES `activity` (`activity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `message_sender_id` FOREIGN KEY (`sender_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of message
@@ -191,8 +217,12 @@ CREATE TABLE `message_board`  (
   `user_id` bigint(0) NULL DEFAULT NULL COMMENT '留言用户ID',
   `content` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '留言内容',
   `create_time` datetime(0) NULL DEFAULT NULL COMMENT '留言时间',
-  PRIMARY KEY (`message_board_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`message_board_id`) USING BTREE,
+  INDEX `message_board_activity_id`(`activity_id`) USING BTREE,
+  INDEX `message_board_user_id`(`user_id`) USING BTREE,
+  CONSTRAINT `message_board_activity_id` FOREIGN KEY (`activity_id`) REFERENCES `activity` (`activity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `message_board_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of message_board
@@ -209,8 +239,10 @@ CREATE TABLE `notice`  (
   `content` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `create_time` datetime(0) NULL DEFAULT NULL,
   `type` tinyint(0) NULL DEFAULT NULL COMMENT '1为系统通知，2为活动通知\r\n',
-  PRIMARY KEY (`notice_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`notice_id`) USING BTREE,
+  INDEX `notice_activity_id`(`activity_id`) USING BTREE,
+  CONSTRAINT `notice_activity_id` FOREIGN KEY (`activity_id`) REFERENCES `activity` (`activity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of notice
@@ -226,7 +258,9 @@ CREATE TABLE `poll`  (
   `topic_text` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `deadline` datetime(0) NULL DEFAULT NULL,
   `multiple_choice` tinyint(1) NULL DEFAULT NULL,
-  PRIMARY KEY (`poll_id`) USING BTREE
+  PRIMARY KEY (`poll_id`) USING BTREE,
+  INDEX `poll_activity_id`(`activity_id`) USING BTREE,
+  CONSTRAINT `poll_activity_id` FOREIGN KEY (`activity_id`) REFERENCES `activity` (`activity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -249,6 +283,32 @@ CREATE TABLE `relativetask`  (
 -- ----------------------------
 -- Records of relativetask
 -- ----------------------------
+
+-- ----------------------------
+-- Table structure for report
+-- ----------------------------
+DROP TABLE IF EXISTS `report`;
+CREATE TABLE `report`  (
+  `report_id` bigint(0) NOT NULL,
+  `type` varchar(80) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `detail` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `activity_id` bigint(0) NULL DEFAULT NULL,
+  `user_id` bigint(0) NULL DEFAULT NULL,
+  `informer_id` bigint(0) NULL DEFAULT NULL,
+  `state` varchar(1) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0',
+  `image` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `target_type` varchar(1) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0',
+  PRIMARY KEY (`report_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of report
+-- ----------------------------
+INSERT INTO `report` VALUES (1, NULL, '举报活动1', 1, 11, NULL, '1', NULL, '0');
+INSERT INTO `report` VALUES (2, NULL, '举报活动2', 2, 22, NULL, '0', NULL, '0');
+INSERT INTO `report` VALUES (3, NULL, '举报用户33', 3, 33, NULL, '0', NULL, '1');
+INSERT INTO `report` VALUES (4, NULL, '举报用户44', 4, 44, NULL, '0', NULL, '1');
+INSERT INTO `report` VALUES (1602491764843810818, 'string', 'string', 0, 0, 0, '0', 'string', '0');
 
 -- ----------------------------
 -- Table structure for tag
@@ -319,12 +379,15 @@ CREATE TABLE `user`  (
   `age` int(0) NULL DEFAULT NULL,
   `introduce` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   `avatar` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'http://42.192.45.95:8081/api/user/avatar.jpg' COMMENT '头像',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 111 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `email`(`email`) USING BTREE,
+  INDEX `name`(`name`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 222 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
+INSERT INTO `user` VALUES (1, '111', 'yy657826973', '657826973@qq.com', 0, 'undefined', 'http://42.192.45.95:8081/api/user/avatar/1.png');
 
 -- ----------------------------
 -- Table structure for user_forget_request
@@ -333,12 +396,14 @@ DROP TABLE IF EXISTS `user_forget_request`;
 CREATE TABLE `user_forget_request`  (
   `id` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '邮箱',
   `code` varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '验证码',
-  PRIMARY KEY (`id`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE,
+  CONSTRAINT `user_forget_request_id` FOREIGN KEY (`id`) REFERENCES `user` (`email`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user_forget_request
 -- ----------------------------
+INSERT INTO `user_forget_request` VALUES ('657826973@qq.com', '8317');
 
 -- ----------------------------
 -- Table structure for user_notice
@@ -348,7 +413,10 @@ CREATE TABLE `user_notice`  (
   `user_id` bigint(0) NOT NULL,
   `notice_id` bigint(0) NOT NULL,
   `status` tinyint(1) NULL DEFAULT NULL COMMENT '通知是否已读：1为已读，0为未读',
-  PRIMARY KEY (`user_id`, `notice_id`) USING BTREE
+  PRIMARY KEY (`user_id`, `notice_id`) USING BTREE,
+  INDEX `user_notice_notice_id`(`notice_id`) USING BTREE,
+  CONSTRAINT `user_notice_notice_id` FOREIGN KEY (`notice_id`) REFERENCES `notice` (`notice_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `user_notice_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -362,7 +430,10 @@ DROP TABLE IF EXISTS `vote`;
 CREATE TABLE `vote`  (
   `user_id` bigint(0) NOT NULL,
   `option_id` bigint(0) NOT NULL,
-  PRIMARY KEY (`user_id`, `option_id`) USING BTREE
+  PRIMARY KEY (`user_id`, `option_id`) USING BTREE,
+  INDEX `vote_option_id`(`option_id`) USING BTREE,
+  CONSTRAINT `vote_option_id` FOREIGN KEY (`option_id`) REFERENCES `vote_option` (`option_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `vote_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -378,7 +449,9 @@ CREATE TABLE `vote_option`  (
   `option_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `poll_id` bigint(0) NULL DEFAULT NULL,
   `vote_num` int(0) NULL DEFAULT NULL,
-  PRIMARY KEY (`option_id`) USING BTREE
+  PRIMARY KEY (`option_id`) USING BTREE,
+  INDEX `vote_option_poll_id`(`poll_id`) USING BTREE,
+  CONSTRAINT `vote_option_poll_id` FOREIGN KEY (`poll_id`) REFERENCES `poll` (`poll_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
