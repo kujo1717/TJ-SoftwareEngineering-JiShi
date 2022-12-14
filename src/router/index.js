@@ -179,6 +179,71 @@ export const constantRoutes = [
     ],
     // hidden: true
   },
+  {
+    path: '/adminConsole',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'AdminConsole',
+        component: () => import('@/views/adminConsole/index'),
+        meta: { title: '管理员控制台', icon: 'user' }
+      }
+    ],
+    // hidden: true
+  },
+  {
+    path: '/adminExamineUser',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'AdminExmaineUser',
+        component: () => import('@/views/adminExamine/ExamineUser'),
+        meta: { title: '审核用户', icon: 'user' }
+      }
+    ],
+    // hidden: true
+  },
+  {
+    path: '/adminExamineActivity',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'AdminExmaineUser',
+        component: () => import('@/views/adminExamine/ExamineActivity'),
+        meta: { title: '审核活动', icon: 'user' }
+      }
+    ],
+    // hidden: true
+  },
+  {
+    path: '/detailExamineUser',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'DetailExamineUser',
+        component: () => import('@/views/adminExamine/ExamineUser/DetailUserExamine'),
+        meta: { title: '详细审核用户', icon: 'user' }
+      }
+    ],
+    // hidden: true
+  },
+  {
+    path: '/detailExamineActivity',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'DetailExamineActivity',
+        component: () => import('@/views/adminExamine/ExamineActivity/DetailActivityExamine'),
+        meta: { title: '详细审核活动', icon: 'user' }
+      }
+    ],
+    // hidden: true
+  },
 
 
 
@@ -195,7 +260,7 @@ const createRouter = () => new Router({
 const router = createRouter()
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
-export function resetRouter() {
+export function resetRouter () {
   const newRouter = createRouter()
   router.matcher = newRouter.matcher // reset router
 }

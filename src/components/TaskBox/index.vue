@@ -100,7 +100,6 @@ taskId: Long 事项id
                 <el-select
                   v-model="taskInfo.classificationTitle"
                   :popper-append-to-body="false"
-                  
                 >
 
                   <el-option
@@ -575,7 +574,7 @@ export default {
     //获取该用户的所有分组名称
     setThisUserAllClassificaitonTitle () {
       this.typeList = []
-    
+
       //向后端请求该用户的所有分类名
       getAllClassificationTitle(this.userId)
         .then((res) => {
@@ -782,7 +781,7 @@ export default {
       this.chosen_taskId = row.taskId;
       this.sonTaskBoxDialogVisible = true;
     },
- 
+
   },
 
   computed: {
@@ -937,7 +936,7 @@ export default {
       }
     },
   },
-  mounted: function () {
+  async mounted () {
     console.log("this.taskId", this.taskId)
     this.setThisUserAllClassificaitonTitle();//获取该用户的所有分组名称
     this.setFrontendTaskObj(this.taskId)//接收从父组件传来的事项信息
@@ -947,44 +946,66 @@ export default {
           .then(() => {//这里涉及到watch的异步
             this.isSaved = true;
             console.log("isSaved!")
+
+            if (this.taskInfo.id != '' && this.taskInfo.id != null) {
+              console.log("我taskId绝对不为空，我是", this.taskInfo.id)
+              // 创建WebSocket连接
+              var websocket = null;
+              if ("WebSocket" in window) {
+                console.group("检测到WebSocket!")
+                console.log("yes!")
+                console.groupEnd("检测到WebSocket!")
+
+                websocket = new WebSocket(
+                  // "ws://localhost:8081/api/webSocket?activityId=" + this.activityId
+                  // "ws://42.192.45.95:8081/api/webSocket?activityId=" + this.activityId
+                  "ws://" + process.env.VUE_APP_BASE_IP_PORT + "/api/taskExpireWebSocket?taskId=" + this.taskInfo.id
+                );
+              } else {
+                alert("该浏览器不支持websocket！");
+              }
+
+              websocket.onopen = function (event) {
+                console.log("建立连接");
+              };
+              websocket.onclose = function (event) {
+                console.log("连接关闭");
+              };
+              websocket.onmessage = (event) => {
+
+
+
+                //将字符串转为JSON对象
+                var message = JSON.parse(event.data);
+                console.log("收到消息", message);
+                if (message.toContactId == this.taskInfo.id) {
+                  console.group("成功了！")
+                  console.log(message)
+                  console.groupEnd("成功了！")
+
+                //实时改变前端展现的状态
+                  if (message.content == "未开始->进行中")
+                    this.taskInfo.taskState = "进行中";
+                  else if (message.content == "进行中->延期中")
+                    this.taskInfo.taskState = "延期中";
+                  console.log("前端状态转变完成！")
+                }
+              };
+              websocket.onerror = function (event) {
+                console.log("websocket通信发生错误");
+              };
+
+              window.onbeforeunload = function () {
+                websocket.close();
+              };
+            }
           })
+
 
       })
 
 
-    // 创建WebSocket连接
-    var websocket = null;
-    if ("WebSocket" in window) {
-      websocket = new WebSocket(
-        // "ws://localhost:8081/api/webSocket?activityId=" + this.activityId
-        // "ws://42.192.45.95:8081/api/webSocket?activityId=" + this.activityId
-        "ws://"+process.env.VUE_APP_BASE_IP_PORT+"/api/webSocket?activityId="+this.activityId
-      );
-    } else {
-      alert("该浏览器不支持websocket！");
-    }
 
-    websocket.onopen = function (event) {
-      console.log("建立连接");
-    };
-    websocket.onclose = function (event) {
-      console.log("连接关闭");
-    };
-    websocket.onmessage = (event) => {
-      console.log("收到消息");
-      //将字符串转为JSON对象
-      var message = JSON.parse(event.data);
-      if (message.fromUser.id != this.userId) {
-        IMUI.appendMessage(message, true);
-      }
-    };
-    websocket.onerror = function (event) {
-      console.log("websocket通信发生错误");
-    };
-
-    window.onbeforeunload = function () {
-      websocket.close();
-    };
   }
 }
 </script>
