@@ -1,11 +1,15 @@
 package com.example.backend.service.impl;
 
 
+
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.backend.Tools.JwtUtil;
+
 import com.example.backend.common.Result;
 import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.User;
+import com.example.backend.entity.friendGroup;
+import com.example.backend.mapper.FriendGroupMapper;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.service.UserService;
 import org.apache.ibatis.jdbc.Null;
@@ -31,10 +35,13 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     @Autowired
     JavaMailSenderImpl mailSender;
+    @Autowired
+    private FriendGroupMapper friendGroupMapper;
     public User findUser(Long id){
         User user = userMapper.selectById(id);//利用mybatis-plus的单表查询，自己不用写SQL语句
         //没有找到用户，返回错误码
         if(user == null){
+
             return null;
         }
 
@@ -46,14 +53,11 @@ public class UserServiceImpl implements UserService {
     public User getUserByEmail(String email) {
         User user = userMapper.selectByEmail(email);
         //没有找到用户，返回错误码
-        if(user == null){
+        if (user == null) {
             return null;
         }
-
-        //找到用户，返回正确信息
         return user;
     }
-
     public Result<String> confirmUser(String email, String password){
         User user=userMapper.selectByEmail(email);
         if (user==null){
@@ -75,6 +79,11 @@ public class UserServiceImpl implements UserService {
             user=userMapper.selectByEmail(email);
             String userId=user.getId().toString();
             String token = JwtUtil.sign(userId);
+            var group=new friendGroup();
+            group.setBelongid(user.getId());
+            group.setGroupid(1L);
+            group.setName("默认分组");
+            friendGroupMapper.insert(group);
             return Result.success("成功验证！");
         }
 

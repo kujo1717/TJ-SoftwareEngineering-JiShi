@@ -10,8 +10,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("user_forget_request")
-public class UserForgetRequest {
-    private String id;
-    private String code;
+@TableName("friend")
+public class friend {
+    Long userid;
+    Long friendid;
+    Long groupid;
+    String name;
 }
