@@ -61,7 +61,7 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: '首页', icon: 'dashboard' }
     }],
     hidden: true
   },
@@ -277,10 +277,22 @@ export const constantRoutes = [
         path: 'index',
         name: 'User',
         component: () => import('@/views/user/index'),
-        meta: { title: 'User', icon: 'user' }
+        meta: { title: '用户', icon: 'user' }
       }
     ],
     hidden: true
+  },
+  {
+    path:'/friend',
+    component:Layout,
+    children:[{
+      path: 'index',
+      name: 'Friend',
+      component:()=>import('@/views/friend/index'),
+      meta:{title:'好友',icon:'user'}
+    }
+    ],
+    hidden:true
   },
 
 

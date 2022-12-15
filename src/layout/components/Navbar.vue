@@ -19,9 +19,9 @@
           <a target="_blank" href="https://github.com/kujo1717/demo">
             <el-dropdown-item>Github</el-dropdown-item>
           </a>
-          <a target="_blank"  href="https://panjiachen.github.io/vue-element-admin-site/#/">
-            <el-dropdown-item>文档</el-dropdown-item>
-          </a>
+          <routerLink to="/friend/index">
+            <el-dropdown-item>好友</el-dropdown-item>
+          </routerLink>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">注销</span>
           </el-dropdown-item>
