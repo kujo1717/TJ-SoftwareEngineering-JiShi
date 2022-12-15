@@ -244,6 +244,18 @@ export const constantRoutes = [
     ],
     hidden: true
   },
+  {
+    path:'/friend',
+    component:Layout,
+    children:[{
+      path: 'index',
+      name: 'Friend',
+      component:()=>import('@/views/friend/index'),
+      meta:{title:'好友',icon:'user'}
+    }
+    ],
+    hidden:true
+  },
 
 
 
