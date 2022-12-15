@@ -1,5 +1,7 @@
 package com.example.backend.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,8 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @TableName("friend")
 public class friend {
-    Long userId;
-    Long friendId;
-    Long groupId;
+    Long userid;
+    Long friendid;
+    Long groupid;
     String name;
 }
