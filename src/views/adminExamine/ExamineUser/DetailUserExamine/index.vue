@@ -275,141 +275,40 @@ export default {
     },
     onSubmit () {
       //审核单没填完整就直接跳出
-      if (!this.FormIsFull()) {
+      if (this.form.punishType==null || this.form.punishType=='') {
         this.$message({
           type: 'info',
-          message: '审核单未填写完整！'
+          message: '审核单未填写裁决方式！'
         });
         return false;
       }
 
-      //填写完整审核日期和审核状态
-      this.form.ISDONE = (this.form.ISREAL == "是") ? "审核通过" : "审核不通过";
-      const today = new Date();
-      this.form.AUDITTIME = this.dateToString(today);
-      this.toHisObj();
-
-      //向后端发送put申请
-      putReportCard(this.form.ID, this.his_obj)
-        .then((res) => {
-          console.log(res);
-          this.$message({
-            type: 'success',
-            message: '审核单提交成功！审核结果：' + this.form.ISDONE
-          });
-        })
-        .catch((err) => {
-          if (err.message == "Request failed with status code 403" && this.flag) {
-            this.flag = false;
-            AccessTokenFailed();
-          }
-          console.log(err);
-          this.$message({
-            type: 'info',
-            message: '审核单提交失败'
-          });
-          return false;
-        });
-
-      //put更改封号天数
-      if (this.form.PUNITIVEMEASURE != '0') {
-        let num = parseInt(this.form.PUNITIVEMEASURE);
-        if (this.getRole(this.form.DEFENDANTID) == "医生") {
-          let uid = this.form.DEFENDANTID;
-          let doctorCard = {};
-          //先获取医生原本信息
-          getDoctorCard(uid)
-            .then((res) => {
-              doctorCard = res.data[0];
-              console.log("获取医生信息成功！");
-
-              //然后修改该用户的bantime（修改可覆盖，避免恶意多次举报）
-              var tempDate = new Date() // 获取今天的日期
-              tempDate.setDate(tempDate.getDate() + num) // 今天的前N天的日期，N自定义
-              let dateString = this.dateToString(tempDate);
-              doctorCard.BANTIME = dateString;
-
-              doctorCard = this.toHisDoctorObj(doctorCard);
-              console.log(doctorCard);
-
-              //PUT修改后端数据，完成封号
-              putDoctorDisable(uid, doctorCard)
-                .then((res) => {
-                  console.log("医生封号的PUT请求成功！");
-                  console.log(res);
-                })
-                .catch((err) => {
-                  if (err.message == "Request failed with status code 403" && this.flag) {
-                    this.flag = false;
-                    AccessTokenFailed();
-                  }
-                  console.log("医生封号失败！");
-                  console.log(err);
-                })
-            })
-            .catch((err) => {
-              if (err.message == "Request failed with status code 403" && this.flag) {
-                this.flag = false;
-                AccessTokenFailed();
-              }
-              console.log("获取医生原本信息失败！");
-              console.log(err);
-            })
-
-        }
-        else if (this.getRole(this.form.DEFENDANTID) == "护工") {
-          let uid = this.form.DEFENDANTID;
-          let nurseCard = {};
-          //先获取护工原本信息
-          getNurseCard(uid)
-            .then((res) => {
-              nurseCard = res.data.message[0];
-
-              //然后修改该用户的bantime（修改可覆盖，避免恶意多次举报）
-              var tempDate = new Date() // 获取今天的日期
-              tempDate.setDate(tempDate.getDate() + num) // 今天的前N天的日期，N自定义
-              let dateString = this.dateToString(tempDate);
-              nurseCard.bantime = dateString;
-
-              nurseCard = this.toHisNurseObj(nurseCard);
-              //PUT修改后端数据，完成封号
-              putNurseDisable(uid, nurseCard)
-                .then((res) => {
-                  console.log("护工封号的PUT请求成功！");
-                  console.log(res);
-                })
-                .catch((err) => {
-                  if (err.message == "Request failed with status code 403" && this.flag) {
-                    this.flag = false;
-                    AccessTokenFailed();
-                  }
-                  console.log("护工封号的PUT请求失败！");
-                  console.log(err);
-                })
-            })
-            .catch((err) => {
-              if (err.message == "Request failed with status code 403" && this.flag) {
-                this.flag = false;
-                AccessTokenFailed();
-              }
-              console.log(err);
-            })
-
-        }
-      }
-
-      this.$router.push({
-        name: "ReportScan",
+      //向后端发送patch申请
+      this.form['state'] = 1;
+      patchOneReport(this.form)
+      .then((res)=>{
+        console.log(res)
       })
+      .catch((err)=>{
+        console.log(err)
+      })
+
+      this.$message({
+        type:'success',
+        message:'审核完成！'
+      })
+      this.$router.push({path:'/adminExamineUser/index'})
 
       return true;
     },
 
     Cancel () {
-      this.dialogVisible = false;
-      this.$router.push({
-        name: "ReportScan",
+      this.$message({
+        type:'info',
+        message:'取消审核'
       })
+      this.dialogVisible = false;
+      this.$router.push({path:'/adminExamineUser/index'})
     },
     FormIsFull () {
       if (this.form.PUNITIVEMEASURE == '' || this.form.ISREAL == '')

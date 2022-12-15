@@ -143,11 +143,6 @@ export default {
         name: "OrgQualify",
       })
     },
-    testAuditLog () {
-      var access_token = this.$cookies.get('token');
-      setToken(access_token);
-      this.getConsoleNum();
-    },
     button_close (data) {
       this.flag = data;
     },

@@ -229,7 +229,7 @@ export const constantRoutes = [
         meta: { title: '详细审核用户', icon: 'user' }
       }
     ],
-    // hidden: true
+    hidden: true
   },
   {
     path: '/detailExamineActivity',
@@ -242,7 +242,7 @@ export const constantRoutes = [
         meta: { title: '详细审核活动', icon: 'user' }
       }
     ],
-    // hidden: true
+    hidden: true
   },
 
 

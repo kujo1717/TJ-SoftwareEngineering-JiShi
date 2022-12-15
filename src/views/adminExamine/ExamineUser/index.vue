@@ -20,6 +20,7 @@
           :data="show_table"
           class="order_table"
           height="500"
+          width="100%"
           v-loading="loading"
           :default-sort="{prop: 'REPORTTIME', order: 'descending'}"
           stripe
