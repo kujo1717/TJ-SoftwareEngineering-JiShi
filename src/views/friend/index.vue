@@ -22,7 +22,8 @@
         <template v-for="item in friendgroup">
          <div style="margin-bottom: 20px;display: flex;font-size: large;align-items: center;justify-content: flex-start;"> 
           <el-avatar :size="60" :src="item.avatar"></el-avatar>
-          <span>{{item.name}}</span>
+          <span v-if="item.name">{{item.name}}</span>
+          <span v-else>{{item.rootname}}</span>
           <span style="margin-left:100px">{{item.email}}</span>
           <span v-if="item.age" style="margin-left: 200px;">{{item.age}}岁</span>
           <span v-else style="margin-left: 200px;">年龄保密</span>
@@ -111,7 +112,8 @@
         groupindex:1,
         dialogVisible: false,
         selectGroup:1,
-        reloading:true
+        reloading:true,
+        temp:null
       };
     },
     computed:{
@@ -136,13 +138,13 @@
         let formData=new FormData()
         
         this.friends.forEach(element => {
-          friendlist.push({"userId":this.$store.getters.id,"friendId":element.id,"groupId":element.groupid,"name":element.name})
+          friendlist.push({"userid":this.$store.getters.id,"friendid":element.id,"groupid":element.groupid,"name":element.name})
         });
         formData.append('firendList',friendlist)
         formData.append('friendGroupList',this.friendgroups)
         console.log(friendlist)
         console.log(this.friendgroups)
-        friendManage({id:this.$store.getters.id,friendList:friendlist,friendGroupList:this.friendgroups}).then(response=>{
+        friendManage({id:this.$store.getters.id,friendList:friendlist,friendGroup:this.friendgroups}).then(response=>{
           this.$message({
             type: 'success',
             message: '已上传服务器!'
@@ -206,12 +208,15 @@
       },
       handleDeleteFriend(friend){
         if(friend.groupid===1){
-          this.$confirm('此操作将彻底删除该好友, 是否继续?', '提示', {
+          this.$confirm('这将彻底删除该好友! 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          
+          this.temp=friend.id
+          this.friends=this.friends.filter(friend1=>{
+            return friend1.id!==this.temp
+          })
           this.$message({
             type: 'success',
             message: '删除成功!'
@@ -231,7 +236,7 @@
       addGroup(){
         let newgroupID=this.friendgroups[this.friendgroups.length-1].groupid+1
         this.friendgroups.push({
-          userid:this.$store.getters.id,
+          belongid:this.$store.getters.id,
           groupid:newgroupID,
           name:"新建分组"
         })
@@ -251,9 +256,7 @@
         }
         let groups = this.friendgroups;
         let activeId = this.selectGroup;
-        if (activeId === targetId) {
-          activeId=1
-        }
+        activeId=1
         this.selectGroup = activeId;
         this.friendgroups = groups.filter(tab => tab.groupid !== targetId);
         this.friendgroups.forEach((group) => {
