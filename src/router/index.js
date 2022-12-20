@@ -51,6 +51,12 @@ export const constantRoutes = [
     component: () => import('@/views/404'),
     hidden: true
   },
+
+
+
+
+]
+export const asyncRoutes = [
   {
     path: '/',
     component: Layout,
@@ -59,7 +65,7 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: '首页', icon: 'dashboard' }
+      meta: { title: '首页', icon: 'dashboard' , roles: ['client']}
     }],
     hidden: false
   },
@@ -71,7 +77,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'calendarView',
         component: () => import('@/views/calendarView/index'),
-        meta: { title: '日程', icon: 'schedule' }
+        meta: { title: '日程', icon: 'schedule', roles: ['client'] }
       }
     ],
   },
@@ -84,7 +90,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'viewList',
         component: () => import('@/views/viewList/index'),
-        meta: { title: '视图', icon: 'viewlist' }
+        meta: { title: '视图', icon: 'viewlist' , roles: ['client']}
       }
     ],
   },
@@ -98,7 +104,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'DataReport',
         component: () => import('@/views/dataReport/index'),
-        meta: { title: '数据分析', icon: 'dataanalysis' }
+        meta: { title: '数据分析', icon: 'dataanalysis', roles: ['client'] }
       }
     ],
   },
@@ -110,44 +116,44 @@ export const constantRoutes = [
         path: 'index',
         name: 'Dustbin',
         component: () => import('@/views/dustbin/index'),
-        meta: { title: '回收站', icon: 'trashbin' }
+        meta: { title: '回收站', icon: 'trashbin', roles: ['client'] }
       }
     ],
   },
   {
-    path: '/activity',
+    path: '/activityIndex',
     component: Layout,
     children: [
       {
-        path: 'activityIndex',
+        path: 'index',
         name: 'ActivityIndex',
         component: () => import('@/views/activity/activityIndex'),
-        meta: { title: '活动广场', icon: 'activityindex' }
+        meta: { title: '活动广场', icon: 'activityindex', roles: ['client'] }
       }
     ],
   },
 
   {
-    path: '/activity',
+    path: '/mineActivity',
     component: Layout,
     children: [
       {
-        path: 'mineActivity',
+        path: 'index',
         name: 'MineActivity',
         component: () => import('@/views/activity/mineActivity'),
-        meta: { title: '我的活动', icon: 'activity' }
+        meta: { title: '我的活动', icon: 'activity', roles: ['client'] }
       }
     ],
   },
   {
-    path: '/activity',
+    path: '/activityPage',
     component: Layout,
     children: [
       {
-        path: 'activityPage',
+        path: 'index',
         name: 'ActivityPage',
         component: () => import('@/views/activity/activityPage'),
-        meta: { title: '活动页面', icon: 'activity' }
+        meta: { title: '活动页面', icon: 'activity', roles: ['client'] }
       }
     ],
     hidden: true,
@@ -160,7 +166,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'message',
         component: () => import('@/views/message/index'),
-        meta: { title: '消息', icon: 'message' }
+        meta: { title: '消息', icon: 'message', roles: ['client'] }
       }
     ],
   },
@@ -174,11 +180,26 @@ export const constantRoutes = [
         path: 'index',
         name: 'User',
         component: () => import('@/views/user/index'),
-        meta: { title: '用户', icon: 'user' }
+        meta: { title: '用户', icon: 'user' , roles: ['client']}
       }
     ],
     // hidden: true
   },
+
+
+  {
+    path: '/friend',
+    component: Layout,
+    children: [{
+      path: 'index',
+      name: 'Friend',
+      component: () => import('@/views/friend/index'),
+      meta: { title: '好友', icon: 'user', roles: ['client'] }
+    }
+    ],
+    hidden: true
+  },
+
   {
     path: '/adminConsole',
     component: Layout,
@@ -187,10 +208,9 @@ export const constantRoutes = [
         path: 'index',
         name: 'AdminConsole',
         component: () => import('@/views/adminConsole/index'),
-        meta: { title: '管理员控制台', icon: 'user' }
+        meta: { title: '管理员控制台', icon: 'user', roles: ['admin'] }
       }
     ],
-    // hidden: true
   },
   {
     path: '/adminExamineUser',
@@ -200,7 +220,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'AdminExmaineUser',
         component: () => import('@/views/adminExamine/ExamineUser'),
-        meta: { title: '审核用户', icon: 'user' }
+        meta: { title: '审核用户', icon: 'user', roles: ['admin'] }
       }
     ],
     // hidden: true
@@ -211,9 +231,9 @@ export const constantRoutes = [
     children: [
       {
         path: 'index',
-        name: 'AdminExmaineUser',
+        name: 'AdminExamineActivity',
         component: () => import('@/views/adminExamine/ExamineActivity'),
-        meta: { title: '审核活动', icon: 'user' }
+        meta: { title: '审核活动', icon: 'user', roles: ['admin'] }
       }
     ],
     // hidden: true
@@ -226,7 +246,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'DetailExamineUser',
         component: () => import('@/views/adminExamine/ExamineUser/DetailUserExamine'),
-        meta: { title: '详细审核用户', icon: 'user' }
+        meta: { title: '详细审核用户', icon: 'user', roles: ['admin'] }
       }
     ],
     hidden: true
@@ -239,30 +259,15 @@ export const constantRoutes = [
         path: 'index',
         name: 'DetailExamineActivity',
         component: () => import('@/views/adminExamine/ExamineActivity/DetailActivityExamine'),
-        meta: { title: '详细审核活动', icon: 'user' }
+        meta: { title: '详细审核活动', icon: 'user', roles: ['admin'] }
       }
     ],
     hidden: true
   },
-  {
-    path:'/friend',
-    component:Layout,
-    children:[{
-      path: 'index',
-      name: 'Friend',
-      component:()=>import('@/views/friend/index'),
-      meta:{title:'好友',icon:'user'}
-    }
-    ],
-    hidden:true
-  },
-
-
-
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
-]
 
+]
 const createRouter = () => new Router({
   // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
@@ -272,7 +277,7 @@ const createRouter = () => new Router({
 const router = createRouter()
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
-export function resetRouter () {
+export function resetRouter() {
   const newRouter = createRouter()
   router.matcher = newRouter.matcher // reset router
 }

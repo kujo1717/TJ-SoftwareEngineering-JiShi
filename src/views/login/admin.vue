@@ -9,7 +9,7 @@
       label-position="top"
     >
       <div class="title-container">
-        <h3 :class="titleClass">登录</h3>
+        <h3 :class="titleClass">管理员登录</h3>
       </div>
 
       <el-form-item prop="username" class="input-box">
@@ -50,13 +50,7 @@
       </el-form-item>
 
       <div style="display: flex; justify-content: space-around">
-        <el-button
-          type="success"
-          style="width: 25%"
-          @click.native.prevent="handleRegister"
-          >前往注册</el-button
-        >
-        <el-button type="text" @click="handleForget">忘记密码?</el-button>
+
         <el-button
           :loading="loading"
           type="primary"
@@ -64,22 +58,14 @@
           @click.native.prevent="handleLogin"
           >登录</el-button
         >
-        <!-- <el-button type="primary" @click="HelloWorldAPI"
-          >HelloWorldAPI</el-button
-        > -->
+
       </div>
 
-      <!-- <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div> -->
     </el-form>
   </div>
 </template>
 
 <script>
-import { HelloWorld } from "@/api/activity";
-// import store from "@/store/index";
 export default {
   name: "Login",
   data() {
@@ -105,8 +91,8 @@ export default {
     };
     return {
       loginForm: {
-        username: "657826973@qq.com",
-        password: "yy657826973",
+        username: "wyyxyy1@qq.com",
+        password: "testpass1",
       },
       loginRules: {
         username: [
@@ -135,15 +121,7 @@ export default {
     },
   },
   methods: {
-    HelloWorldAPI() {
-      HelloWorld()
-        .then((res) => {
-          console.log("HelloWorld:res:", res);
-        })
-        .catch((err) => {
-          console.log("HelloWorld:err:", err);
-        });
-    },
+
     showPwd() {
       if (this.passwordType === "password") {
         this.passwordType = "";
@@ -156,24 +134,12 @@ export default {
     },
     handleLogin() {
       this.loading = true;
-      this.$refs.loginForm.validate(async (valid) => {
+      this.$refs.loginForm.validate((valid) => {
         if (valid) {
           this.$store
             .dispatch("user/login", this.loginForm)
-            .then(async () => {
-              await this.$store.dispatch("user/getInfo");
-              const roles = this.$store.getters.roles;
-              console.log("login:roles:", roles);
-              let path_s = "";
-              if (roles.includes("admin")) {
-                path_s = "/adminConsole/index";
-              } else if (roles.includes("client")) {
-                path_s = "/dashboard";
-              }
-              this.$router.push({ path: path_s });
-
-              // this.$router.push({ path: this.redirect || path_s });
-
+            .then(() => {
+              this.$router.push({ path: this.redirect || "/" });
               console.log("跳转");
               this.loading = false;
             })
@@ -186,28 +152,8 @@ export default {
         }
       });
     },
-    handleRegister() {
-      this.titleClass = "title-leave";
-      setTimeout(() => {
-        this.loginFormClass = "login-form-leave";
-      }, 500);
 
-      setTimeout(() => {
-        this.$router.push("/register");
-        this.loading = false;
-      }, 1000);
-    },
-    handleForget() {
-      this.titleClass = "title-leave";
-      setTimeout(() => {
-        this.loginFormClass = "login-form-leave-forget";
-      }, 500);
 
-      setTimeout(() => {
-        this.$router.push("/forget");
-        this.loading = false;
-      }, 1000);
-    },
   },
 };
 </script>

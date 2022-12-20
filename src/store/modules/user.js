@@ -1,4 +1,4 @@
-import { login, logout, getInfo,register,update } from '@/api/user'
+import { login, logout, getInfo, register, update } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -7,10 +7,12 @@ const getDefaultState = () => {
     token: getToken(),
     name: '',
     avatar: '',
-    introduce:'',
-    age:'',
-    id:'',
-    email:''
+    introduce: '',
+    age: '',
+    id: '',
+    email: '',
+    roles: '',
+
   }
 }
 
@@ -29,18 +31,22 @@ const mutations = {
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
   },
-  SET_AGE:(state,age)=>{
-    state.age=age
+  SET_AGE: (state, age) => {
+    state.age = age
   },
-  SET_INTRODUCE:(state,introduce)=>{
-    state.introduce=introduce
+  SET_INTRODUCE: (state, introduce) => {
+    state.introduce = introduce
   },
-  SET_ID:(state,id)=>{
-    state.id=id;
+  SET_ID: (state, id) => {
+    state.id = id;
   },
-  SET_EMAIL:(state,email)=>{
-    state.email=email;
-  }
+  SET_EMAIL: (state, email) => {
+    state.email = email;
+  },
+  SET_ROLES: (state, roles) => {
+    state.roles = roles;
+  },
+
 }
 
 const actions = {
@@ -55,55 +61,55 @@ const actions = {
         setToken(data)
         resolve()
       }).catch(error => {
-        
+
         reject(error)
       })
     })
   },
   //user register
-  register({ commit },userInfo){
-    const { email,username, password } = userInfo
-    return new Promise((resolve,reject)=>{
+  register({ commit }, userInfo) {
+    const { email, username, password } = userInfo
+    return new Promise((resolve, reject) => {
       console.log("进入action")
-      register({email:email,password:password,name:username}).then(response=>{
+      register({ email: email, password: password, name: username }).then(response => {
         console.log(response)
         //const{data}=response
         //commit('SET_TOKEN', data)
         //setToken(data)
         resolve()
-      }).catch(error=>{
+      }).catch(error => {
         reject(error)
       })
     })
   },
-  updateInfo({commit},userInfo){
+  updateInfo({ commit }, userInfo) {
     console.log(userInfo)
-    const{name,age,introduce,avatarFile}=userInfo
-    let formData=new FormData()
-    formData.append('name',name)
-    formData.append('age',age)
-    formData.append('introduce',introduce)
-    if(avatarFile!=''){
-      formData.append('avatarFile',avatarFile.raw)
+    const { name, age, introduce, avatarFile } = userInfo
+    let formData = new FormData()
+    formData.append('name', name)
+    formData.append('age', age)
+    formData.append('introduce', introduce)
+    if (avatarFile != '') {
+      formData.append('avatarFile', avatarFile.raw)
     }
     console.log(formData)
     console.log("进入UpdateAction")
-    return new Promise((resolve,reject)=>{
-      
-      update(formData).then(response=>{
-        const{data}=response
+    return new Promise((resolve, reject) => {
+
+      update(formData).then(response => {
+        const { data } = response
         if (!data) {
           return reject('Verification failed, please Login again.')
         }
-        const { name, age,introduce,avatar,id } = data
+        const { name, age, introduce, avatar, id } = data
         commit('SET_NAME', name)
         commit('SET_AGE', age)
-        commit('SET_INTRODUCE',introduce)
-        commit('SET_AVATAR',avatar)
+        commit('SET_INTRODUCE', introduce)
+        commit('SET_AVATAR', avatar)
 
 
         resolve()
-      }).catch(error=>{
+      }).catch(error => {
         console.log("")
         reject(error)
       })
@@ -121,14 +127,24 @@ const actions = {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar,age,introduce,id,email } = data
-
+        const { name, avatar, age, introduce, id, email, role } = data
+        let roles = []
+        switch (role) {
+          case '0':
+            roles = ['client']
+            break
+          case '1':
+            roles = ['admin']
+            break
+        }
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         commit('SET_AGE', age)
-        commit('SET_INTRODUCE',introduce)
-        commit('SET_EMAIL',email)
-        commit('SET_ID',id)
+        commit('SET_INTRODUCE', introduce)
+        commit('SET_EMAIL', email)
+        commit('SET_ID', id)
+        commit('SET_ROLES', roles)
+
         resolve(data)
       }).catch(error => {
         reject(error)

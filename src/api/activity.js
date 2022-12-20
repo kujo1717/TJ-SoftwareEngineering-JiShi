@@ -265,3 +265,15 @@ export function getIsMember(user_id, activity_id) {
     })
 }
 
+//管理员删除活动
+export function deleteActivityByAdmin(admin_id, activity_id) {
+    return request({
+        url: '/api/activity/adminDeleteAct',
+        method: 'delete',
+        params: {
+            user_id: admin_id,
+            activity_id: activity_id
+        },
+
+    })
+}

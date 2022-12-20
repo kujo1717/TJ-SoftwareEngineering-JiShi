@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-export function getAuditLog (state) {
+export function getAuditLog(state) {
   return request({
     url: '/api/report/getNumByState',
     method: 'get',
@@ -10,7 +10,7 @@ export function getAuditLog (state) {
   })
 }
 
-export function getAllActivityReportList () {
+export function getAllActivityReportList() {
   return request({
     url: '/api/report/getReports',
     method: 'get',
@@ -22,7 +22,7 @@ export function getAllActivityReportList () {
   })
 }
 
-export function getAllUserReportList () {
+export function getAllUserReportList() {
   return request({
     url: '/api/report/getReports',
     method: 'get',
@@ -34,7 +34,7 @@ export function getAllUserReportList () {
   })
 }
 
-export function getOneReport (reportId) {
+export function getOneReport(reportId) {
   return request({
     url: '/api/report/getOneReport',
     method: 'get',
@@ -44,7 +44,7 @@ export function getOneReport (reportId) {
   })
 }
 
-export function postOneReport (reportObj){
+export function postOneReport(reportObj) {
   return request({
     url: '/api/report/postOneReport',
     method: 'post',
@@ -52,10 +52,11 @@ export function postOneReport (reportObj){
   })
 }
 
-export function patchOneReport(reportObj){
+export function patchOneReport(reportObj) {
   return request({
     url: '/api/report/patchOneReport',
     method: 'patch',
-    data: reportObj
+    data: reportObj,
+    params: reportObj,
   })
 }
