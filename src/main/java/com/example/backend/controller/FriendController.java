@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.common.Result;
 import com.example.backend.dto.FriendDTO;
 import com.example.backend.entity.friendGroup;
+import com.example.backend.service.FriendRequestService;
 import com.example.backend.service.FriendService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import java.util.Map;
 public class FriendController {
     @Autowired
     FriendService friendService;
+    @Autowired
+    FriendRequestService friendRequestService;
     @GetMapping("")
     public Result<Map<String,Object>> getUserFriends(@RequestParam Long id){
         Map<String,Object> map = new HashMap<>();
@@ -35,5 +38,11 @@ public class FriendController {
         }
         return Result.fail(10001,"失败");
 
+    }
+    @PatchMapping("sendRequest")
+    public Result<String> sendRequest(Long userid,String friendEmail){
+        if(friendRequestService.sendFriendRequest(userid, friendEmail, 1)){
+            return Result.success("成功发送好友申请");}
+        return Result.fail(10001,"你已经向对方发送过好友申请或目标不存在");
     }
 }

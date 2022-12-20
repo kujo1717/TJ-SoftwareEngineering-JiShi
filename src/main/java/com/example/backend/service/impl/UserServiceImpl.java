@@ -17,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
+import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.Base64;
@@ -63,7 +65,7 @@ public class UserServiceImpl implements UserService {
         if (user==null){
             return Result.fail(10001,"用户不存在");
         }
-        else if (!user.getPassword().equals(password)){
+        else if (!user.getPassword().equals(DigestUtils.md5DigestAsHex(password.getBytes()))){
             return Result.fail(10001,"密码错误");
         }
         String userId=user.getId().toString();
@@ -72,9 +74,13 @@ public class UserServiceImpl implements UserService {
     }
     public Result<String> registerUser(String email,String password,String name){
         User user=userMapper.selectByEmail(email);
+
         if (user!=null){
+            System.out.println("11111111111111111111111");
             return Result.fail(10001,"用户已验证");
         }
+
+        password= DigestUtils.md5DigestAsHex(password.getBytes());
         if(userMapper.insertUser(name,email,password)>0){
             user=userMapper.selectByEmail(email);
             String userId=user.getId().toString();

@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
+import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 @Service
@@ -70,7 +72,7 @@ public class UserForgetRequestServiceImpl implements UserForgetRequestService {
         if(!userForgetRequestDTO.getCode().equals(userForgetRequest.getCode())){
             return Result.fail(10001,"验证码不对！也许是失效了?");
         }
-        if(userMapper.updateUserPwd(userForgetRequestDTO.getPwd(), userForgetRequestDTO.getId())>0){
+        if(userMapper.updateUserPwd(DigestUtils.md5DigestAsHex(userForgetRequestDTO.getPwd().getBytes()), userForgetRequestDTO.getId())>0){
             return Result.success("成功修改！");
         }
             return Result.fail(10001,"奇怪的错误");

@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Service
 public interface FriendService {
-    Result<String> addFriend(String email);
+    Result<String> addFriend(Long userid,Long friendid);
     List<Map<String,Object>> getFriends(Long id);
     List<friend> getFriendList(Long id);
     boolean setNewFriends(FriendDTO friendDTO);

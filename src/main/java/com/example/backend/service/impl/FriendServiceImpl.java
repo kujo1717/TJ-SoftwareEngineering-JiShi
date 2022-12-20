@@ -23,9 +23,14 @@ public class FriendServiceImpl implements FriendService {
     FriendMapper friendMapper;
     @Autowired
     FriendGroupMapper friendGroupMapper;
-    public Result<String> addFriend(String email){
-
-        return Result.success("已发送请求");
+    public Result<String> addFriend(Long userid,Long friendid){
+        try {
+            friendMapper.insert(new friend(userid, friendid, 1L, null));
+            friendMapper.insert(new friend(friendid, userid, 1L, null));
+        }catch (Exception e){
+            return Result.fail(10001,e.getMessage());
+        }
+        return Result.success("添加成功");
     }
     public List<Map<String,Object>> getFriends(Long id){
         var friends=friendMapper.selectFriend(id);

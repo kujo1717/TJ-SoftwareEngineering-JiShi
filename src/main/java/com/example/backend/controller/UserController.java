@@ -79,7 +79,7 @@ public class UserController {
 
     @GetMapping("email")
     public Result<String> email(@RequestParam("user") String user, @RequestParam("code") String code) {
-
+        System.out.println("111111111");
         Base64.Decoder decoder = Base64.getDecoder();
         String str = new String(decoder.decode(code));
         String[] strings = str.split("/");
