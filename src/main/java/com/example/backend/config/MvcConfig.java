@@ -27,7 +27,6 @@ public class MvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/user/email")
                 .excludePathPatterns("/user/forget");
     }
-
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 //        registry.addResourceHandler("/static/**") //过滤策略

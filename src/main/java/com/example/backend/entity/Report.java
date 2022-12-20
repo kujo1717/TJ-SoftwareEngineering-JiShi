@@ -33,10 +33,12 @@ public class Report {
     private String detail;
     private Long activityId;
     private Long userId;
+    private Long adminId;
     private Long informerId;
     private String state;
     private String image;
     private String targetType;
+    private String handleOperation;
     @DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd hh:mm:ss")
     private Date reportTime;

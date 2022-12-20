@@ -2,11 +2,19 @@ package com.example.backend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.backend.Tools.SystemNoticeUtil;
+import com.example.backend.common.Result;
+import com.example.backend.entity.Activity;
 import com.example.backend.entity.ActivityApply;
 import com.example.backend.entity.Report;
+import com.example.backend.entity.User;
 import com.example.backend.mapper.ReportMapper;
+import com.example.backend.service.ActivityService;
 import com.example.backend.service.ReportService;
+import com.example.backend.service.UserService;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -21,6 +29,14 @@ import java.util.stream.Collectors;
 public class ReportServiceImpl implements ReportService {
     @Autowired
     private ReportMapper reportMapper;
+
+    @Autowired
+    private ActivityService activityService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private SystemNoticeUtil systemNoticeUtil;
+
 
     @Override
     public Map<String, Object> getReportList(String state, String target_type,String sortByTime) {
@@ -61,17 +77,35 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Map<String, Object> changeReportState(String state, Long report_id,Date handle_time) {
+    public Map<String, Object> changeReportState(String state,String handle_operation,Long admin_id,Long report_id,Date handle_time) {
         Map<String, Object> map = new HashMap<>();
+        Report report=reportMapper.selectById(report_id);
+
+        String state_=report.getState();
+
         Integer i = reportMapper.update(
                 null,
                 Wrappers.<Report>lambdaUpdate()
                         .eq(Report::getReportId, report_id)
                         .set(Report::getState, state)
                         .set(Report::getHandleTime,handle_time)
+                        .set(Report::getHandleOperation,handle_operation)
+                        .set(Report::getAdminId,admin_id)
         );
         map.put("i", i);
         map.put("state", state);
+        /**
+         * 举报单状态  0  ->  1
+         * 且状态修改成功
+         * 根据举报单信息 进行处理
+         * */
+        report=reportMapper.selectById(report_id);
+        if (state_.equals("0")&&state.equals("1")&&i.equals(1)){
+            Map<String, Object> handle_map=handleReport(report);
+            map.put("handle",handle_map);
+        }
+
+
         return map;
     }
 
@@ -102,5 +136,42 @@ public class ReportServiceImpl implements ReportService {
         map.put("user",user_list.size());
 
         return map;
+    }
+
+    @Override
+    public Map<String, Object> handleReport(Report report) {
+        Long activity_id=report.getActivityId();
+        Long user_id=report.getUserId();
+        Long admin_id=report.getAdminId();
+        User admin=userService.findUser(admin_id);
+        String handle_operation=report.getHandleOperation();
+        /** handle act */
+        if (activity_id!=null){
+            /**
+             * 1.删除活动
+             * */
+            Activity activity=activityService.getAct(activity_id);
+            Long creator_id=activity.getCreator_id();
+            if (handle_operation.equals("1")){
+                /**删除活动本身*/
+                int delete_act = activityService.DeleteAct(activity_id);
+                if (delete_act == 1) {
+                    /**向创建者发送通知*/
+                    String title="您的活动受到举报，现经审核已删除";
+                    String content="管理员<"+admin.getName()+">"+"经审核后删除了您的违规活动<"+activity.getTitle_name()+">";
+                    systemNoticeUtil.SendSystemNotice(creator_id,title,content);
+
+//                    return Result.success(res_map);
+                } else {
+//                    return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "DeleteAct FAILED!");
+                }
+            }
+
+
+        } else if (user_id!=null) {
+            /** handle user */
+        }
+
+        return null;
     }
 }
