@@ -127,6 +127,58 @@
           </div>
         </el-card>
       </el-tab-pane>
+      <!--好友 by135-->
+      <el-tab-pane label="好友通知" name="firend">
+        <span slot="label">
+          好友通知
+          <el-badge
+            v-if="(friend_unread_num > 0) & (friend_unread_num <= 99)"
+            class="mark"
+            :value="friend_unread_num"
+          />
+          <el-badge v-else-if="friend_unread_num > 99" class="mark" value="99+" />
+        </span> 
+
+        <el-card
+          v-for="info in firend_infos"
+          :key="info.index"
+          class="card-item"
+        >
+          <div slot="header">
+            <el-row>
+              <el-col :span="16" class="title-item">
+                <div v-if="info.friendRequest.status==3">{{ info.name}}同意了您的好友请求</div>
+                <div v-else-if="info.friendRequest.status==2">{{ info.name}}拒绝了您的好友请求</div>
+                <div v-else><el-avatar :size="60" :src="info.avatar"></el-avatar>{{ info.name}}想添加您为好友</div>
+                <el-badge v-if="info.status == 0" value="new" class="mark" />
+              </el-col>
+              
+            </el-row>
+            <el-row>
+              <el-col :span="8" class="date-item">
+                {{ info.friendRequest.createTime }}
+              </el-col>
+            </el-row>
+          </div>
+          <el-col v-if="info.friendRequest.status==1" :span="8" style="margin-left: 50%;">
+                <el-button
+                  class="button-item"
+                  type="text"
+                  @click="rejectFriend(info.index)"
+                  >拒绝</el-button>
+                <el-button
+                  class="button-item"
+                  type="text"
+                  @click="acceptFriend(info.index)"
+                  >接受</el-button>
+                
+            </el-col>
+            <el-col v-else :span="8" style="margin-left: 80%;">
+              该申请已处理
+            </el-col>
+        </el-card>
+      </el-tab-pane>
+      <!--好友结束-->
     </el-tabs>
     <el-dialog
       v-if="check_info != null"
@@ -148,20 +200,27 @@ import {
   getActivityInfo,
   getItemInfo,
   modifyNoticeStatus,
-  modifyItemNoticeStatus
+  modifyItemNoticeStatus,
+  getFriendRequest,
+  rejectFriendRequest,
+  acceptFriendRequest
 } from "@/api/message";
 export default {
   name: "Message",
   data() {
     return {
-      user_id: 1,
+      user_id: this.$store.getters.id,
       tab_name: "sys",
       system_infos: [],
       activity_infos: [],
       item_infos: [],
+      //好友by135
+      firend_infos:[],
       sys_unread_num: 0,
       act_unread_num: 0,
       item_unread_num: 0,
+      //好友by135
+      friend_unread_num:0,
       check_info: null,
       dialogVisible: false,
     };
@@ -201,6 +260,18 @@ export default {
     test(tab) {
       console.log(tab.name);
     },
+    acceptFriend(index){
+      acceptFriendRequest(this.user_id,this.firend_infos[index].friendRequest.friendid).then((res)=>{
+        console.log(res)
+        this.firend_infos[index].friendRequest.status=0;
+      })
+    },
+    rejectFriend(index){
+      rejectFriendRequest(this.user_id,this.firend_infos[index].friendRequest.friendid).then((res)=>{
+        console.log(res)
+        this.firend_infos[index].friendRequest.status=0;
+      })
+    }
   },
   async mounted() {
     await getSystemInfo(this.user_id)
@@ -242,6 +313,24 @@ export default {
         console.log(res);
         this.item_infos = res.data;
         this.item_infos.forEach((value, index) => {
+          // 添加index
+          value.index = index;
+          // 计算未读通知数
+          if (value.status == 0) {
+            this.item_unread_num++;
+          }
+        });
+        console.log("添加index后", this.item_infos);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+      //好友通知
+      await getFriendRequest(this.user_id)
+      .then((res) => {
+        console.log(res);
+        this.firend_infos = res.data;
+        this.firend_infos.forEach((value, index) => {
           // 添加index
           value.index = index;
           // 计算未读通知数

@@ -61,8 +61,6 @@
 </template>
   
 <script>
-import { validUsername } from '@/utils/validate'
-import { call } from 'body-parser'
 
 export default {
     name: 'Login',

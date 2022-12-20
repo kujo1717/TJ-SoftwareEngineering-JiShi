@@ -1,7 +1,18 @@
 <template>
     <div class="friend-container">
-      <h1>好友列表</h1><el-button type="primary" style="height: 50%;align-self: center;margin-left: 70%;">添加好友</el-button>
-      <el-button type="primary" style="height: 50%;align-self: center;" @click="(dialogVisible=true)">好友管理</el-button>
+      <h1>好友列表</h1><el-popover
+    placement="top-start"
+    title="添加好友"
+    width="200"
+    trigger="click"
+    style="margin-left: 60%;height: 50%;align-self: center;">
+    <div>
+    <el-input v-model="friendToAddEmail" placeholder="输入对方邮箱"></el-input>
+    <el-button type="primary" @click="addFriend(friendToAddEmail)">确定</el-button>
+  </div>
+    <el-button type="primary" slot="reference">添加好友</el-button>
+  </el-popover>
+      <el-button type="primary" style="height: 50%;align-self: center;margin-left: 1%;" @click="(dialogVisible=true)">好友管理</el-button>
       <hr width="100%"></hr>
       <div class="friend-groupbox">
         <el-menu default-active="1"
@@ -102,7 +113,7 @@
 
 </template>
 <script>
-  import { friendList,friendManage } from '@/api/friend';
+  import { friendList,friendManage,AddFriend} from '@/api/friend';
   export default {
     name: "CalenderView",
     data() {
@@ -113,7 +124,8 @@
         dialogVisible: false,
         selectGroup:1,
         reloading:true,
-        temp:null
+        temp:null,
+        friendToAddEmail:null
       };
     },
     computed:{
@@ -271,7 +283,21 @@
             }
         })
         console.log("群组"+this.friendgroups)
-      }
+      },
+      addFriend(friendEmail){
+        AddFriend(this.$store.getters.id,friendEmail).then(
+          this.$message({
+            type: 'success',
+            message: '添加成功!'
+          })
+        ).catch(() => {
+
+            this.$message({
+              type: 'error',
+              message: '已经发送过或目标不存在'
+            });          
+          })
+        }
 
     },
     mounted() {

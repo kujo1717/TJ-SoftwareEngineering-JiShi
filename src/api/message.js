@@ -29,6 +29,16 @@ export function getItemInfo(userId) {
         }
     })
 }
+//好友通知
+export function getFriendRequest(userId){
+    return request({
+        url:'/api/notice/getFriendRequest',
+        method:'get',
+        params:{
+            userId:userId
+        }
+    })
+}
 
 export function modifyNoticeStatus(userId, noticeId) {
     return request({
@@ -47,6 +57,26 @@ export function modifyItemNoticeStatus(itemNoticeId) {
         method: 'patch',
         params: {
             itemNoticeId: itemNoticeId
+        }
+    })
+}
+export function rejectFriendRequest(userid,friendid){
+    return request({
+        url:'/api/notice/rejectFriendRequest',
+        method:'patch',
+        params:{
+            userid:userid,
+            friendid:friendid
+        }
+    })
+}
+export function acceptFriendRequest(userid,friendid){
+    return request({
+        url:"/api/notice/acceptFriendRequest",
+        method:'patch',
+        params:{
+            userid:userid,
+            friendid:friendid
         }
     })
 }

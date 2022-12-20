@@ -2,15 +2,25 @@ import request from '@/utils/request'
 
 export function friendList(id) {
     return request({
-      url: '/friend',
+      url: '/api/friend',
       method: 'get',
       params: { id }
     })
   }
 export function friendManage(data){
   return request({
-    url:'/friend/manage',
+    url:'/api/friend/manage',
     method:'post',
     data
+  })
+}
+export function AddFriend(userid,email){
+  return request({
+    url:'/api/friend/sendRequest',
+    method:'patch',
+    params:{
+      userid:userid,
+      friendEmail:email
+    }
   })
 }
