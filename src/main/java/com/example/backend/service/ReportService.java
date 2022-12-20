@@ -25,11 +25,16 @@ public interface ReportService {
 
 
     /** 修改举报单状态 */
-    Map<String,Object> changeReportState(String state,Long report_id,Date handle_time);
+    Map<String,Object> changeReportState(String state,String handle_operation,Long admin_id,Long report_id,Date handle_time);
 
     /**获取具体状态的举报单数量 */
     Map<String,Object> getReportListNumByState(String state);
 
+
+    /**
+     * 根据举报单信息 进行处理
+     * */
+    Map<String,Object> handleReport(Report report);
 
 
 }

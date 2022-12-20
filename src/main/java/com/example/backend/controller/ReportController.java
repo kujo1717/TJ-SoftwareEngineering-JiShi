@@ -1,9 +1,13 @@
 package com.example.backend.controller;
 
 import com.example.backend.common.Result;
+import com.example.backend.entity.Activity;
 import com.example.backend.entity.ActivityApply;
 import com.example.backend.entity.Report;
+import com.example.backend.entity.User;
+import com.example.backend.service.ActivityService;
 import com.example.backend.service.ReportService;
+import com.example.backend.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,6 +30,12 @@ import java.util.Map;
 public class ReportController {
     @Autowired
     private ReportService reportService;
+
+    @Autowired
+    private ActivityService activityService;
+
+    @Autowired
+    private UserService userService;
 
     @ApiOperation("获取具体状态的举报单列表信息")
     @GetMapping("getNumByState")
@@ -126,7 +136,19 @@ public class ReportController {
 
         try{
             Map<String, Object> res_map=reportService.getReport(report_id);
-            map.put("report",res_map.get("report"));
+            Report report=(Report)res_map.get("report");
+            Long activity_id=report.getActivityId();
+            Long user_id=report.getUserId();
+            if (activity_id!=null){
+                Activity activity=activityService.getAct(activity_id);
+                map.put("activity",activity);
+            }
+            if (user_id!=null){
+                User user=userService.findUser(user_id);
+                map.put("user",user);
+            }
+
+            map.put("report",report);
             map.put("report_id",report_id);
 
             return Result.success(map);
@@ -145,7 +167,11 @@ public class ReportController {
             @ApiParam(name = "report_id", value = "举报单ID", required = true)
             @RequestParam("report_id") Long report_id,
             @ApiParam(name = "state", value = "希望设置的举报单的状态,0是未审核，1是已审核", required = true)
-            @RequestParam("state") String state
+            @RequestParam("state") String state,
+            @ApiParam(name = "admin_id", value = "管理员ID", required = true)
+            @RequestParam("admin_id") Long admin_id,
+            @ApiParam(name = "handle_operation", value = "处理的操作", required = false)
+            @RequestParam("handle_operation") String handle_operation
     ){
         Map<String,Object> map=new HashMap<>();
         if (state.equals("0")||state.equals("1")){
@@ -159,10 +185,9 @@ public class ReportController {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:ss");
         System.out.println("当前时间：" + sdf.format(now));
 
-
-
         try{
-            Map<String, Object> res_map=reportService.changeReportState(state,report_id,now);
+            /** change report state */
+            Map<String, Object> res_map=reportService.changeReportState(state,handle_operation,admin_id,report_id,now);
             map=res_map;
             if (map.get("i").equals(1)){
                 return Result.success(map);

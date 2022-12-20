@@ -1,14 +1,12 @@
 package com.example.backend.controller;
 
 import com.example.backend.Tools.DateTimeUtil;
+import com.example.backend.Tools.SystemNoticeUtil;
 import com.example.backend.common.Result;
 import com.example.backend.dto.ActivityUserRole;
 import com.example.backend.dto.ActivityBriefDto;
 import com.example.backend.dto.ActivityDetailDto;
-import com.example.backend.entity.Activity;
-import com.example.backend.entity.ActivityApply;
-import com.example.backend.entity.ActivityMark;
-import com.example.backend.entity.ActivityParticipate;
+import com.example.backend.entity.*;
 import com.example.backend.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +31,11 @@ public class ActivityController {
     @Autowired
     private ActivityService activityService;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private SystemNoticeUtil systemNoticeUtil;
     @Autowired
     private ActivityApplyService activityApplyService;
 
@@ -78,26 +81,25 @@ public class ActivityController {
     }
 
 
-
     @ApiOperation("获取所有活动")
     @GetMapping("/getAll")
-    public Result<Map<String,Object>> GetAll() {
-        List<Activity> activityList=activityService.getAll();
-        Map<String,Object> map=new HashMap<>();
-        map.put("all act",activityList);
+    public Result<Map<String, Object>> GetAll() {
+        List<Activity> activityList = activityService.getAll();
+        Map<String, Object> map = new HashMap<>();
+        map.put("all act", activityList);
         return Result.success(map);
     }
 
 
     @ApiOperation("Hello")
     @GetMapping("/HelloWorld")
-    public Result<Map<String,Object>> HelloWorld() {
+    public Result<Map<String, Object>> HelloWorld() {
 //        Map<String,Object> map=new HashMap<>();
 //        map.put("hello","hello");
 //        return Result.success(map);
-        List<Activity> activityList=activityService.getAll();
-        Map<String,Object> map=new HashMap<>();
-        map.put("all act",activityList);
+        List<Activity> activityList = activityService.getAll();
+        Map<String, Object> map = new HashMap<>();
+        map.put("all act", activityList);
         return Result.success(map);
     }
 
@@ -231,11 +233,11 @@ public class ActivityController {
 
     @ApiOperation("新建活动")
     @PostMapping("/postAct")
-    public Result<Map<String,Object>> insertOneActivity(
+    public Result<Map<String, Object>> insertOneActivity(
             @RequestBody Activity activity,
             @ApiParam(name = "tag_ids", value = "tag_ids", required = true)
             @RequestParam("tag_ids") List<Long> tag_ids) {
-        Map<String,Object> result_map=new HashMap<>();
+        Map<String, Object> result_map = new HashMap<>();
         System.out.println(activity);
         System.out.println(tag_ids);
         Long newID;
@@ -259,7 +261,7 @@ public class ActivityController {
         } catch (Exception e) {
             return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "insertOneActivity FAILED");
         }
-        result_map.put("activity_id",newID);
+        result_map.put("activity_id", newID);
         return Result.success(result_map);
     }
 
@@ -402,7 +404,7 @@ public class ActivityController {
             Integer res = activityService.SetActivityState(activity_id, 1);
             //取所有报名者
             List<ActivityApply> applyList = activityApplyService.GetAllApplicantList(activity_id);
-            if(applyList.size()>0){
+            if (applyList.size() > 0) {
                 //取得活动信息
                 Activity activity = activityService.getAct(activity_id);
                 Integer capacity = activity.getCapacity();
@@ -410,9 +412,9 @@ public class ActivityController {
                 //按时间排序，最早在前
                 List<ActivityApply> applyList_sort = applyList.stream().sorted
                         (Comparator.comparingLong(a -> a.getApply_time().getTime())).collect(Collectors.toList());
-                System.out.println("applyList:"+applyList.toString());
+                System.out.println("applyList:" + applyList.toString());
 
-                System.out.println("applyList_sort:"+applyList_sort.toString());
+                System.out.println("applyList_sort:" + applyList_sort.toString());
 
                 //删除所有报名人
                 activityApplyService.DeleteAct(activity_id);
@@ -424,7 +426,6 @@ public class ActivityController {
                     activityParticipateService.AddParticipant(participate);
                 }
             }
-
 
 
             return Result.success("creatorStopApply SUCCESS");
@@ -541,23 +542,77 @@ public class ActivityController {
 
     }
 
-    /**获取地图范围内的活动*/
+    /**
+     * 管理员删除活动
+     * 同时删除其他所有表的相关记录
+     * 发送通知
+     */
+    @ApiOperation("管理员删除活动")
+    @DeleteMapping("/adminDeleteAct")
+    public Result<Map<String, Object>> AdminDeleteAct(
+            @ApiParam(name = "admin_id", value = "管理员id", required = true)
+            @RequestParam("admin_id") Long admin_id,
+            @ApiParam(name = "activity_id", value = "活动id", required = true)
+            @RequestParam("activity_id") Long activity_id) {
+        Integer delete_act;
+        Map<String, Object> res_map = new HashMap<>();
+        res_map.put("admin_id", admin_id);
+        res_map.put("activity_id", activity_id);
+        try {
+            /**判断是管理员
+             * */
+            User admin=userService.findUser(admin_id);
+            Activity activity=activityService.getAct(activity_id);
+            Long creator_id=activity.getCreator_id();
+            if (admin.getRole().equals("1")){
+
+                /**删除活动本身*/
+                delete_act = activityService.DeleteAct(activity_id);
+                System.out.println("delete_act:" + delete_act);
+                if (delete_act == 1) {
+                    /**act本体删除成功，删除相关的表记录*/
+                    activityApplyService.DeleteAct(activity_id);
+                    activityParticipateService.DeleteAct(activity_id);
+
+                    /**向创建者发送通知*/
+                    systemNoticeUtil.SendSystemNotice(creator_id,"管理员删除活动","管理员"+admin.getName());
+
+                    return Result.success(res_map);
+                } else {
+                    return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "DeleteAct FAILED!");
+                }
+            }
+            else {
+                return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "NOT ADMINISTRATOR !");
+
+            }
+
+        } catch (Exception e) {
+            return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "DeleteAct FAILED!");
+        }
+
+    }
+
+
+    /**
+     * 获取地图范围内的活动
+     */
     @ApiOperation("获取地图范围内的活动")
     @GetMapping("/getMapAct")
-    public Result<Map<String,Object>> GetMapAct(
+    public Result<Map<String, Object>> GetMapAct(
             @ApiParam(name = "latitudes", value = "latitudes", required = true)
             @RequestParam("latitudes") List<Double> latitudes,
             @ApiParam(name = "longitudes", value = "longitudes", required = true)
             @RequestParam("longitudes") List<Double> longitudes
-            ) {
+    ) {
 //        System.out.println("latitudes"+latitudes);
-        Map<String,Object> map=new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         List<Activity> activityList = new ArrayList<>();
         try {
-            activityList=activityService.GetMapActList(latitudes,longitudes);
-            map.put("activityList",activityList);
-            map.put("latitudes",latitudes);
-            map.put("longitudes",longitudes);
+            activityList = activityService.GetMapActList(latitudes, longitudes);
+            map.put("activityList", activityList);
+            map.put("latitudes", latitudes);
+            map.put("longitudes", longitudes);
             return Result.success(map);
         } catch (Exception e) {
             return Result.fail(HttpStatus.EXPECTATION_FAILED.value(), "GetMapAct failed");

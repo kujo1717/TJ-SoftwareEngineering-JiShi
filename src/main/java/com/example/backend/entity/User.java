@@ -32,4 +32,5 @@ public class User {
     private int age;
     private String introduce;
     private String avatar;
+    private String role;
 }

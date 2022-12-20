@@ -3,6 +3,7 @@ package com.example.backend.controller;
 
 import com.example.backend.Tools.JwtUtil;
 import com.example.backend.Tools.SendNoticeUtil;
+import com.example.backend.Tools.SystemNoticeUtil;
 import com.example.backend.common.Result;
 import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.Notice;
@@ -39,9 +40,7 @@ import static com.example.backend.Tools.SendNoticeUtil.formatDay;
 public class UserController {
 
     @Autowired
-    NoticeService noticeService;
-    @Autowired
-    UserNoticeService userNoticeService;
+    private SystemNoticeUtil systemNoticeUtil;
 
 
     @Autowired
@@ -68,9 +67,7 @@ public class UserController {
 
     @PostMapping("login")
     public Result<String> login(@RequestBody User user) {
-        //System.out.println("111");
         User user_whole=userService.getUserByEmail(user.getEmail());
-        SendUserNotice(user_whole.getId(),"系统记录","成功登录");
         return userService.confirmUser(user.getEmail(), user.getPassword());
     }
 
@@ -93,7 +90,6 @@ public class UserController {
 
     @PostMapping("register")
     public Result<String> register(@RequestBody User user) throws MessagingException {
-
 
         return userService.email(user);
         //return userService.registerUser(user.getEmail(),user.getPassword(),user.getName());
@@ -145,19 +141,4 @@ public class UserController {
     }
 
 
-
-    /**发送系统通知的接口
-     * */
-    public Integer SendUserNotice(Long user_id,String title,String content)
-    {
-        Integer i;
-
-        // 获取当前的时间
-        var Now = new Date();
-        Notice notice = new Notice(formatDay(Now)+":"+title, content, Now, 1);
-        noticeService.addNotice(notice);
-        UserNotice userNotice = new UserNotice(user_id, notice.getNoticeId(), 0);
-        i=userNoticeService.addUserNotice(userNotice);
-        return i;
-    }
 }
