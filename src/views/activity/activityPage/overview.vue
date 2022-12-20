@@ -98,6 +98,12 @@
         </div>
         <!-- 成员展示 -->
         <div class="pmb_members">
+          <!-- 点击邀请好友 -->
+          <i
+            class="el-icon-circle-plus-outline"
+            style="margin-top: 1em; font-size: 1.8em"
+            @click="ClickShowInviteFriend"
+          ></i>
           <div
             class="pmb_member_item"
             v-for="(member, index) in participant_list"
@@ -263,10 +269,13 @@
           <img :src="other_user_detail_data.avatar" style="height: 200px" />
         </div>
         <div>
-          <span>{{ other_user_detail_data.name }}</span>
+          <span>用户名：{{ other_user_detail_data.name }}</span>
         </div>
         <div>
-          <span>{{ other_user_detail_data.introduce }}</span>
+          <span>用户介绍：{{ other_user_detail_data.introduce }}</span>
+        </div>
+        <div>
+          <span>联系邮箱：{{ other_user_detail_data.email }}</span>
         </div>
         <!-- <div>
           <el-button type="primary" v-if="other_user_detail_data.relation == 2"
@@ -686,6 +695,33 @@
         ></MapChoose>
       </span>
     </el-dialog>
+
+    <!-- 邀请好友的dialog -->
+    <el-dialog
+      :v-if="showDialog_inviteFriend"
+      :visible.sync="showDialog_inviteFriend"
+      title="邀请好友参与活动"
+    >
+      <span>
+        <el-tree
+          :data="friend_tree_data"
+          show-checkbox
+          default-expand-all
+          node-key="id"
+          ref="tree"
+          highlight-current
+          props="{
+          children: 'children',
+          label: 'label'
+        }"
+        >
+        </el-tree>
+        <el-button @click="resetChecked">清空选中</el-button>
+        <el-button type="primary" @click="InviteFriends"
+          >确认邀请好友</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -702,6 +738,8 @@ import {
   patchActStopApply,
   postActivityApply,
 } from "@/api/activity";
+import { friendList } from "@/api/friend";
+
 import MapChoose from "@/components/MapChoose";
 import ReportBox from "@/components/ReportBox";
 
@@ -968,6 +1006,15 @@ export default {
           value: 2,
         },
       ],
+
+      /**
+       * 邀请好友
+       *
+       */
+      //好友列表数据
+      friends_data: [],
+      friend_tree_data: [],
+      showDialog_inviteFriend: false,
     };
   },
   created: function () {},
@@ -1413,19 +1460,17 @@ export default {
 
     // 查看某个user的 detail
     CheckUserDetail(user) {
-      const userID = user.id;
-      // console.log(userID);
       this.isShow_dialog_user = true;
-      // api
-      // userID请求user详情
+
       this.other_user_detail_data = {};
       this.other_user_detail_data = {
-        id: userID,
+        id: user.id,
         name: user.name,
         avatar: user.avatar,
-        role: user.role,
-        relation: 2, // 0 是我，1是好友，2不是好友
+        email: user.email,
+        introduce: user.introduce,
       };
+      console.log("other_user_detail_data:", other_user_detail_data);
       this.other_user_detail_data = mem;
     },
 
@@ -1961,6 +2006,62 @@ export default {
         }
       }
       this.image_urlList = image_urlList;
+    },
+
+    /**
+     * 邀请好友
+     */
+    //邀请好友的弹窗显示
+    ClickShowInviteFriend() {
+      this.showDialog_inviteFriend = true;
+      this.getUserFriends();
+    },
+
+    //获取当前用户的好友
+    async getUserFriends() {
+      await friendList(this.user_id)
+        .then((res) => {
+          console.log("friendList:res", res);
+          this.friends_data = res.data;
+          const group_data = res.data.groups;
+          const friend_data = res.data.friends;
+          /**
+           * 拼装tree数据
+           */
+          let friend_tree_data = [];
+          group_data.forEach((group) => {
+            let one_group_children = [];
+            friend_data.forEach((f) => {
+              if (f.groupid == group.groupid) {
+                one_group_children.push({
+                  id: f.id,
+                  label: f.email,
+                });
+              }
+            });
+            friend_tree_data.push({
+              id: group.groupid,
+              label: group.name,
+              children: one_group_children,
+            });
+          });
+
+          this.friend_tree_data = friend_tree_data;
+        })
+        .catch((err) => {
+          console.log("friendList:err", err);
+        });
+    },
+
+    //清空选中好友
+    resetChecked() {
+      this.$refs.tree.setCheckedKeys([]);
+    },
+
+    //选中若干好友后，给所有好友发送参与活动的邀请
+    InviteFriends() {
+      let chosen_nodes = this.$refs.tree.getCheckedNodes(true);
+      console.log("chosen_nodes:", chosen_nodes);
     },
   },
   computed: {
