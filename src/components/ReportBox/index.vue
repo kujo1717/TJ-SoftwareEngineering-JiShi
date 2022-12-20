@@ -21,7 +21,8 @@ selection参数用于选择按钮的样式，这个样式是你们告诉我然�
       @click="dialogOpen()"
       size="mini"
       type="danger"
-    >提交举报单</el-button>
+      >提交举报单</el-button
+    >
 
     <el-dialog
       class="serviceDialog"
@@ -38,30 +39,16 @@ selection参数用于选择按钮的样式，这个样式是你们告诉我然�
           label-width="200px"
           class="demo-ruleForm"
         >
-
-          <el-form-item
-            v-if="targetType=='1'"
-            class="center"
-          >
-            <h2>将举报用户：{{userId}}</h2>
+          <el-form-item v-if="targetType == '1'" class="center">
+            <h2>将举报用户：{{ userId }}</h2>
           </el-form-item>
-          <el-form-item
-            v-else-if="targetType=='0'"
-            class="center"
-          >
-            <h2>将举报活动：{{activityId}}</h2>
+          <el-form-item v-else-if="targetType == '0'" class="center">
+            <h2>将举报活动：{{ activityId }}</h2>
           </el-form-item>
 
           <!--多选框-->
-          <el-form-item
-            label="举报分类"
-            prop="type"
-            v-if="targetType=='0'"
-          >
-            <el-select
-              v-model="form.type"
-              placeholder="请选择"
-            >
+          <el-form-item label="举报分类" prop="type" v-if="targetType == '0'">
+            <el-select v-model="form.type" placeholder="请选择">
               <el-option
                 v-for="item in activityReportTypes"
                 :key="item.value"
@@ -74,13 +61,10 @@ selection参数用于选择按钮的样式，这个样式是你们告诉我然�
           <el-form-item
             label="举报分类"
             prop="type"
-            v-else-if="targetType=='1'"
+            v-else-if="targetType == '1'"
           >
             <!--多选框-->
-            <el-select
-              v-model="form.type"
-              placeholder="请选择"
-            >
+            <el-select v-model="form.type" placeholder="请选择">
               <el-option
                 v-for="item in userReportTypes"
                 :key="item.value"
@@ -90,10 +74,7 @@ selection参数用于选择按钮的样式，这个样式是你们告诉我然�
             </el-select>
           </el-form-item>
 
-          <el-form-item
-            label="举报详述"
-            prop="detail"
-          >
+          <el-form-item label="举报详述" prop="detail">
             <el-input
               type="textarea"
               :rows="5"
@@ -102,23 +83,12 @@ selection参数用于选择按钮的样式，这个样式是你们告诉我然�
             ></el-input>
           </el-form-item>
 
-          <el-form-item
-            label="举报截图"
-            prop="pic"
-          >
-          </el-form-item>
-
+          <el-form-item label="举报截图" prop="pic"> </el-form-item>
         </el-form>
         <!-- 底部的slot插槽 -->
       </div>
-      <span
-        slot="footer"
-        class="dialogFooter"
-      >
-        <el-button
-          type="primary"
-          @click="onSubmit()"
-        >确认</el-button>
+      <span slot="footer" class="dialogFooter">
+        <el-button type="primary" @click="onSubmit()">确认</el-button>
         <el-button @click="Cancel()">取消</el-button>
       </span>
     </el-dialog>
@@ -126,10 +96,10 @@ selection参数用于选择按钮的样式，这个样式是你们告诉我然�
 </template>
 
 <script>
-import { postOneReport } from '@/api/admin.js'
+import { postOneReport } from "@/api/admin.js";
 export default {
   name: "ReportBox",
-  data () {
+  data() {
     return {
       dialogVisible: false,
       form: {
@@ -140,56 +110,60 @@ export default {
         type: "string",
         detail: "string",
         image: "string",
-        targetType: this.targetType,    
+        targetType: this.targetType,
       },
 
-      userReportTypes: [{
-        value: '言语粗俗',
-        label: '言语粗俗'
-      }, {
-        value: '传播谣言',
-        label: '传播谣言'
-      }, {
-        value: '涉嫌诈骗',
-        label: '涉嫌诈骗'
-      }, {
-        value: '恶意骚扰',
-        label: '恶意骚扰'
-      }, {
-        value: '其他',
-        label: '其他'
-      }],
+      userReportTypes: [
+        {
+          value: "言语粗俗",
+          label: "言语粗俗",
+        },
+        {
+          value: "传播谣言",
+          label: "传播谣言",
+        },
+        {
+          value: "涉嫌诈骗",
+          label: "涉嫌诈骗",
+        },
+        {
+          value: "恶意骚扰",
+          label: "恶意骚扰",
+        },
+        {
+          value: "其他",
+          label: "其他",
+        },
+      ],
 
-      activityReportTypes: [{
-        value: '聚众赌博',
-        label: '聚众赌博'
-      }, {
-        value: '邪教传播',
-        label: '邪教传播'
-      }, {
-        value: '非法组织',
-        label: '非法组织'
-      }, {
-        value: '贩卖毒品',
-        label: '贩卖毒品'
-      }, {
-        value: '其他',
-        label: '其他'
-      }],
+      activityReportTypes: [
+        {
+          value: "聚众赌博",
+          label: "聚众赌博",
+        },
+        {
+          value: "邪教传播",
+          label: "邪教传播",
+        },
+        {
+          value: "非法组织",
+          label: "非法组织",
+        },
+        {
+          value: "贩卖毒品",
+          label: "贩卖毒品",
+        },
+        {
+          value: "其他",
+          label: "其他",
+        },
+      ],
 
-      rules: {
-
-      },
+      rules: {},
     };
   },
   //先执行props传参，再执行上面form中的初始化，然后再执行mounted
-  props: [
-    "selection",
-    "targetType",
-    "informerId",
-    "userId",
-    "activityId",
-  ],
+  props: ["selection", "targetType", "informerId", "userId", "activityId"],
 
   watch: {
     dialogVisible: {
@@ -202,16 +176,19 @@ export default {
   },
 
   methods: {
-    dialogOpen () {
+    dialogOpen() {
       this.dialogVisible = true;
     },
-    onSubmit () {
-      this.$msgbox('提交中...', '举报单提交', {
-        confirmButtonText: '正在努力提交中',
+    onSubmit() {
+      this.$msgbox("提交中...", "举报单提交", {
+        confirmButtonText: "正在努力提交中",
         confirmButtonLoading: true,
       });
 
       //post给后端
+      this.form.activityId=this.activityId;
+      this.form.userId=this.userId;
+      console.log("post report:form", this.form);
       postOneReport(this.form)
         .then((res) => {
           console.log(res);
@@ -221,7 +198,7 @@ export default {
             message: "举报单提交成功！",
           });
           this.dialogVisible = false;
-          
+
           //this.uploadPhoto(res.data.message.id);
         })
         .catch((err) => {
@@ -233,7 +210,7 @@ export default {
           });
         });
     },
-    Cancel () {
+    Cancel() {
       this.dialogVisible = false;
       this.$message({
         type: "info",
@@ -243,26 +220,23 @@ export default {
       //this.MakeFormEmpty();
     },
 
-
     // 文件状态改变时的钩子，添加文件、上传成功和上传失败时都会被调用
-    onUploadChange (file, fileList) {
-
-    }
+    onUploadChange(file, fileList) {},
   },
-  handleRemove (file, fileList) {
+  handleRemove(file, fileList) {
     setTimeout(() => {
       this.fileList = fileList;
     }, 1000);
   },
-  handlePictureCardPreview (file) {
+  handlePictureCardPreview(file) {
     this.dialogImageUrl = file.url;
     this.dialogVisible = true;
   },
 
   mounted: function () {
 
-  },
 
+  },
 };
 </script>
 

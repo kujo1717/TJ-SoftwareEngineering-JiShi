@@ -228,7 +228,10 @@
 
       <span v-if="state_val == 1">
         <h2>已结束报名！活动正在进行中</h2>
-        <el-button type="text" @click="ClickCreatorFinishAct"
+        <el-button
+          v-if="UserIdentity == 'creator'"
+          type="text"
+          @click="ClickCreatorFinishAct"
           >结束活动</el-button
         >
       </span>
@@ -246,6 +249,8 @@
       >
         删除活动
       </el-button>
+
+      <ReportBox selection="test" targetType="0" :activityId="activity_id" />
 
       <!-- 某个用户的详情查看 -->
       <el-dialog
@@ -698,6 +703,7 @@ import {
   postActivityApply,
 } from "@/api/activity";
 import MapChoose from "@/components/MapChoose";
+import ReportBox from "@/components/ReportBox";
 
 import { getAllTag } from "@/api/tag";
 import { getInfo } from "@/api/user";
@@ -711,7 +717,7 @@ import VuePoll from "vue-poll";
 import ActivityMarkCard from "./markcard.vue";
 export default {
   name: "ActivityPageOverView",
-  components: { VuePoll, ActivityMarkCard, MapChoose },
+  components: { VuePoll, ActivityMarkCard, MapChoose, ReportBox },
   data() {
     return {
       /**
@@ -1985,6 +1991,7 @@ export default {
   },
   mounted() {
     this.activity_id = this.$route.query.id;
+
     // 根据传入的id，获取活动的详情
     this.getActDetail(this.activity_id);
 
