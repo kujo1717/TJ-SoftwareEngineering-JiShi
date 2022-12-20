@@ -408,7 +408,7 @@ public class ActivityController {
                 //取得活动信息
                 Activity activity = activityService.getAct(activity_id);
                 Integer capacity = activity.getCapacity();
-                Integer participatant_num = activity.getParticipant_num();
+                Integer participatant_num = activityParticipateService.CountParticipantNum(activity_id);
                 //按时间排序，最早在前
                 List<ActivityApply> applyList_sort = applyList.stream().sorted
                         (Comparator.comparingLong(a -> a.getApply_time().getTime())).collect(Collectors.toList());

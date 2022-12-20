@@ -54,7 +54,7 @@ public class ActivityDetailDto {
 
 
     private Short state;
-    private Short repeat_interval;
+
 
     @JsonSerialize(using = ToStringSerializer.class)
     private Long creator_id;
@@ -96,14 +96,12 @@ public class ActivityDetailDto {
         this.capacity = activity.getCapacity();
         this.state = activity.getState();
         this.creator_id = activity.getCreator_id();
-        this.applicant_num = activity.getApplicant_num();
-        this.participant_num = activity.getParticipant_num();
+
 
         this.address_formatted=activity.getAddress_formatted();
         this.address_name=activity.getAddress_name();
         this.longitude=activity.getLongitude();
         this.latitude=activity.getLatitude();
-        this.repeat_interval=activity.getRepeat_interval();
         this.images=activity.getImages();
 
     }

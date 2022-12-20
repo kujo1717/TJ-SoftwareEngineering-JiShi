@@ -66,11 +66,7 @@ public class Activity {
     @TableField( "capacity")
     private Integer capacity;
 
-    @TableField( "participant_num")
-    private Integer participant_num;
 
-    @TableField( "applicant_num")
-    private Integer applicant_num;
 
     @TableField( "hit_num")
     private Integer hit_num;
@@ -80,8 +76,7 @@ public class Activity {
 
     @TableField( "state")
     private Short state;
-    @TableField( "repeat_interval")
-    private Short repeat_interval;
+
     @TableField( "creator_id")
     private Long creator_id;
 
