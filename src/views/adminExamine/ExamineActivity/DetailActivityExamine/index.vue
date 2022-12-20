@@ -31,23 +31,29 @@
     <!--活动信息-->
     <div>
       <el-descriptions title="活动详情" :column="2" border>
-        <el-descriptions-item label="举报单ID"
-          >{{ form.reportId }}
-        </el-descriptions-item>
-        <el-descriptions-item label="举报人ID"
-          >{{ form.informerId }}
-        </el-descriptions-item>
         <el-descriptions-item label="活动ID"
-          >{{ form.activityId }}
+          >{{ activity.activity_id }}
         </el-descriptions-item>
-        <el-descriptions-item label="举报分类">{{
-          form.type
-        }}</el-descriptions-item>
-        <el-descriptions-item label="举报详述"
-          >{{ form.detail }}
+        <el-descriptions-item label="活动名字"
+          >{{ activity.title_name }}
         </el-descriptions-item>
-        <el-descriptions-item label="举报时间"
-          >{{ form.reportTime }}
+        <el-descriptions-item label="参与容量"
+          >{{ activity.capacity }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="简介"
+          >{{ activity.summary }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="文字说明"
+          >{{ activity.detail_text }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="点击量"
+          >{{ activity.hit_num }}
+        </el-descriptions-item>
+        <el-descriptions-item label="开始时间"
+          >{{ activity.start_time }}
         </el-descriptions-item>
       </el-descriptions>
     </div>
@@ -114,6 +120,7 @@ export default {
       form: {},
       his_obj: {},
       loading: false,
+      activity: "",
     };
   },
   computed: {
@@ -182,9 +189,11 @@ export default {
   },
   mounted: function () {
     //上一个页面传来的参数
-    let reportDetail = this.$route.query.res.data.report;
+    let reportDetail = this.$route.query.res.data;
     console.log("reportDetail:res", this.$route.query.res.data);
-    this.form = reportDetail;
+    this.activity = reportDetail.activity;
+
+    this.form = reportDetail.report;
     for (let i in this.form) {
       if (this.form[i] == "" || this.form[i] == null) this.form[i] = "未知";
     }
