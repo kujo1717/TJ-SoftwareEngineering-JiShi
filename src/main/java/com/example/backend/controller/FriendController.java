@@ -45,4 +45,19 @@ public class FriendController {
             return Result.success("成功发送好友申请");}
         return Result.fail(10001,"你已经向对方发送过好友申请或目标不存在");
     }
+
+    @PostMapping("inviteAct")
+    public Result<Map<String,Object>> inviteAct(
+            @RequestParam("friendId_list") List<Long> friendId_list,
+            @RequestParam("activity_id") Long activity_id,
+            @RequestParam("user_id") Long user_id
+    ){
+        Map<String,Object> map = new HashMap<>();
+        map.put("friendId_list",friendId_list);
+        map.put("activity_id",activity_id);
+        map.put("user_id",user_id);
+
+        return Result.success(map);
+
+    }
 }
