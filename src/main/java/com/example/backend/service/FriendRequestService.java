@@ -9,7 +9,7 @@ import java.util.List;
 @Service
 public interface FriendRequestService {
     List<FriendRequestDto> findFriendRequest(Long userid);
-    boolean sendFriendRequest(Long userid,String friendEmail,int status);
-    boolean sendFriendRequestById(Long userid,Long friendId,int status);
+    boolean sendFriendRequest(Long userid,String friendEmail,Long activity_id,int status);
+    boolean sendFriendRequestById(Long userid,Long friendId,Long activity_id,int status);
     boolean modifyFriendRequestStatus(Long userid,Long friendid);
 }

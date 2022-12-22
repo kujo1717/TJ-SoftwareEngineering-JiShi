@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.backend.dto.FriendRequestDto;
+import com.example.backend.entity.Activity;
 import com.example.backend.entity.User;
 import com.example.backend.entity.friendRequest;
+import com.example.backend.mapper.ActivityMapper;
 import com.example.backend.mapper.FriendRequestMapper;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.service.FriendRequestService;
@@ -21,6 +23,8 @@ public class FriendRequestImpl implements FriendRequestService {
     FriendRequestMapper friendRequestMapper;
     @Autowired
     UserMapper userMapper;
+    @Autowired
+    ActivityMapper activityMapper;
     @Override
     public List<FriendRequestDto> findFriendRequest(Long userid) {
         QueryWrapper<friendRequest> queryWrapper=new QueryWrapper<>();
@@ -29,16 +33,23 @@ public class FriendRequestImpl implements FriendRequestService {
         var requestList=friendRequestMapper.selectList(queryWrapper);
         for (int i=0;i<requestList.size();i++){
             User user=userMapper.selectById(requestList.get(i).getFriendid());
-            re.add(new FriendRequestDto(requestList.get(i),user.getName(),user.getAvatar()));
+            System.out.println("获取活动id"+requestList.get(i));
+            Activity activity=activityMapper.selectById(requestList.get(i).getActivityId());
+
+            if (activity!=null) {
+                re.add(new FriendRequestDto(requestList.get(i), user.getName(), user.getAvatar(), activity.getTitle_name()));
+            }
+            else
+                re.add(new FriendRequestDto(requestList.get(i), user.getName(), user.getAvatar(),null));
         }
         return re;
     }
 
     @Override
-    public boolean sendFriendRequest(Long userid, String friendEmail,int status) {
+    public boolean sendFriendRequest(Long userid, String friendEmail,Long activity_id,int status) {
         var Now=new Date();
         Long friendId=userMapper.selectByEmail(friendEmail).getId();
-        friendRequest friend_request=new friendRequest(friendId,userid,Now,status);
+        friendRequest friend_request=new friendRequest(friendId,userid,Now,activity_id,status);
         try {
             if (friendRequestMapper.insert(friend_request) > 0) {
                 return true;
@@ -49,9 +60,9 @@ public class FriendRequestImpl implements FriendRequestService {
         return false;
     }
     @Override
-    public boolean sendFriendRequestById(Long userid, Long friendid,int status) {
+    public boolean sendFriendRequestById(Long userid, Long friendid,Long activity_id,int status) {
         var Now=new Date();
-        friendRequest friend_request=new friendRequest(userid,friendid,Now,status);
+        friendRequest friend_request=new friendRequest(userid,friendid,Now,activity_id,status);
         if(friendRequestMapper.insert(friend_request)>0) {
             return true;
         }

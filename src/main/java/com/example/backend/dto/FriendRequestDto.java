@@ -15,4 +15,5 @@ public class FriendRequestDto {
     friendRequest friendRequest;
     String name;
     String avatar;
+    String activity_name;
 }

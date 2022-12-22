@@ -151,7 +151,7 @@ public class NoticeController {
                                                     @RequestParam("friendid") Long friendid){
         try{
             if (friendRequestService.modifyFriendRequestStatus(userid,friendid)){
-                friendRequestService.sendFriendRequestById(friendid,userid,2);
+                friendRequestService.sendFriendRequestById(friendid,userid,null,2);
                 return Result.success("信息状态更新成功");
             }
             return Result.success("更新失败");
@@ -167,7 +167,7 @@ public class NoticeController {
                                                   @RequestParam("friendid") Long friendid){
         try{
             if (friendRequestService.modifyFriendRequestStatus(userid,friendid)){
-                friendRequestService.sendFriendRequestById(friendid,userid,3);
+                friendRequestService.sendFriendRequestById(friendid,userid,null,3);
                 friendService.addFriend(userid,friendid);
                 return Result.success("信息状态更新成功");
             }

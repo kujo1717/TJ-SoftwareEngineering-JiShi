@@ -41,7 +41,7 @@ public class FriendController {
     }
     @PatchMapping("sendRequest")
     public Result<String> sendRequest(Long userid,String friendEmail){
-        if(friendRequestService.sendFriendRequest(userid, friendEmail, 1)){
+        if(friendRequestService.sendFriendRequest(userid, friendEmail, null,1)){
             return Result.success("成功发送好友申请");}
         return Result.fail(10001,"你已经向对方发送过好友申请或目标不存在");
     }
@@ -56,7 +56,9 @@ public class FriendController {
         map.put("friendId_list",friendId_list);
         map.put("activity_id",activity_id);
         map.put("user_id",user_id);
-
+        for(int i=0;i<friendId_list.size();i++){
+           friendRequestService.sendFriendRequestById(friendId_list.get(i),user_id,activity_id,4);
+        }
         return Result.success(map);
 
     }
