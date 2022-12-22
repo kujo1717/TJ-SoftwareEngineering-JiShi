@@ -147,7 +147,9 @@
           <div slot="header">
             <el-row>
               <el-col :span="16" class="title-item">
-                <div v-if="info.friendRequest.status==3">{{ info.name}}同意了您的好友请求</div>
+                <!--活动的邀请-->
+                <div v-if="info.friendRequest.status==4 || info.friendRequest.status==5">{{info.name}}邀请您参加活动{{info.activity_name}}</div>
+                <div v-else-if="info.friendRequest.status==3">{{ info.name}}同意了您的好友请求</div>
                 <div v-else-if="info.friendRequest.status==2">{{ info.name}}拒绝了您的好友请求</div>
                 <div v-else><el-avatar :size="60" :src="info.avatar"></el-avatar>{{ info.name}}想添加您为好友</div>
                 <el-badge v-if="info.status == 0" value="new" class="mark" />
@@ -170,6 +172,20 @@
                   class="button-item"
                   type="text"
                   @click="acceptFriend(info.index)"
+                  >接受</el-button>
+                
+            </el-col>
+            <!--活动的邀请,处理后状态为5-->
+            <el-col v-else-if="info.friendRequest.status==4" :span="8" style="margin-left: 50%;">
+                <el-button
+                  class="button-item"
+                  type="text"
+                  @click=""
+                  >拒绝</el-button>
+                <el-button
+                  class="button-item"
+                  type="text"
+                  @click=""
                   >接受</el-button>
                 
             </el-col>

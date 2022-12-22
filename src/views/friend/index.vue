@@ -80,7 +80,7 @@
           <el-input v-model="friends[friends.indexOf(item)].name" style="width:10% ;"></el-input>
           <span>原名:{{item.rootname}}</span>
           <span style="margin-left:100px">{{item.email}}</span>
-  <el-button type="text"style="margin-left: 500px;margin-right: 20px;" @click="handleDeleteFriend(item)">删除</el-button>
+  <el-button type="text" style="margin-left: 500px;margin-right: 20px;" @click="handleDeleteFriend(item)">删除</el-button>
   <el-dropdown @command="handleCommand">
   <span class="el-dropdown-link">
     移动至<i class="el-icon-arrow-down el-icon--right"></i>
@@ -120,9 +120,9 @@
       return {
         friends:[],
         friendgroups:[],
-        groupindex:1,
+        groupindex:"1",
         dialogVisible: false,
-        selectGroup:1,
+        selectGroup:"1",
         reloading:true,
         temp:null,
         friendToAddEmail:null
@@ -246,16 +246,18 @@
         }
       },
       addGroup(){
-        let newgroupID=this.friendgroups[this.friendgroups.length-1].groupid+1
+        let newgroupID=(this.friendgroups.length+1).toString()
         this.friendgroups.push({
           belongid:this.$store.getters.id,
           groupid:newgroupID,
           name:"新建分组"
         })
         this.selectGroup=newgroupID
+
       },
       deleteGroup(targetId) {
-        if(targetId===1){
+        console.log("目标id"+targetId)
+        if(targetId==="1"){
           this.$message.error('默认分组不可删除!');
           return
         }
@@ -267,9 +269,7 @@
           return
         }
         let groups = this.friendgroups;
-        let activeId = this.selectGroup;
-        activeId=1
-        this.selectGroup = activeId;
+        this.selectGroup = "1";
         this.friendgroups = groups.filter(tab => tab.groupid !== targetId);
         this.friendgroups.forEach((group) => {
         if(group.groupid >targetId){
@@ -300,8 +300,8 @@
         }
 
     },
-    mounted() {
-      friendList(this.$store.getters.id).then(response => {
+    async mounted() {
+      await friendList(this.$store.getters.id).then(response => {
         console.log(response)
         this.friends=response.data.friends;
         this.friendgroups=response.data.groups;
