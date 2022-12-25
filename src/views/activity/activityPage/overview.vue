@@ -100,6 +100,7 @@
         <div class="pmb_members">
           <!-- 点击邀请好友 -->
           <i
+            v-if="UserIdentity == 'creator'"
             class="el-icon-circle-plus-outline"
             style="margin-top: 1em; font-size: 1.8em"
             @click="ClickShowInviteFriend"
@@ -207,7 +208,7 @@
           <h2>报名人数:{{ applicant_num }}</h2>
         </div>
         <!-- 报名与取消报名的按钮 -->
-        <div v-if="!is_creator">
+        <div v-if="!is_creator && !is_member">
           <!-- if 没有报名 -->
           <span v-if="!is_applicant">
             <el-button type="primary" @click="ClickapplyActivity"
@@ -223,7 +224,7 @@
           </span>
         </div>
         <!-- 创建人 才能 结束报名 -->
-        <div v-else>
+        <div v-if="is_creator">
           <span>
             <el-button type="text" @click="ClickCreatorCloseApply">
               停止报名
@@ -282,6 +283,11 @@
             >添加好友</el-button
           >
         </div> -->
+        <ReportBox
+          selection="test"
+          targetType="1"
+          :userId="other_user_detail_data.id"
+        />
       </el-dialog>
     </el-card>
 
@@ -738,7 +744,7 @@ import {
   patchActStopApply,
   postActivityApply,
 } from "@/api/activity";
-import { friendList } from "@/api/friend";
+import { friendList, InviteAct } from "@/api/friend";
 
 import MapChoose from "@/components/MapChoose";
 import ReportBox from "@/components/ReportBox";
@@ -2059,9 +2065,65 @@ export default {
     },
 
     //选中若干好友后，给所有好友发送参与活动的邀请
-    InviteFriends() {
+    async InviteFriends() {
       let chosen_nodes = this.$refs.tree.getCheckedNodes(true);
-      console.log("chosen_nodes:", chosen_nodes);
+      //邀请的好友个数不能超过当前空余的参与人数
+      let friend_num = chosen_nodes.length;
+      let participate_left = this.participate_limit - this.participant_num;
+      if (friend_num == 0) {
+        this.$alert("请至少选择一名好友发送邀请", "", {
+          confirmButtonText: "确定",
+        });
+        return;
+      }
+
+      if (friend_num > participate_left) {
+        this.$alert(
+          "邀请的好友人数 " +
+            friend_num +
+            " 不能超过剩余可参与人数 " +
+            participate_left,
+          "人数超出活动限制",
+          {
+            confirmButtonText: "确定",
+            callback: (action) => {
+              this.$message({
+                type: "info",
+                message: `邀请好友失败`,
+              });
+            },
+          }
+        );
+        return;
+      }
+
+      let friednId_list = chosen_nodes.map((x) => {
+        return x.id;
+      });
+      // console.log("InviteAct:friednId_list:", friednId_list);
+
+      await InviteAct(friednId_list, this.activity_id, this.user_id)
+        .then((res) => {
+          console.log("InviteAct:res:", res);
+          this.$alert(
+            "已向选中好友发送活动参与邀请，好友同意后可直接参与该活动",
+            "邀请成功发送",
+            {
+              confirmButtonText: "确定",
+              callback: (action) => {
+                this.$message({
+                  type: "success",
+                  message: `成功发送活动参与邀请`,
+                });
+              },
+            }
+          );
+          this.showDialog_inviteFriend = false;
+          return;
+        })
+        .catch((err) => {
+          console.log("InviteAct:err:", err);
+        });
     },
   },
   computed: {

@@ -13,7 +13,7 @@ export function getAvailableActs() {
 //获取活动的标签列表
 export function findActTags(act_id) {
     return request({
-        url: '/api/activityTag/getActTag/'+ act_id.toString(),
+        url: '/api/activityTag/getActTag/' + act_id.toString(),
         method: 'get',
         params: {
         }
@@ -273,6 +273,21 @@ export function deleteActivityByAdmin(admin_id, activity_id) {
         params: {
             user_id: admin_id,
             activity_id: activity_id
+        },
+
+    })
+}
+
+//处理好友的活动邀请
+export function handleFriendActInvite(user_id,friend_id, activity_id , handle_code) {
+    return request({
+        url: '/api/activity/handleFriendActInvite',
+        method: 'patch',
+        params: {
+            user_id: user_id,
+            activity_id: activity_id,
+            friend_id: friend_id,
+            handle_code: handle_code
         },
 
     })

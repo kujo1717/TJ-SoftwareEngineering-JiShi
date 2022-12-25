@@ -96,11 +96,7 @@
           <el-badge v-else-if="item_unread_num > 99" class="mark" value="99+" />
         </span>
 
-        <el-card
-          v-for="info in item_infos"
-          :key="info.index"
-          class="card-item"
-        >
+        <el-card v-for="info in item_infos" :key="info.index" class="card-item">
           <div slot="header">
             <el-row>
               <el-col :span="16" class="title-item">
@@ -136,8 +132,12 @@
             class="mark"
             :value="friend_unread_num"
           />
-          <el-badge v-else-if="friend_unread_num > 99" class="mark" value="99+" />
-        </span> 
+          <el-badge
+            v-else-if="friend_unread_num > 99"
+            class="mark"
+            value="99+"
+          />
+        </span>
 
         <el-card
           v-for="info in firend_infos"
@@ -148,13 +148,26 @@
             <el-row>
               <el-col :span="16" class="title-item">
                 <!--活动的邀请-->
-                <div v-if="info.friendRequest.status==4 || info.friendRequest.status==5">{{info.name}}邀请您参加活动{{info.activity_name}}</div>
-                <div v-else-if="info.friendRequest.status==3">{{ info.name}}同意了您的好友请求</div>
-                <div v-else-if="info.friendRequest.status==2">{{ info.name}}拒绝了您的好友请求</div>
-                <div v-else><el-avatar :size="60" :src="info.avatar"></el-avatar>{{ info.name}}想添加您为好友</div>
+                <div
+                  v-if="
+                    info.friendRequest.status == 4 ||
+                    info.friendRequest.status == 5
+                  "
+                >
+                  {{ info.name }}邀请您参加活动{{ info.activity_name }}
+                </div>
+                <div v-else-if="info.friendRequest.status == 3">
+                  {{ info.name }}同意了您的好友请求
+                </div>
+                <div v-else-if="info.friendRequest.status == 2">
+                  {{ info.name }}拒绝了您的好友请求
+                </div>
+                <div v-else>
+                  <el-avatar :size="60" :src="info.avatar"></el-avatar
+                  >{{ info.name }}想添加您为好友
+                </div>
                 <el-badge v-if="info.status == 0" value="new" class="mark" />
               </el-col>
-              
             </el-row>
             <el-row>
               <el-col :span="8" class="date-item">
@@ -162,36 +175,46 @@
               </el-col>
             </el-row>
           </div>
-          <el-col v-if="info.friendRequest.status==1" :span="8" style="margin-left: 50%;">
-                <el-button
-                  class="button-item"
-                  type="text"
-                  @click="rejectFriend(info.index)"
-                  >拒绝</el-button>
-                <el-button
-                  class="button-item"
-                  type="text"
-                  @click="acceptFriend(info.index)"
-                  >接受</el-button>
-                
-            </el-col>
-            <!--活动的邀请,处理后状态为5-->
-            <el-col v-else-if="info.friendRequest.status==4" :span="8" style="margin-left: 50%;">
-                <el-button
-                  class="button-item"
-                  type="text"
-                  @click=""
-                  >拒绝</el-button>
-                <el-button
-                  class="button-item"
-                  type="text"
-                  @click=""
-                  >接受</el-button>
-                
-            </el-col>
-            <el-col v-else :span="8" style="margin-left: 80%;">
-              该申请已处理
-            </el-col>
+          <el-col
+            v-if="info.friendRequest.status == 1"
+            :span="8"
+            style="margin-left: 50%"
+          >
+            <el-button
+              class="button-item"
+              type="text"
+              @click="rejectFriend(info.index)"
+              >拒绝</el-button
+            >
+            <el-button
+              class="button-item"
+              type="text"
+              @click="acceptFriend(info.index)"
+              >接受</el-button
+            >
+          </el-col>
+          <!--活动的邀请,处理后状态为5-->
+          <el-col
+            v-else-if="info.friendRequest.status == 4"
+            :span="8"
+            style="margin-left: 50%"
+          >
+            <el-button
+              class="button-item"
+              type="text"
+              @click="activityInvite_reject(info.index)"
+              >拒绝</el-button
+            >
+            <el-button
+              class="button-item"
+              type="text"
+              @click="activityInvite_accept(info.index)"
+              >接受</el-button
+            >
+          </el-col>
+          <el-col v-else :span="8" style="margin-left: 80%">
+            该申请已处理
+          </el-col>
         </el-card>
       </el-tab-pane>
       <!--好友结束-->
@@ -219,8 +242,9 @@ import {
   modifyItemNoticeStatus,
   getFriendRequest,
   rejectFriendRequest,
-  acceptFriendRequest
+  acceptFriendRequest,
 } from "@/api/message";
+import { handleFriendActInvite } from "@/api/activity";
 export default {
   name: "Message",
   data() {
@@ -231,12 +255,12 @@ export default {
       activity_infos: [],
       item_infos: [],
       //好友by135
-      firend_infos:[],
+      firend_infos: [],
       sys_unread_num: 0,
       act_unread_num: 0,
       item_unread_num: 0,
       //好友by135
-      friend_unread_num:0,
+      friend_unread_num: 0,
       check_info: null,
       dialogVisible: false,
     };
@@ -244,29 +268,25 @@ export default {
   methods: {
     ShowDetails(index) {
       console.log(index);
-      if(this.tab_name=="sys"){
+      if (this.tab_name == "sys") {
         this.check_info = this.system_infos[index];
-      }
-      else if(this.tab_name=="act"){
+      } else if (this.tab_name == "act") {
         this.check_info = this.activity_infos[index];
-      }
-      else if(this.tab_name=="item"){
+      } else if (this.tab_name == "item") {
         this.check_info = this.item_infos[index];
       }
       this.dialogVisible = true;
       // 更新消息状态
-      if(this.check_info.status == 0){
-        if(this.tab_name == "sys"){
+      if (this.check_info.status == 0) {
+        if (this.tab_name == "sys") {
           this.system_infos[index].status = 1;
           this.sys_unread_num--;
           modifyNoticeStatus(this.user_id, this.system_infos[index].noticeId);
-        }
-        else if(this.tab_name == "act"){
+        } else if (this.tab_name == "act") {
           this.activity_infos[index].status = 1;
           this.act_unread_num--;
           modifyNoticeStatus(this.user_id, this.activity_infos[index].noticeId);
-        }
-        else if(this.tab_name == "item"){
+        } else if (this.tab_name == "item") {
           this.item_infos[index].status = 1;
           this.item_unread_num--;
           modifyItemNoticeStatus(this.item_infos[index].itemNoticeId);
@@ -276,18 +296,44 @@ export default {
     test(tab) {
       console.log(tab.name);
     },
-    acceptFriend(index){
-      acceptFriendRequest(this.user_id,this.firend_infos[index].friendRequest.friendid).then((res)=>{
-        console.log(res)
-        this.firend_infos[index].friendRequest.status=0;
-      })
+    acceptFriend(index) {
+      acceptFriendRequest(
+        this.user_id,
+        this.firend_infos[index].friendRequest.friendid
+      ).then((res) => {
+        console.log(res);
+        this.firend_infos[index].friendRequest.status = 0;
+      });
     },
-    rejectFriend(index){
-      rejectFriendRequest(this.user_id,this.firend_infos[index].friendRequest.friendid).then((res)=>{
-        console.log(res)
-        this.firend_infos[index].friendRequest.status=0;
-      })
-    }
+    rejectFriend(index) {
+      rejectFriendRequest(
+        this.user_id,
+        this.firend_infos[index].friendRequest.friendid
+      ).then((res) => {
+        console.log(res);
+        this.firend_infos[index].friendRequest.status = 0;
+      });
+    },
+
+    //活动邀请的处理
+    async acctivityInvite_handle(handle_code, index) {
+      let friend_id = this.firend_infos[index].friendRequest.friendid;
+      let user_id = this.user_id;
+      let activity_id = this.firend_infos[index].friendRequest.activityId;
+      await handleFriendActInvite(user_id, friend_id, activity_id, handle_code)
+        .then((res) => {
+          console.log("handleFriendActInvite:res", res);
+        })
+        .catch((err) => {
+          console.log("handleFriendActInvite:err", err);
+        });
+    },
+    activityInvite_reject(index) {
+      this.acctivityInvite_handle(0, index);
+    },
+    activityInvite_accept(index) {
+      this.acctivityInvite_handle(1, index);
+    },
   },
   async mounted() {
     await getSystemInfo(this.user_id)
@@ -341,8 +387,8 @@ export default {
       .catch((err) => {
         console.log(err);
       });
-      //好友通知
-      await getFriendRequest(this.user_id)
+    //好友通知
+    await getFriendRequest(this.user_id)
       .then((res) => {
         console.log(res);
         this.firend_infos = res.data;

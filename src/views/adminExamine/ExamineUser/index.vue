@@ -209,7 +209,7 @@
 </template>
 
 <script>
-import { getAllActivityReportList, getOneReport } from '@/api/admin.js'
+import { getAllUserReportList, getOneReport } from '@/api/admin.js'
 export default {
   name: "AdminExamineUser",
   components: {},
@@ -322,7 +322,7 @@ export default {
   },
   mounted: function () {
     //从后端拿举报单数据
-    getAllActivityReportList()
+    getAllUserReportList()
       .then((res) => {
 
         let receive_table = res.data.reports;
