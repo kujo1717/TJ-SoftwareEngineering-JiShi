@@ -23,6 +23,7 @@ import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -62,11 +63,20 @@ public class UserServiceImpl implements UserService {
     }
     public Result<String> confirmUser(String email, String password){
         User user=userMapper.selectByEmail(email);
+        Long user_id=user.getId();
         if (user==null){
             return Result.fail(10001,"用户不存在");
         }
         else if (!user.getPassword().equals(DigestUtils.md5DigestAsHex(password.getBytes()))){
             return Result.fail(10001,"密码错误");
+        }
+        if (user.getBannedTime()!=null&&user.getBannedTime().after(new Date())){
+            return Result.fail(10001,"账号封禁中..."+user.getBannedTime().toString()+"解封");
+        }
+        else {
+            userMapper.update(null,Wrappers.<User>lambdaUpdate()
+                    .eq(User::getId,user_id)
+                    .set(User::getBannedTime,null));
         }
         String userId=user.getId().toString();
         String token = JwtUtil.sign(userId);

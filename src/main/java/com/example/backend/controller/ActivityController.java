@@ -32,6 +32,9 @@ public class ActivityController {
     private ActivityService activityService;
 
     @Autowired
+    private FriendRequestService friendRequestService;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -620,4 +623,33 @@ public class ActivityController {
     }
 
 
+    @ApiOperation("处理好友的活动邀请")
+    @PatchMapping("/handleFriendActInvite")
+    public Result<Map<String,Object>> HandleFriendActInvite(
+                                      @ApiParam(name = "activity_id", value = "activity_id", required = true)
+                                      @RequestParam("activity_id")Long activity_id,
+                                      @ApiParam(name = "user_id", value = "user_id", required = true)
+                                      @RequestParam("user_id")Long user_id,
+                                      @ApiParam(name = "friend_id", value = "friend_id", required = true)
+                                      @RequestParam("friend_id")Long friend_id,
+                                      @ApiParam(name = "handle_code", value = "handle_code", required = true)
+                                      @RequestParam("handle_code")Integer handle_code
+                                      ) {
+        Map<String,Object> map=new HashMap<>();
+        map.put("activity_id",activity_id);
+        map.put("user_id",user_id);
+        map.put("friend_id",friend_id);
+        map.put("handle_code",handle_code);
+        try{
+            if (!friendRequestService.handleActivityInvite(user_id,friend_id,activity_id,handle_code)){
+                return Result.fail(500,"handleFriendActInvite FAILD");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return Result.fail(500,e.getMessage());
+        }
+
+        return Result.success(map);
+
+    }
 }

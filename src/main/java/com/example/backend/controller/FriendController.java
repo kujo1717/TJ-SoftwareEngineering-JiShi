@@ -56,6 +56,7 @@ public class FriendController {
         map.put("friendId_list",friendId_list);
         map.put("activity_id",activity_id);
         map.put("user_id",user_id);
+        System.out.println("friendId_list:"+friendId_list.get(0));
         for(int i=0;i<friendId_list.size();i++){
            friendRequestService.sendFriendRequestById(friendId_list.get(i),user_id,activity_id,4);
         }

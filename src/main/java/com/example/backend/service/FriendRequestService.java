@@ -12,4 +12,6 @@ public interface FriendRequestService {
     boolean sendFriendRequest(Long userid,String friendEmail,Long activity_id,int status);
     boolean sendFriendRequestById(Long userid,Long friendId,Long activity_id,int status);
     boolean modifyFriendRequestStatus(Long userid,Long friendid);
+
+    boolean handleActivityInvite(Long user_id,Long friend_id,Long activity_id,Integer handle_code);
 }

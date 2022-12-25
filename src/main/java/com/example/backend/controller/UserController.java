@@ -68,6 +68,8 @@ public class UserController {
     @PostMapping("login")
     public Result<String> login(@RequestBody User user) {
         User user_whole=userService.getUserByEmail(user.getEmail());
+
+
         return userService.confirmUser(user.getEmail(), user.getPassword());
     }
 

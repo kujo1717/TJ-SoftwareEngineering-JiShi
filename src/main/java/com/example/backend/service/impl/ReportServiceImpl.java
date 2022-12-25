@@ -2,6 +2,7 @@ package com.example.backend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.backend.Tools.DateTimeUtil;
 import com.example.backend.Tools.SystemNoticeUtil;
 import com.example.backend.common.Result;
 import com.example.backend.entity.Activity;
@@ -9,6 +10,7 @@ import com.example.backend.entity.ActivityApply;
 import com.example.backend.entity.Report;
 import com.example.backend.entity.User;
 import com.example.backend.mapper.ReportMapper;
+import com.example.backend.mapper.UserMapper;
 import com.example.backend.service.ActivityService;
 import com.example.backend.service.ReportService;
 import com.example.backend.service.UserService;
@@ -34,6 +36,10 @@ public class ReportServiceImpl implements ReportService {
     private ActivityService activityService;
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserMapper userMapper;
+
     @Autowired
     private SystemNoticeUtil systemNoticeUtil;
 
@@ -143,6 +149,7 @@ public class ReportServiceImpl implements ReportService {
         Long activity_id=report.getActivityId();
         Long user_id=report.getUserId();
         Long admin_id=report.getAdminId();
+        int banndeDay=Integer.parseInt(report.getHandleOperation());
         User admin=userService.findUser(admin_id);
         String handle_operation=report.getHandleOperation();
         /** handle act */
@@ -170,6 +177,23 @@ public class ReportServiceImpl implements ReportService {
 
         } else if (user_id!=null) {
             /** handle user */
+            /** 设置用户封禁天数 */
+            //在原封禁天数的基础上加封
+            User user=userMapper.selectById(user_id);
+            Date nowTime=user.getBannedTime();
+
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(nowTime);
+            calendar.add(Calendar.DATE,banndeDay);
+            Date targetDate = calendar.getTime();
+
+
+
+            userMapper.update(null,Wrappers.<User>lambdaUpdate()
+                    .eq(User::getId,user_id)
+                    .set(User::getBannedTime,targetDate));
+
         }
 
         return null;

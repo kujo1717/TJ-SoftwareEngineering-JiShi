@@ -3,13 +3,17 @@ package com.example.backend.service.impl;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.backend.dto.ActivityUserRole;
 import com.example.backend.dto.FriendRequestDto;
 import com.example.backend.entity.Activity;
+import com.example.backend.entity.ActivityParticipate;
 import com.example.backend.entity.User;
 import com.example.backend.entity.friendRequest;
 import com.example.backend.mapper.ActivityMapper;
 import com.example.backend.mapper.FriendRequestMapper;
 import com.example.backend.mapper.UserMapper;
+import com.example.backend.service.ActivityApplyService;
+import com.example.backend.service.ActivityParticipateService;
 import com.example.backend.service.FriendRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +21,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
 @Service
 public class FriendRequestImpl implements FriendRequestService {
     @Autowired
@@ -25,6 +31,13 @@ public class FriendRequestImpl implements FriendRequestService {
     UserMapper userMapper;
     @Autowired
     ActivityMapper activityMapper;
+
+    @Autowired
+    ActivityApplyService activityApplyService;
+
+    @Autowired
+    ActivityParticipateService activityParticipateService;
+
     @Override
     public List<FriendRequestDto> findFriendRequest(Long userid) {
         QueryWrapper<friendRequest> queryWrapper=new QueryWrapper<>();
@@ -50,6 +63,12 @@ public class FriendRequestImpl implements FriendRequestService {
         var Now=new Date();
         Long friendId=userMapper.selectByEmail(friendEmail).getId();
         friendRequest friend_request=new friendRequest(friendId,userid,Now,activity_id,status);
+        //查找是不是已经发送过了
+        List<Map<String,Object>>tList=friendRequestMapper.SelectFriendRequestActInviteList(activity_id,friendId,userid,status);
+
+        if (tList.size()>0){
+            return  true;
+        }
         try {
             if (friendRequestMapper.insert(friend_request) > 0) {
                 return true;
@@ -63,6 +82,12 @@ public class FriendRequestImpl implements FriendRequestService {
     public boolean sendFriendRequestById(Long userid, Long friendid,Long activity_id,int status) {
         var Now=new Date();
         friendRequest friend_request=new friendRequest(userid,friendid,Now,activity_id,status);
+        //查找是不是已经发送过了
+        List<Map<String,Object>>tList=friendRequestMapper.SelectFriendRequestActInviteList(activity_id,friendid,userid,status);
+
+        if (tList.size()>0){
+            return  true;
+        }
         if(friendRequestMapper.insert(friend_request)>0) {
             return true;
         }
@@ -77,5 +102,43 @@ public class FriendRequestImpl implements FriendRequestService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean handleActivityInvite(Long user_id, Long friend_id, Long activity_id, Integer handle_code) {
+        boolean flag=false;
+        if (handle_code.equals(0)){
+            flag=true;
+        } else if (handle_code.equals(1)) {
+            /**handle code 1 接受邀请*/
+
+            /**判断user是不是活动的报名者*/
+            ActivityUserRole RoleApplicant=activityApplyService.isApplicant(user_id,activity_id);
+            boolean isApplicant=RoleApplicant.getIs_applicant();
+            if (isApplicant){
+                /**是报名者则从报名者中删除*/
+                activityApplyService.UserCancelApplyAct(activity_id,user_id);
+            }
+            /**user 是不是活动的参与者*/
+            ActivityUserRole RoleParticipant=activityParticipateService.isMember(user_id,activity_id);
+            if (!RoleParticipant.getIs_member()){
+                /**user添加到活动的参与者*/
+                ActivityParticipate activityParticipate=new ActivityParticipate(activity_id,user_id);
+                activityParticipateService.AddParticipant(activityParticipate);
+            }
+
+            flag=true;
+        }
+        //更新消息状态
+        if(flag){
+            friendRequestMapper.update(null, Wrappers.<friendRequest>lambdaUpdate()
+                    .eq(friendRequest::getUserid,user_id)
+                    .eq(friendRequest::getActivityId,activity_id)
+                    .eq(friendRequest::getStatus,4)
+                    .eq(friendRequest::getFriendid,friend_id)
+                    .set(friendRequest::getStatus,5));
+        }
+
+        return flag;
     }
 }

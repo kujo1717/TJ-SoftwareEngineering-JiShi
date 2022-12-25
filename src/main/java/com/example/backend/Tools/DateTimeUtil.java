@@ -43,4 +43,13 @@ public class DateTimeUtil {
     public static Timestamp getCurrentTimestamp(){
         return new Timestamp(new Date().getTime());
     }
+
+
+    public static Date addDate(Date date, int day)   {
+        long time = date.getTime(); // 得到指定日期的毫秒数
+        long addSec=day * 24 * 60 * 60 * 1000; // 要加上的天数转换成毫秒数
+        time += addSec; // 相加得到新的毫秒数
+        return new Date(time); // 将毫秒数转换成日期
+    }
+
 }
