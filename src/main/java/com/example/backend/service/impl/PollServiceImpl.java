@@ -36,7 +36,6 @@ public class PollServiceImpl implements PollService {
     }
   }
   public List<Poll> findPoll(Long activity_id){
-
     QueryWrapper<Poll> queryWrapper=new QueryWrapper<>();
     queryWrapper
             .eq("activity_id",activity_id);
@@ -44,5 +43,15 @@ public class PollServiceImpl implements PollService {
     System.out.println(pollMapper.selectList(queryWrapper));
 
     return list;
+  }
+  @Override
+  public Integer deletePoll(Long pollID){
+    try{
+      pollMapper.deleteById(pollID);
+    return 1;
+    }
+    catch(Exception e){
+      return 0;
+    }
   }
 }
