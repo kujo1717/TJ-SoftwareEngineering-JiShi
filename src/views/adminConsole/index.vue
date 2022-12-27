@@ -194,7 +194,10 @@ export default {
     //     loading.close();
     //   })
 
-
+    let login = this.$route.params.login;
+    if (login=="1") {
+      window.location.reload();
+    }
 
   }
 }

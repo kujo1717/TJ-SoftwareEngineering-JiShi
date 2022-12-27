@@ -83,7 +83,12 @@ selection参数用于选择按钮的样式，这个样式是你们告诉我然�
             ></el-input>
           </el-form-item>
 
-          <el-form-item label="举报截图" prop="pic"> </el-form-item>
+          <el-form-item label="举报截图" prop="pic">
+            <UploadImg
+              @FileChange="HandleUploadImgInput"
+              :limit="3"
+            ></UploadImg>
+          </el-form-item>
         </el-form>
         <!-- 底部的slot插槽 -->
       </div>
@@ -96,17 +101,20 @@ selection参数用于选择按钮的样式，这个样式是你们告诉我然�
 </template>
 
 <script>
+import { postFile } from "@/api/file";
+import UploadImg from "@/components/UploadImg";
 import { postOneReport } from "@/api/admin.js";
 export default {
   name: "ReportBox",
+  components: { UploadImg },
   data() {
     return {
       dialogVisible: false,
+      file_formData: "",
       form: {
         informerId: this.$store.getters.id,
         activityId: this.activityId,
         userId: this.userId,
-
         type: "string",
         detail: "string",
         image: "string",
@@ -176,6 +184,11 @@ export default {
   },
 
   methods: {
+    //接收组件传来的formData
+    HandleUploadImgInput(FormData) {
+      this.file_formData = FormData;
+      console.log("this.file_formData", this.file_formData);
+    },
     dialogOpen() {
       this.dialogVisible = true;
     },
@@ -186,12 +199,32 @@ export default {
       });
 
       //post给后端
-      this.form.activityId=this.activityId;
-      this.form.userId=this.userId;
+      this.form.activityId = this.activityId;
+      this.form.userId = this.userId;
       console.log("post report:form", this.form);
       postOneReport(this.form)
-        .then((res) => {
-          console.log(res);
+        .then(async (res) => {
+          console.log("postOneReport:res:", res);
+          //report id
+          let report_id = res.data.report.reportId;
+          // 组装upload的formData
+
+          if (this.file_formData) {
+            this.file_formData.append("folderPath", "/report/illus");
+
+            this.file_formData.append("entity", "report");
+            this.file_formData.append("id", report_id);
+          }
+
+          //上传图片,并额外传递参数，使得这些图片与report绑定
+          await postFile(this.file_formData)
+            .then((res) => {
+              console.log("postFile:res:", res);
+            })
+            .catch((err) => {
+              console.log("postFile:err:", err);
+            });
+
           this.$msgbox.close();
           this.$message({
             type: "success",
@@ -233,10 +266,7 @@ export default {
     this.dialogVisible = true;
   },
 
-  mounted: function () {
-
-
-  },
+  mounted: function () {},
 };
 </script>
 

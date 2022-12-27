@@ -164,13 +164,13 @@ export default {
               await this.$store.dispatch("user/getInfo");
               const roles = this.$store.getters.roles;
               console.log("login:roles:", roles);
-              let path_s = "";
+              let name_s = "";
               if (roles.includes("admin")) {
-                path_s = "/adminConsole/index";
+                name_s = "AdminConsole";
               } else if (roles.includes("client")) {
-                path_s = "/dashboard";
+                name_s = "Dashboard";
               }
-              this.$router.push({ path: path_s });
+              this.$router.push({ name: name_s, params: { login: "1" } });
 
               // this.$router.push({ path: this.redirect || path_s });
 

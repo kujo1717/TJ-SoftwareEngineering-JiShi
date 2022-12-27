@@ -10,9 +10,7 @@
         <el-descriptions-item label="举报人ID"
           >{{ form.informerId }}
         </el-descriptions-item>
-        <el-descriptions-item label="被举报人ID"
-          >{{ form.userId }}
-        </el-descriptions-item>
+
         <el-descriptions-item label="活动ID"
           >{{ form.activityId }}
         </el-descriptions-item>
@@ -24,6 +22,21 @@
         </el-descriptions-item>
         <el-descriptions-item label="举报详述"
           >{{ form.detail }}
+        </el-descriptions-item>
+        <el-descriptions-item label="举报配图">
+          <!-- 配图展示 -->
+          <div class="images">
+            <el-image
+              style="margin-right: 1em; height: 20em"
+              v-for="(img, img_i) in image_urlList"
+              :key="img_i"
+              :src="img"
+            >
+              <div slot="error" class="image-slot">
+                <i class="el-icon-picture-outline"></i>
+              </div>
+            </el-image>
+          </div>
         </el-descriptions-item>
       </el-descriptions>
     </div>
@@ -186,6 +199,30 @@ export default {
         return false;
       return true;
     },
+
+    // 切割images字符串，直接通过url访问图片
+    GetImgUrl() {
+      const images = this.form.image;
+      const image_urlList = [];
+      if (images != "") {
+        const image_paths = images.split(":");
+
+        for (let i = 0; i < image_paths.length; i++) {
+          /** 直接通过url访问图片 */
+          let image_url;
+          const image_path = image_paths[i];
+
+          if (image_path.length > 0) {
+            image_url = process.env.VUE_APP_BASE_API + "/api" + image_path;
+            // image_url = "http://42.192.45.95:8081/api" + image_path;
+
+            console.log("image_url", image_url);
+            image_urlList.push(image_url);
+          }
+        }
+      }
+      this.image_urlList = image_urlList;
+    },
   },
   mounted: function () {
     //上一个页面传来的参数
@@ -194,6 +231,7 @@ export default {
     this.activity = reportDetail.activity;
 
     this.form = reportDetail.report;
+    this.GetImgUrl();
     for (let i in this.form) {
       if (this.form[i] == "" || this.form[i] == null) this.form[i] = "未知";
     }
