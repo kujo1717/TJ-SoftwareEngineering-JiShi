@@ -8,6 +8,14 @@ export function getPoll(acitivity_id) {
     params: {}
   })
 }
+// 删除投票
+export function deletePoll(poll_id) {
+  return request({
+    url: '/api/poll/deletePoll/' + poll_id.toString(),
+    method: 'delete',
+    params: {}
+  })
+}
 export function getVote(userID) {
   return request({
     url: '/api/vote/getvote/' + userID.toString(),
