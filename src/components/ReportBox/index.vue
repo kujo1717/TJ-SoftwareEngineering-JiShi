@@ -40,10 +40,10 @@ selection参数用于选择按钮的样式，这个样式是你们告诉我然�
           class="demo-ruleForm"
         >
           <el-form-item v-if="targetType == '1'" class="center">
-            <h2>将举报用户：{{ userId }}</h2>
+            <h2>将举报用户：{{ name }}</h2>
           </el-form-item>
           <el-form-item v-else-if="targetType == '0'" class="center">
-            <h2>将举报活动：{{ activityId }}</h2>
+            <h2>将举报活动：{{ name }}</h2>
           </el-form-item>
 
           <!--多选框-->
@@ -171,7 +171,7 @@ export default {
     };
   },
   //先执行props传参，再执行上面form中的初始化，然后再执行mounted
-  props: ["selection", "targetType", "informerId", "userId", "activityId"],
+  props: ["selection", "targetType", "informerId", "userId", "activityId","name"],
 
   watch: {
     dialogVisible: {

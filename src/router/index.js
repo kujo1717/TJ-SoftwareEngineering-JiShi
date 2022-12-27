@@ -60,12 +60,12 @@ export const asyncRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    // redirect: '/dashboard',
     children: [{
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: '首页', icon: 'dashboard' , roles: ['client']}
+      meta: { title: '首页', icon: 'dashboard', roles: ['client'] }
     }],
     hidden: false
   },
@@ -90,7 +90,7 @@ export const asyncRoutes = [
         path: 'index',
         name: 'viewList',
         component: () => import('@/views/viewList/index'),
-        meta: { title: '视图', icon: 'viewlist' , roles: ['client']}
+        meta: { title: '视图', icon: 'viewlist', roles: ['client'] }
       }
     ],
   },
@@ -180,7 +180,7 @@ export const asyncRoutes = [
         path: 'index',
         name: 'User',
         component: () => import('@/views/user/index'),
-        meta: { title: '用户', icon: 'user' , roles: ['client']}
+        meta: { title: '个人信息', icon: 'user', roles: ['client', 'admin'] }
       }
     ],
     // hidden: true

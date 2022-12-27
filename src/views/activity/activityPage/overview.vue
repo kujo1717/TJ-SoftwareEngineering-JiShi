@@ -257,7 +257,7 @@
         删除活动
       </el-button>
 
-      <ReportBox selection="test" targetType="0" :activityId="activity_id" />
+      <ReportBox selection="test" targetType="0" :activityId="activity_id" :name="title_name"/>
 
       <!-- 某个用户的详情查看 -->
       <el-dialog
@@ -287,6 +287,7 @@
           selection="test"
           targetType="1"
           :userId="other_user_detail_data.id"
+          :name="other_user_detail_data.name"
         />
       </el-dialog>
     </el-card>

@@ -1,12 +1,8 @@
 
 <template>
   <div class="views">
-
     <el-row>
-      <el-col
-        :span="14"
-        class="lightgreen-box"
-      >
+      <el-col :span="14" class="lightgreen-box">
         <el-card class="box-card">
           <el-row>
             <el-col :span="2">
@@ -14,57 +10,50 @@
                 src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
               ></el-avatar>
             </el-col>
-            <el-col
-              :span="12"
-              class="font-size1"
-            >
-              你好~黄彦铭
+            <el-col :span="12" class="font-size1">
+              你好,{{user_name}}
               <!-- <font size="1">role</font><br> -->
               <el-tag size="mini">管理员</el-tag>
             </el-col>
-            <el-col
-              :span="10"
-              class="font-size1"
-            >
+            
+            <el-col :span="10" class="font-size1"> 
 
+              
             </el-col>
+
+
           </el-row>
         </el-card>
-        <br>
-        <el-card class="box-card font-size2">
-          <div style="margin-bottom:20px">信息管理栏</div>
+        <br />
+
+        <!-- <el-card class="box-card font-size2">
+          <div style="margin-bottom: 20px">信息管理栏</div>
           <div
-            style="margin-left:30px;margin-bottom:15px"
+            style="margin-left: 30px; margin-bottom: 15px"
             @click="toSearch()"
           >
             信息管理
-            <el-button
-              type="primary"
-              icon="el-icon-edit"
-            ></el-button>
+            <el-button type="primary" icon="el-icon-edit"></el-button>
           </div>
-        </el-card>
-        <br>
+        </el-card> -->
+
+        <br />
         <el-card class="box-card font-size2">
-          <div style="margin-bottom:30px">工作台</div>
+          <div style="margin-bottom: 30px">工作台</div>
           <!--护工资质审核-->
-          <div style="margin-bottom:20px">
-            用户举报单审核<br>
-            <el-button
-              style="margin-left:90px"
-              @click="toCarerQualify"
-              round
-            >待审核：{{auditLog.userReportTodoNum}}</el-button>
+          <div style="margin-bottom: 20px">
+            用户举报单审核<br />
+            <el-button style="margin-left: 90px" @click="toCarerQualify" round
+              >待审核：{{ auditLog.userReportTodoNum }}</el-button
+            >
           </div>
 
           <!--举报单审核-->
-          <div style="margin-bottom:20px">
-            活动举报单审核<br>
-            <el-button
-              style="margin-left:90px"
-              @click="toReportScan"
-              round
-            >待审核：{{auditLog.activityReportTodoNum}}</el-button>
+          <div style="margin-bottom: 20px">
+            活动举报单审核<br />
+            <el-button style="margin-left: 90px" @click="toReportScan" round
+              >待审核：{{ auditLog.activityReportTodoNum }}</el-button
+            >
           </div>
         </el-card>
       </el-col>
@@ -73,38 +62,38 @@
       <el-col :span="10">
         <el-card class="box-card">
           <div
-            style="width: 470px;height: 630px; position: relative;overflow: hidden;"
+            style="
+              width: 470px;
+              height: 630px;
+              position: relative;
+              overflow: hidden;
+            "
           >
             <div
               id="abc"
-              style="overflow-x: hidden;overflow-y: scroll;position: absolute;"
+              style="overflow-x: hidden; overflow-y: scroll; position: absolute"
             >
-              <div style="width: 470px;height: 565px;">
-                <el-calendar v-model="value">
-                </el-calendar>
+              <div style="width: 470px; height: 565px">
+                <el-calendar v-model="value"> </el-calendar>
               </div>
             </div>
           </div>
         </el-card>
       </el-col>
     </el-row>
-    <ReportBox
-      selection="test"
-      targetType='0'
-      activityId=1
-    />
+    <ReportBox selection="test" targetType="0" activityId="1" name="name" />
   </div>
 </template>
 
 <script>
-import ReportBox from '@/components/ReportBox'
-import { getAuditLog } from '@/api/admin.js'
+import ReportBox from "@/components/ReportBox";
+import { getAuditLog } from "@/api/admin.js";
 import Axios from "axios";
 
 export default {
-  name: 'adminConsole',
+  name: "adminConsole",
   components: { ReportBox },
-  data () {
+  data() {
     return {
       flag: true,
       auditLog: {
@@ -115,38 +104,50 @@ export default {
       role: "无数据",
       position: "无数据",
       ID: 222022080700000001,
-      value: '',
+      value: "",
     };
   },
+  computed: {
+    user_id: {
+      get: function () {
+        return this.$store.getters.id;
+      },
+    },
+    user_name: {
+      get: function () {
+        return this.$store.getters.name;
+      },
+    },
+  },
   methods: {
-    toCarerQualify () {
+    toCarerQualify() {
       this.dialogVisible = false;
       this.$router.push({
         name: "CarerQualify",
-      })
+      });
     },
-    toReportScan () {
+    toReportScan() {
       this.dialogVisible = false;
       this.$router.push({
         name: "ReportScan",
-      })
+      });
     },
-    toSearch () {
+    toSearch() {
       this.dialogVisible = false;
       this.$router.push({
         name: "Search",
-      })
+      });
     },
-    toOrg () {
+    toOrg() {
       this.dialogVisible = false;
       this.$router.push({
         name: "OrgQualify",
-      })
+      });
     },
-    button_close (data) {
+    button_close(data) {
       this.flag = data;
     },
-    getConsoleNum () {
+    getConsoleNum() {
       getAuditLog(0)
         .then((res) => {
           this.auditLog.userReportTodoNum = res.data.user;
@@ -154,10 +155,8 @@ export default {
         })
         .catch((err) => {
           console.log(err);
-        })
-
+        });
     },
-
   },
   //初始向后端请求数据
   mounted: function () {
@@ -168,9 +167,8 @@ export default {
     //   background: 'rgba(0, 0, 0, 0.7)'
     // });
 
-
     //获取待审核数目
-    console.log("hahahaha")
+    console.log("hahahaha");
     this.getConsoleNum();
 
     //获取管理员个人信息
@@ -193,14 +191,8 @@ export default {
     //     console.log(err);
     //     loading.close();
     //   })
-
-    let login = this.$route.params.login;
-    if (login=="1") {
-      window.location.reload();
-    }
-
-  }
-}
+  },
+};
 </script>
 
 // lang选择less语法，scoped限制该样式只在本文件使用，不影响其他组件

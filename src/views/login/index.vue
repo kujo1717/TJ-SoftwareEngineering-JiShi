@@ -165,14 +165,24 @@ export default {
               const roles = this.$store.getters.roles;
               console.log("login:roles:", roles);
               let name_s = "";
+              let path_s = "";
               if (roles.includes("admin")) {
                 name_s = "AdminConsole";
+                path_s = "/adminConsole/index";
               } else if (roles.includes("client")) {
                 name_s = "Dashboard";
+                path_s = "/dashboard";
               }
-              this.$router.push({ name: name_s, params: { login: "1" } });
+              console.log("name_s:", name_s);
+              console.log("path_s:", path_s);
 
-              // this.$router.push({ path: this.redirect || path_s });
+              window.location.reload();
+              // setTimeout(() => {
+              //   this.$router.push({ path: this.redirect || path_s });
+              // }, 3000);
+
+              this.$router.push({ path: this.redirect || path_s });
+              // this.$router.push({ name: name_s });
 
               console.log("跳转");
               this.loading = false;

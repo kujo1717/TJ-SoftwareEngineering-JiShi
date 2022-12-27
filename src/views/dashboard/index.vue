@@ -92,11 +92,7 @@ export default {
     },
   },
   mounted() {
-    let login = this.$route.params.login;
-    console.log("this.$route.params;", this.$route.params);
-    if (login == "1") {
-      window.location.reload();
-    }
+
   },
 };
 </script>
