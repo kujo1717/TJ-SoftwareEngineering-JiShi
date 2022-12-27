@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.Tools.FileUtils;
 import com.example.backend.common.Result;
 import com.example.backend.service.ActivityService;
+import com.example.backend.service.ReportService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -29,6 +30,10 @@ import java.util.*;
 public class FileController {
     @Autowired
     ActivityService activityService;
+
+    @Autowired
+    ReportService reportService;
+
 //    public static String BASE_FOLDER = "D:/Upload";
     public static String BASE_FOLDER = "/file";
 
@@ -46,6 +51,7 @@ public class FileController {
     ) {
 
         folderPath = BASE_FOLDER + folderPath;
+//        folderPath = folderPath;
         Map<String, Object> result_map = new HashMap<>();
         List<Map<String, Object>> file_list = new ArrayList<>();
 
@@ -104,6 +110,20 @@ public class FileController {
                     images=images+":"+one_imge;
                 }
                 activityService.PatchActImages(images,id);
+            }
+
+            /** 举报单图片的绑定 */
+            if (entity!=null && entity.equals("report") && id!=null){
+                String images="";
+                /**图片路径字符串*/
+                for (Map<String, Object> file_map:file_list){
+                    String name=(String) file_map.get("name");
+
+                    String one_imge="/report/illus/"+name;
+                    images=images+":"+one_imge;
+                }
+                reportService.PatchReportImages(images,id);
+
             }
 
             return Result.success(result_map);

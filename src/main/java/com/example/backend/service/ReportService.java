@@ -37,4 +37,10 @@ public interface ReportService {
     Map<String,Object> handleReport(Report report);
 
 
+
+    /**举报单的images，覆盖*/
+
+    String PatchReportImages(String images,Long report_id);
+
+
 }

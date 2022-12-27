@@ -63,6 +63,23 @@ public class MvcConfig implements WebMvcConfigurer {
                                 System.getProperty("file.separator")
                 );
 
+        registry.addResourceHandler("/report/illus/**").
+                addResourceLocations("file:" +
+                                System.getProperty("file.separator") +
+                                "file" +
+                                System.getProperty("file.separator") +
+                                "report" +
+                                System.getProperty("file.separator") +
+                                "illus" +
+                                System.getProperty("file.separator")
+                );
+//        registry.addResourceHandler("/report/illus/**").
+//                addResourceLocations("file:" +"D:/Upload/report/illus"
+//                );
+
+
+
+
     }
 
 

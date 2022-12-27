@@ -86,7 +86,6 @@ public class UserServiceImpl implements UserService {
         User user=userMapper.selectByEmail(email);
 
         if (user!=null){
-            System.out.println("11111111111111111111111");
             return Result.fail(10001,"用户已验证");
         }
 

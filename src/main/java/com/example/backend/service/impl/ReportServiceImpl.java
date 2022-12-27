@@ -77,8 +77,9 @@ public class ReportServiceImpl implements ReportService {
     public Map<String, Object> addReport(Report report) {
         Map<String, Object> map = new HashMap<>();
         Integer i = reportMapper.insert(report);
-        map.put("i", i);
         map.put("report", report);
+
+        map.put("i", i);
         return map;
     }
 
@@ -197,5 +198,17 @@ public class ReportServiceImpl implements ReportService {
         }
 
         return null;
+    }
+
+
+    @Override
+    public String PatchReportImages(String images, Long report_id) {
+        reportMapper.update(
+                null,
+                Wrappers.<Report>lambdaUpdate()
+                        .set(Report::getImage,images)
+                        .eq(Report::getReportId,report_id)
+        );
+        return images;
     }
 }
