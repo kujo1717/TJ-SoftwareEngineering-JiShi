@@ -196,7 +196,9 @@ public class ActivityServiceImpl implements ActivityService{
     @Override
     public Integer ActivityHitNumPlus(Long activity_id) {
         Activity act=activityMapper.selectById(activity_id);
-
+        if (act==null){
+            return -1;
+        }
 
         activityMapper.update(
                 null,
