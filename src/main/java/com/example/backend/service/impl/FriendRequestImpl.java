@@ -62,10 +62,18 @@ public class FriendRequestImpl implements FriendRequestService {
     public boolean sendFriendRequest(Long userid, String friendEmail,Long activity_id,int status) {
         var Now=new Date();
         Long friendId=userMapper.selectByEmail(friendEmail).getId();
-        friendRequest friend_request=new friendRequest(friendId,userid,Now,activity_id,status);
+        friendRequest friend_request=new friendRequest(null,friendId,userid,Now,activity_id,status);
+        List<Map<String, Object>> tList;
         //查找是不是已经发送过了
-        List<Map<String,Object>>tList=friendRequestMapper.SelectFriendRequestActInviteList(activity_id,friendId,userid,status);
-
+        if (activity_id!=null) {
+            tList = friendRequestMapper.SelectFriendRequestActInviteList(activity_id, friendId, userid, status);
+        }
+        else {
+            QueryWrapper queryWrapper=new QueryWrapper();
+            queryWrapper.eq("userid",friendId);
+            queryWrapper.eq("friendid",userid);
+            tList=friendRequestMapper.selectList(queryWrapper);
+        }
         if (tList.size()>0){
             return  true;
         }
@@ -81,7 +89,7 @@ public class FriendRequestImpl implements FriendRequestService {
     @Override
     public boolean sendFriendRequestById(Long userid, Long friendid,Long activity_id,int status) {
         var Now=new Date();
-        friendRequest friend_request=new friendRequest(userid,friendid,Now,activity_id,status);
+        friendRequest friend_request=new friendRequest(null,userid,friendid,Now,activity_id,status);
         //查找是不是已经发送过了
         List<Map<String,Object>>tList=friendRequestMapper.SelectFriendRequestActInviteList(activity_id,friendid,userid,status);
 
