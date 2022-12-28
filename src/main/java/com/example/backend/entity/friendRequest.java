@@ -17,6 +17,8 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class friendRequest {
     @JsonSerialize(using= ToStringSerializer.class)
+    private Long friendRequestId;
+    @JsonSerialize(using= ToStringSerializer.class)
     private Long userid;
     @JsonSerialize(using= ToStringSerializer.class)
     private Long friendid;
