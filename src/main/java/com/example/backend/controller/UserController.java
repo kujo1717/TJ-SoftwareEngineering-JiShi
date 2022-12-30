@@ -14,6 +14,7 @@ import com.example.backend.service.UserNoticeService;
 import com.example.backend.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.system.ApplicationHome;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -142,5 +143,16 @@ public class UserController {
         return userService.putUser(userid, user.getName(), user.getIntroduce(), user.getAge(), imgUrl);
     }
 
+    @ApiOperation("管理员用：根据id返回指定用户信息")
+    @GetMapping("/adminGetUserById")
+    public Result<User> findUserById(@ApiParam(name = "userId", value = "userId", required = true)
+                                         @RequestParam("userId") Long userId) {
+        try {
+            return Result.success(userService.findUser(userId));
+        }
+        catch (Exception e){
+            return Result.fail(500,e.getMessage());
+        }
+    }
 
 }

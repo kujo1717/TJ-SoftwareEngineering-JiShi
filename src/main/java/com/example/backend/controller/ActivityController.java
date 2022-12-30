@@ -652,4 +652,34 @@ public class ActivityController {
         return Result.success(map);
 
     }
+
+    /**
+     * @description: 管理员用：获取活动详情
+     * @author: hym
+     * @date: 2022/12/30 19:53
+     * @param: \
+     * @return:
+     * @return: null
+     **/
+    @ApiOperation("管理员用：获取活动详情")
+    @GetMapping("/adminGetActivityById")
+    public Result<ActivityDetailDto> getActivityById(@ApiParam(name = "activity_id", value = "activity_id", required = true)
+                                                         @RequestParam("activity_id") Long activity_id){
+        try {
+            /**获取Activity实体*/
+            Activity activity = activityService.getAct(activity_id);
+
+            /**组装活动detail的dto*/
+            ActivityDetailDto activityDetailDto = new ActivityDetailDto(activity);
+            /**apply人数*/
+            activityDetailDto.setApplicant_num(activityApplyService.CountApplicantNum(activity.getActivity_id()));
+            /**participate人数*/
+            activityDetailDto.setParticipant_num((activityParticipateService.CountParticipantNum(activity.getActivity_id())));
+
+            return Result.success(activityDetailDto);
+        }
+        catch (Exception e){
+            return Result.fail(500,e.getMessage());
+        }
+    }
 }
