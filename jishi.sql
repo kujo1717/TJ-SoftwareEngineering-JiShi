@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 25/12/2022 09:05:01
+ Date: 30/12/2022 10:40:44
 */
 
 SET NAMES utf8mb4;
@@ -49,7 +49,7 @@ CREATE TABLE `activity`  (
 -- ----------------------------
 -- Records of activity
 -- ----------------------------
-INSERT INTO `activity` VALUES (1605191090871222273, '测试好友邀请', NULL, '测试好友邀请', '2022-11-17 00:00:00', NULL, '2022-12-20 21:19:13', 114, 1, 2, 1148, 0, NULL, '测试好友邀请', NULL, NULL, NULL, '', 0);
+INSERT INTO `activity` VALUES (1605191090871222273, '测试好友邀请', NULL, '测试好友邀请', '2022-11-17 00:00:00', NULL, '2022-12-20 21:19:13', 117, 1, 2, 1148, 0, NULL, '测试好友邀请', NULL, NULL, NULL, '', 0);
 
 -- ----------------------------
 -- Table structure for activity_apply
@@ -194,15 +194,13 @@ CREATE TABLE `friend_request`  (
   `status` int(0) NOT NULL,
   `create_time` datetime(0) NULL DEFAULT NULL,
   `activity_id` bigint(0) NULL DEFAULT NULL,
-  PRIMARY KEY (`userid`, `friendid`, `status`) USING BTREE
+  `friend_request_id` bigint(0) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`friend_request_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of friend_request
 -- ----------------------------
-INSERT INTO `friend_request` VALUES (1147, 1148, 0, '2022-12-20 21:17:56', NULL);
-INSERT INTO `friend_request` VALUES (1147, 1148, 5, '2022-12-24 18:06:55', 1605191090871222273);
-INSERT INTO `friend_request` VALUES (1148, 1147, 3, '2022-12-20 21:18:11', NULL);
 
 -- ----------------------------
 -- Table structure for item_notice
@@ -366,8 +364,7 @@ INSERT INTO `report` VALUES (1605067502637928449, '非法组织', '2222', 160506
 INSERT INTO `report` VALUES (1606672425737572354, '恶意骚扰', '1147', NULL, 1147, 1147, '1', 'string', '1', '2022-12-24 23:25:31', '2022-12-24 23:25:48', 1149, '90');
 INSERT INTO `report` VALUES (1606673373331484673, '恶意骚扰', '1147', NULL, 1147, 1147, '1', 'string', '1', '2022-12-24 23:29:17', '2022-12-24 23:29:28', 1149, '90');
 INSERT INTO `report` VALUES (1606673912031113218, '恶意骚扰', '1147', NULL, 1147, 1147, '1', 'string', '1', '2022-12-24 23:31:26', '2022-12-24 23:31:45', 1149, '7');
-INSERT INTO `report` VALUES (1606675010875838466, '恶意骚扰', '1147', NULL, 1147, 1147, '1', 'string', '1', '2022-12-24 23:35:48', '2022-12-24 23:36:07', 1149, '1');
-INSERT INTO `report` VALUES (1606675010913587202, '恶意骚扰', '1147', NULL, 1147, 1147, '1', 'string', '1', '2022-12-24 23:35:48', '2022-12-24 23:36:15', 1149, '7');
+INSERT INTO `report` VALUES (1606675010875838466, '恶意骚扰', '1147', NULL, 1147, 1147, '0', ':/report/illus/1607395288530554881-404.a57b6f31.png', '1', '2022-12-24 23:35:48', '2022-12-24 23:36:07', 1149, '1');
 
 -- ----------------------------
 -- Table structure for tag
