@@ -11,4 +11,6 @@ import java.util.List;
 public interface PollService {
   List<Poll> findPoll(Long activity_id);
   Long createPoll(Long activity_id, String topic_text, LocalDateTime deadline,boolean multiple_choice);
+
+  Integer deletePoll(Long pollID);
 }

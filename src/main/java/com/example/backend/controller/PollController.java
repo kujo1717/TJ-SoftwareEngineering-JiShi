@@ -38,7 +38,7 @@ public class PollController {
       boolean multipleChoice = Boolean.parseBoolean(JSON.toJSONString(pollWithOption.get("multipleChoice")));
       List<options> voteoptions = JSON.parseArray(JSON.toJSONString(pollWithOption.get("option")), options.class);
       LocalDateTime deadline = LocalDateTime.now();
-      String deadline_input=JSON.toJSONString(pollWithOption.get("deadline")).replace("\"", "");
+      String deadline_input=JSON.toJSONString(pollWithOption.get("deadline_time")).replace("\"", "");
       if (deadline_input.length() > 4) {
         deadline=LocalDateTime.parse(deadline_input, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
       }
@@ -63,4 +63,17 @@ public class PollController {
       return Result.fail(HttpStatus.EXPECTATION_FAILED.value(),"findPoll failed");
     }
   }
+
+  @ApiOperation("删除投票")
+  @DeleteMapping("/deletePoll/{pollID}")
+  public Integer removePoll(@ApiParam(name="pollID", value="投票id", required = true)
+                                     @PathVariable("pollID") Long pollID){
+    try {
+      return pollService.deletePoll(pollID);
+    }
+    catch (Exception e){
+      return 0;
+    }
+  }
 }
+
