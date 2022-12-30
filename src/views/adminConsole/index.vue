@@ -14,6 +14,8 @@
               你好,{{user_name}}
               <!-- <font size="1">role</font><br> -->
               <el-tag size="mini">管理员</el-tag>
+              <br>
+              <font size="2em">管理员编号：{{user_id}}</font>
             </el-col>
             
             <el-col :span="10" class="font-size1"> 
@@ -81,7 +83,7 @@
         </el-card>
       </el-col>
     </el-row>
-    <ReportBox selection="test" targetType="0" activityId="1" name="name" />
+    <!-- <ReportBox selection="test" targetType="0" activityId="1" name="name" /> -->
   </div>
 </template>
 
@@ -100,10 +102,8 @@ export default {
         userReportTodoNum: 0,
         activityReportTodoNum: 0,
       },
-      name: "无数据",
       role: "无数据",
       position: "无数据",
-      ID: 222022080700000001,
       value: "",
     };
   },

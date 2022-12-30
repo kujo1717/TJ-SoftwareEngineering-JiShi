@@ -60,3 +60,23 @@ export function patchOneReport(reportObj) {
     params: reportObj,
   })
 }
+
+export function getOneActivity(activityId){
+  return request({
+    url:'/api/activity/adminGetActivityById',
+    method: 'get',
+    params:{
+      activity_id: activityId
+    }
+  })
+}
+
+export function getOneUser(userId){
+  return request({
+    url:'/api/user/adminGetUserById',
+    method: 'get',
+    params:{
+      userId: userId
+    }
+  })
+}

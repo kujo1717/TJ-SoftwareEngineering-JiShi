@@ -33,14 +33,14 @@
           <el-table-column
             prop="type"
             label="举报分类"
-            width="180"
+            width="250"
           >
           </el-table-column>
 
           <el-table-column
             prop="reportTime"
             label="举报时间"
-            width="180"
+            width="280"
             sortable
           ></el-table-column>
 
@@ -51,7 +51,7 @@
           >
             <template slot-scope="scope">
               <el-tag
-                v-if="scope.row.state==0"
+                v-if="scope.row!=null && scope.row.state==0"
                 type='warning'
                 disable-transitions
               >待审核</el-tag>
@@ -301,7 +301,8 @@ export default {
         endlength = DataAll.length;
       }
       //第五步：循环获取当前页数的数据，放入展示的数组中
-      for (let i = strlength - 1; i < endlength; i++) {
+      let j = 0;
+      for (let i = strlength - 1; i < endlength && j < DataAll.length; i++, j++) {
         this.show_table.push(DataAll[i]);
       }
       //数据的总条数
@@ -327,7 +328,7 @@ export default {
       .then((res) => {
         
         let receive_table = res.data.reports;
-        for (let i = 0; i < receive_table.length; i++) {
+        for (let i = 0; i < receive_table.length; i++) {    
           //选择加到哪一个列表里，待审核列表还是已审核列表
           let choice = receive_table[i].state == 0 ? 0 : 1;
           this.order_table[choice].push(receive_table[i]);
@@ -347,11 +348,17 @@ export default {
   watch: {
     tab_index: {
       handler (newVal, oldVal) {
+        console.group("换页测试")
+        
         this.query.total = this.order_table[this.tab_index].length;//更改页面总条数
         this.show_table = this.order_table[this.tab_index].slice(0);//更改显示的条目集合
+        console.log(this.show_table)
         this.getPageData();//换页后重新获取页的数据
+
+        console.log(this.show_table)
         console.log(newVal);
         console.log(oldVal);
+        console.groupEnd("换页测试")
       }
     }
   }

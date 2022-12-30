@@ -3,25 +3,24 @@
   <div class="views">
     <!--举报单信息-->
     <div>
-      <el-descriptions title="活动举报单" :column="2" border>
-        <el-descriptions-item label="举报单ID"
-          >{{ form.reportId }}
+      <el-descriptions
+        title="活动举报单"
+        :column="2"
+        border
+      >
+        <el-descriptions-item label="举报单ID">{{ form.reportId }}
         </el-descriptions-item>
-        <el-descriptions-item label="举报人ID"
-          >{{ form.informerId }}
+        <el-descriptions-item label="举报人ID">{{ form.informerId }}
         </el-descriptions-item>
-        <el-descriptions-item label="被举报人ID"
-          >{{ form.userId }}
+        <el-descriptions-item label="被举报人ID">{{ form.userId }}
         </el-descriptions-item>
 
         <el-descriptions-item label="举报分类">{{
           form.type
         }}</el-descriptions-item>
-        <el-descriptions-item label="举报时间"
-          >{{ form.reportTime }}
+        <el-descriptions-item label="举报时间">{{ form.reportTime }}
         </el-descriptions-item>
-        <el-descriptions-item label="举报详述"
-          >{{ form.detail }}
+        <el-descriptions-item label="举报详述">{{ form.detail }}
         </el-descriptions-item>
 
         <el-descriptions-item label="举报配图">
@@ -33,7 +32,10 @@
               :key="img_i"
               :src="img"
             >
-              <div slot="error" class="image-slot">
+              <div
+                slot="error"
+                class="image-slot"
+              >
                 <i class="el-icon-picture-outline"></i>
               </div>
             </el-image>
@@ -44,24 +46,21 @@
 
     <!--用户信息-->
     <div>
-      <el-descriptions title="被举报人信息" :column="2" border>
-        <el-descriptions-item label="举报单ID"
-          >{{ form.reportId }}
+      <el-descriptions
+        title="被举报人信息"
+        :column="2"
+        border
+      >
+        <el-descriptions-item label="用户ID">{{ userForm.id }}
         </el-descriptions-item>
-        <el-descriptions-item label="举报人ID"
-          >{{ form.informerId }}
+        <el-descriptions-item label="邮箱">{{ userForm.email }}
         </el-descriptions-item>
-        <el-descriptions-item label="被举报人ID"
-          >{{ form.userId }}
+        <el-descriptions-item label="用户昵称">{{ userForm.name }}
         </el-descriptions-item>
-        <el-descriptions-item label="举报分类">{{
-          form.type
-        }}</el-descriptions-item>
-        <el-descriptions-item label="举报详述"
-          >{{ form.detail }}
+        <el-descriptions-item label="年龄">
+          {{userForm.age}}
         </el-descriptions-item>
-        <el-descriptions-item label="举报时间"
-          >{{ form.reportTime }}
+        <el-descriptions-item label="信誉积分">{{ userForm.credit }}
         </el-descriptions-item>
       </el-descriptions>
     </div>
@@ -69,7 +68,10 @@
     <!--惩罚形式选择-->
     <div>
       管理员裁决
-      <el-select v-model="form.punishType" placeholder="请选择">
+      <el-select
+        v-model="form.punishType"
+        placeholder="请选择"
+      >
         <el-option
           v-for="item in punishment"
           :key="item.value"
@@ -85,30 +87,30 @@
     </div>
 
     <!--确认/取消按钮-->
-    <div
-      style="
+    <div style="
         position: relative;
         left: 50%;
         width: 400px;
         height: 400px;
         margin-left: -200px;
         display: block;
-      "
-    >
-      <el-button type="primary" @click="onSubmit()" style="margin-right: 1em"
-        >提交</el-button
-      >
+      ">
+      <el-button
+        type="primary"
+        @click="onSubmit()"
+        style="margin-right: 1em"
+      >提交</el-button>
       <el-button @click="Cancel()">取消</el-button>
     </div>
   </div>
 </template>
 
 <script>
-import { patchOneReport } from "@/api/admin";
+import { patchOneReport, getOneUser } from "@/api/admin";
 export default {
   name: "DetailUserExamine",
   components: {},
-  data() {
+  data () {
     return {
       flag: true,
       image_url: "",
@@ -146,6 +148,7 @@ export default {
       faultSide: "",
       punishType: "",
       form: {},
+      userForm: {},
       his_obj: {},
       loading: false,
     };
@@ -164,7 +167,7 @@ export default {
   },
   methods: {
     // 测试从后端获取图片
-    getPhoto(report_id) {
+    getPhoto (report_id) {
       axios
         .request({
           // 以Blob对象的数据类型返回数据
@@ -188,7 +191,7 @@ export default {
           this.get_jpg(report_id);
         });
     },
-    get_jpg(id) {
+    get_jpg (id) {
       axios
         .request({
           // 以Blob对象的数据类型返回数据
@@ -212,7 +215,7 @@ export default {
           this.get_jpeg(id);
         });
     },
-    get_jpeg(id) {
+    get_jpeg (id) {
       axios
         .request({
           // 以Blob对象的数据类型返回数据
@@ -236,7 +239,7 @@ export default {
           this.get_gif(id);
         });
     },
-    get_gif(id) {
+    get_gif (id) {
       axios
         .request({
           // 以Blob对象的数据类型返回数据
@@ -260,14 +263,14 @@ export default {
           this.loading = false;
         });
     },
-    getRole(id) {
+    getRole (id) {
       if (id[0] == "0" && id[1] == "0") return "老人";
       else if (id[0] == "1" && id[1] == "0") return "医生";
       else if (id[0] == "1" && id[1] == "1") return "护工";
       else if (id[0] == "2" && id[1] == "2") return "管理员";
       else return "未知角色";
     },
-    isAfterToday(
+    isAfterToday (
       bantime //传入的参数为string类型
     ) {
       if (typeof bantime != "string" || bantime.length < 9) return false;
@@ -289,7 +292,7 @@ export default {
 
       return true;
     },
-    dateToString(
+    dateToString (
       currentDate //返回类型为string
     ) {
       let currentYear = currentDate.getFullYear();
@@ -301,7 +304,7 @@ export default {
       let str = currentYear + "-" + currentMonth + "-" + currentDay;
       return str;
     },
-    onSubmit() {
+    onSubmit () {
       //审核单没填完整就直接跳出
       if (this.form.punishType == null || this.form.punishType == "") {
         this.$message({
@@ -337,7 +340,7 @@ export default {
       return true;
     },
 
-    Cancel() {
+    Cancel () {
       this.$message({
         type: "info",
         message: "取消审核",
@@ -345,14 +348,14 @@ export default {
       this.dialogVisible = false;
       this.$router.push({ path: "/adminExamineUser/index" });
     },
-    FormIsFull() {
+    FormIsFull () {
       if (this.form.PUNITIVEMEASURE == "" || this.form.ISREAL == "")
         return false;
       return true;
     },
 
     // 切割images字符串，直接通过url访问图片
-    GetImgUrl() {
+    GetImgUrl () {
       const images = this.form.image;
       const image_urlList = [];
       if (images != "") {
@@ -390,6 +393,14 @@ export default {
     // this.getPhoto(this.form.ID);
 
     //根据用户ID,请求用户详细信息
+    getOneUser(reportDetail.userId)
+      .then((res) => {
+        console.log("res=", res)
+        this.userForm = res.data;
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   },
 };
 </script>
