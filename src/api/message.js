@@ -30,12 +30,12 @@ export function getItemInfo(userId) {
     })
 }
 //好友通知
-export function getFriendRequest(userId){
+export function getFriendRequest(userId) {
     return request({
-        url:'/api/notice/getFriendRequest',
-        method:'get',
-        params:{
-            userId:userId
+        url: '/api/notice/getFriendRequest',
+        method: 'get',
+        params: {
+            userId: userId
         }
     })
 }
@@ -60,23 +60,59 @@ export function modifyItemNoticeStatus(itemNoticeId) {
         }
     })
 }
-export function rejectFriendRequest(userid,friendid){
+export function rejectFriendRequest(userid, friendid) {
     return request({
-        url:'/api/notice/rejectFriendRequest',
-        method:'patch',
-        params:{
-            userid:userid,
-            friendid:friendid
+        url: '/api/notice/rejectFriendRequest',
+        method: 'patch',
+        params: {
+            userid: userid,
+            friendid: friendid
         }
     })
 }
-export function acceptFriendRequest(userid,friendid){
+export function acceptFriendRequest(userid, friendid) {
     return request({
-        url:"/api/notice/acceptFriendRequest",
-        method:'patch',
-        params:{
-            userid:userid,
-            friendid:friendid
+        url: "/api/notice/acceptFriendRequest",
+        method: 'patch',
+        params: {
+            userid: userid,
+            friendid: friendid
         }
     })
 }
+
+// 删除user notice
+export function deleteUserNotice(user_id, notice_id) {
+    return request({
+        url: "/api/notice/deleteUserNotice",
+        method: 'delete',
+        params: {
+            user_id: user_id,
+            notice_id: notice_id
+        }
+    })
+}
+
+// 删除item notice
+export function deleteItemrNotice(item_notice_id) {
+    return request({
+        url: "/api/notice/deleteItemNotice",
+        method: 'delete',
+        params: {
+            item_notice_id: item_notice_id,
+        }
+    })
+}
+
+// 删除friend request
+export function deleteFriendRequest(friend_request_id) {
+    return request({
+        url: "/api/notice/deleteFriendRequest",
+        method: 'delete',
+        params: {
+            friend_request_id: friend_request_id,
+        }
+    })
+}
+
+

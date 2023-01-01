@@ -62,4 +62,14 @@ export function sendMessageBoard(activityId, userId, content, createTime) {
         }
     })
 }
+// 删除留言板消息
+export function deleteMessageBoard(message_board_id) {
+    return request({
+        url: '/api/chat/deleteMessageBoard',
+        method: 'delete',
+        params: {
+            message_board_id: message_board_id,
+        }
+    })
+}
 
