@@ -275,12 +275,14 @@ public class SendNoticeUtil {
 
                     String tagText = null;
                     //根据个性化标签tag生成不同的语音播报
-                    if(task.getTag() == "室内"){
+                    if(task.getTag().equals("室内")){
                         tagText = "这是一个室内事项。";
                     }
-                    else if (task.getTag() == "户外") {
+                    else if (task.getTag().equals("户外")) {
                         tagText = "这是一个户外事项。" + GaodeUtil.getLiveWeatherText();
                     }
+                    else
+                        tagText = "";
 
                     ItemNotice itemNotice = new ItemNotice(task.getUserId(), task.getTaskTitle() + "事项开始提醒", "该事项还有十分钟就要开始了，请注意及时参加哦" + tagText, Now, task.getTaskId(), 0);
                     itemNoticeService.addItemNotice(itemNotice);

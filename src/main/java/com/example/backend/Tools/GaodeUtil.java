@@ -143,24 +143,24 @@ public class GaodeUtil {
     //获取实时天气语音播报
     public static String getLiveWeatherText() throws IOException {
         LiveWeatherDto weatherObj = GaodeUtil.getLiveWeather();
-        String weatherStr = "实时天气：" + weatherObj.getWeather() + "\n" +
+        String weatherStr = "实时天气：" + weatherObj.getWeather() + "，" +
                 "实时温度：" + weatherObj.getTemperature();
 
         /*1.判断温度*/
         int temperature = Integer.parseInt(weatherObj.getTemperature());
         if(temperature > 25)
-            weatherStr += "，气温较热，建议短袖出门哦，";
+            weatherStr += "，气温较热，建议短袖出门哦。";
         else if(temperature >= 15)
             weatherStr += "，气温适宜~";
         else if(temperature >= 5)
-            weatherStr += "，气温较冷，注意添衣哦，";
+            weatherStr += "，气温较冷，注意添衣哦。";
         else
-            weatherStr += "，气温寒冷，注意保暖哦，";
+            weatherStr += "，气温寒冷，注意保暖哦。";
 
         /*2.判断天气*/
         //如果天气不好
         if(weatherObj.getWeather().indexOf("雨") >= 0 || weatherObj.getWeather().indexOf("雪") >= 0){
-            weatherStr += "，而且出门要记得带伞哦~";
+            weatherStr += "出门要记得带伞哦~";
         }
 
         return weatherStr;

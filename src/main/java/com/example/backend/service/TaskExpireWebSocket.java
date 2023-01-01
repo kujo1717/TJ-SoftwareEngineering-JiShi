@@ -54,7 +54,6 @@ public class TaskExpireWebSocket {
     }
 
     public boolean sendMessage(String taskId, FormatMessage formatMessage) {
-        System.out.println("fffffffffffffffff");
         System.out.println(webSocketMap);
         if(webSocketMap == null || webSocketMap.size() == 0)
             return false;
