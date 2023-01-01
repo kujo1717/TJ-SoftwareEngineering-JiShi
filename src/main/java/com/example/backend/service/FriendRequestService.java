@@ -14,4 +14,6 @@ public interface FriendRequestService {
     boolean modifyFriendRequestStatus(Long userid,Long friendid);
 
     boolean handleActivityInvite(Long user_id,Long friend_id,Long activity_id,Integer handle_code);
+
+    int deleteFriendRequest(Long friend_request_id);
 }

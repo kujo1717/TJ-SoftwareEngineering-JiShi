@@ -149,4 +149,9 @@ public class FriendRequestImpl implements FriendRequestService {
 
         return flag;
     }
+
+    @Override
+    public int deleteFriendRequest(Long friend_request_id) {
+        return friendRequestMapper.deleteById(friend_request_id);
+    }
 }

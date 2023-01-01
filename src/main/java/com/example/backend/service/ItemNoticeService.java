@@ -17,4 +17,6 @@ public interface ItemNoticeService {
     int modifyItemNoticeStatus(Long itemNoticeId);
 
     int addItemNotice(ItemNotice itemNotice);
+
+    Integer deleteItemNotice(Long item_notice_id);
 }

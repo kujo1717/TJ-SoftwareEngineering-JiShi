@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.naming.spi.DirStateFactory;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author 2051196 刘一飞
@@ -175,5 +177,68 @@ public class NoticeController {
         }catch (Exception e){
             return Result.fail(500, e.getMessage());
         }
+    }
+
+
+    @ApiOperation("删除user notice")
+    @DeleteMapping("deleteUserNotice")
+    public Result<Map<String, Object>> deleteUserNotice(
+            @ApiParam(name = "user_id", value = "user_id", required = true)
+            @RequestParam() Long user_id,
+            @ApiParam(name = "notice_id", value = "notice_id", required = true)
+            @RequestParam() Long notice_id
+    ) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("notice_id",notice_id);
+        map.put("user_id",user_id);
+        try {
+            Integer i=userNoticeService.deleteUserNotice(user_id,notice_id);
+            map.put("i",i);
+
+            return Result.success(map);
+        } catch (Exception e) {
+            return Result.fail(500, e.getMessage());
+        }
+
+    }
+
+    @ApiOperation("删除item notice")
+    @DeleteMapping("deleteItemNotice")
+    public Result<Map<String, Object>> deleteItemNotice(
+            @ApiParam(name = "item_notice_id", value = "item_notice_id", required = true)
+            @RequestParam() Long item_notice_id
+
+    ) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("item_notice_id",item_notice_id);
+        try {
+            Integer i=itemNoticeService.deleteItemNotice(item_notice_id);
+            map.put("i",i);
+
+            return Result.success(map);
+        } catch (Exception e) {
+            return Result.fail(500, e.getMessage());
+        }
+
+    }
+
+    @ApiOperation("删除friend request")
+    @DeleteMapping("deleteFriendRequest")
+    public Result<Map<String, Object>> deleteFriendRequest(
+            @ApiParam(name = "friend_request_id", value = "friend_request_id", required = true)
+            @RequestParam() Long friend_request_id
+
+    ) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("friend_request_id",friend_request_id);
+        try {
+            Integer i=friendRequestService.deleteFriendRequest(friend_request_id);
+            map.put("i",i);
+
+            return Result.success(map);
+        } catch (Exception e) {
+            return Result.fail(500, e.getMessage());
+        }
+
     }
 }
