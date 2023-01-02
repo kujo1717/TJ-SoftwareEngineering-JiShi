@@ -19,7 +19,8 @@
           <a target="_blank" href="https://github.com/kujo1717/demo">
             <el-dropdown-item>Github</el-dropdown-item>
           </a>
-          <routerLink to="/friend/index">
+          
+          <routerLink v-if="roles=='client'" to="/friend/index">
             <el-dropdown-item>好友</el-dropdown-item>
           </routerLink>
           <el-dropdown-item divided @click.native="logout">
@@ -44,7 +45,8 @@ export default {
   computed: {
     ...mapGetters([
       'sidebar',
-      'avatar'
+      'avatar',
+      'roles'
     ])
   },
   methods: {
