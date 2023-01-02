@@ -16,7 +16,13 @@
           :key="group.classificationTitle"
           class="mpvg_group"
         >
-          <span class="mpvg_group_title">{{ group.classificationTitle }}</span>
+          <span class="mpvg_group_title">{{ group.classificationTitle }}
+            <el-button
+              size="mini"
+              type="danger"
+              @click="deleteClassification(group.classificationTitle)"
+            ><i class="el-icon-delete"></i></el-button>
+          </span>
           <!-- 在该分组新建task -->
           <el-card
             v-if="!group.isShow_quickCreate_new_task"
@@ -97,7 +103,7 @@
 <script>
 // import glistitem from "./glistitem";
 import draggable from "vuedraggable";
-import { getAllSortedTask, postOneNewClassification } from "@/api/classification.js"
+import { getAllSortedTask, postOneNewClassification, deleteOneClassification } from "@/api/classification.js"
 import { postOneNewTask, patchOneTask } from "@/api/task.js"
 
 export default {
@@ -258,9 +264,17 @@ export default {
       postOneNewClassification(this.userId, this.quickCreate_group_name)
         .then((res) => {
           console.log(res);
+          this.$message({
+            type:'success',
+            message:'添加分组成功！'
+          })
         })
         .catch((err) => {
           console.log(err);
+          this.$message({
+            type:'danger',
+            message:'添加分组失败'
+          })
         })
       //请求为这个项目新增一个空分组
       //let new_group_id = this.quickCreate_group_name + "_ID";
@@ -408,6 +422,42 @@ export default {
         .catch((err) => {
           console.log(err);
         })
+
+    },
+    deleteClassification (classificationTitle) {
+      if (classificationTitle == "默认分组") {
+        this.$message({
+          type: 'warning',
+          message: '不能删除默认分组！'
+        })
+      }
+      else {
+        this.$confirm('您确定要删除分组吗吗？原分组内的所有事项将自动移入默认分组', '确认信息', {
+          distinguishCancelAndClose: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
+        })
+          .then(() => {
+            console.log("断点")
+            deleteOneClassification(this.userId, classificationTitle)
+              .then((res) => {
+                console.log(res);
+                this.$message({
+                  type: 'success',
+                  message: '成功删除分组！'
+                })
+                this.setListsData();
+              })
+              .catch((err) => {
+                console.log(err);
+                this.$message({
+                  type: 'danger',
+                  message: '删除分组失败'
+                })
+              })
+          })
+
+      }
 
     }
   },

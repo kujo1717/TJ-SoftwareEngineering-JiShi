@@ -19,7 +19,17 @@ export function postOneNewClassification (userId, classificationTitle) {
   })
 }
 
-export function deletetOneNewClassification (userId, classificationTitle) {
+
+
+export function getAllClassificationTitle (userId) {
+  return request({
+    url: '/api/classification/getOneUserAllClassificationTitle',
+    method: 'get',
+    params: { userId: userId }
+  })
+}
+
+export function deleteOneClassification (userId, classificationTitle) {
   return request({
     url: '/api/classification/deleteOneClassification',
     method: 'delete',
@@ -27,13 +37,5 @@ export function deletetOneNewClassification (userId, classificationTitle) {
       userId: userId,
       classificationTitle: classificationTitle
     }
-  })
-}
-
-export function getAllClassificationTitle (userId) {
-  return request({
-    url: '/api/classification/getOneUserAllClassificationTitle',
-    method: 'get',
-    params: { userId: userId }
   })
 }
