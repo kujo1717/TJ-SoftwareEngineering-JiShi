@@ -201,6 +201,16 @@
                 {{ info.friendRequest.createTime }}
               </el-col>
             </el-row>
+            <el-row>
+              <el-button
+                type="text"
+                style="float: right"
+                @click="
+                  ClickDeleteFriendRequest(info.friendRequest.friendRequestId)
+                "
+                >删除消息</el-button
+              >
+            </el-row>
           </div>
           <el-col
             v-if="info.friendRequest.status == 1"
@@ -242,16 +252,6 @@
           <el-col v-else :span="8" style="margin-left: 80%">
             该申请已处理
           </el-col>
-          <el-row>
-            <el-button
-              type="text"
-              style="float: right"
-              @click="
-                ClickDeleteFriendRequest(info.friendRequest.friendRequestId)
-              "
-              >删除消息</el-button
-            >
-          </el-row>
         </el-card>
       </el-tab-pane>
       <!--好友结束-->
