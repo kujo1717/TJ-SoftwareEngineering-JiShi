@@ -110,7 +110,7 @@ public class ClassificationController {
     {
         //默认分组不可删除
         if(classificationTitle.equals("默认分组"))
-            return Result.fail(405,"默认分组不可删除！");
+            return Result.fail(400,"默认分组不可删除！");
 
         //先收集准备删除的分类中的所有task
         List<Task> taskList = taskService.selectOneUserOneSortAllTask(userId, classificationTitle);
