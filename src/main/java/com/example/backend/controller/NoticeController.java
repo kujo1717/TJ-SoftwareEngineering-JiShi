@@ -167,6 +167,7 @@ public class NoticeController {
                                                   @RequestParam("userid") Long userid,
                                               @ApiParam(name = "friendid", value = "对方id", required = true)
                                                   @RequestParam("friendid") Long friendid){
+
         try{
             if (friendRequestService.modifyFriendRequestStatus(userid,friendid)){
                 friendRequestService.sendFriendRequestById(friendid,userid,null,3);
@@ -175,6 +176,7 @@ public class NoticeController {
             }
             return Result.success("更新失败");
         }catch (Exception e){
+            System.out.println(e.getMessage());
             return Result.fail(500, e.getMessage());
         }
     }

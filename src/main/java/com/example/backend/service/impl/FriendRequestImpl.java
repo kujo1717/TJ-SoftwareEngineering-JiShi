@@ -88,10 +88,17 @@ public class FriendRequestImpl implements FriendRequestService {
     }
     @Override
     public boolean sendFriendRequestById(Long userid, Long friendid,Long activity_id,int status) {
+        QueryWrapper<friendRequest> queryWrapper=new QueryWrapper();
+        queryWrapper.eq("userid",userid);
+        queryWrapper.eq("status",status);
+        if (activity_id!=null)
+            queryWrapper.eq("activity_id",activity_id);
+        else
+            queryWrapper.eq("friendid",friendid);
         var Now=new Date();
         friendRequest friend_request=new friendRequest(null,userid,friendid,Now,activity_id,status);
         //查找是不是已经发送过了
-        List<Map<String,Object>>tList=friendRequestMapper.SelectFriendRequestActInviteList(activity_id,friendid,userid,status);
+        List<friendRequest> tList=friendRequestMapper.selectList(queryWrapper);
 
         if (tList.size()>0){
             return  true;
