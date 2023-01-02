@@ -1032,7 +1032,10 @@ export default {
     //子组件的emit
     resetDialogVisible () {
       this.taskBoxDialogVisible = false;
-      this.getFrontendDataByBackendData();
+
+      //刷新前端页面
+      this.SetContentsData()
+      this.GetMyProjects()
     },
     /**
      * 后端数据转前端数据
