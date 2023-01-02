@@ -14,6 +14,12 @@
           <el-card>
             <h4>{{ item.content }}</h4>
             <p>{{ item.userName }} 提交于 {{ item.createTime }}</p>
+            <el-button
+              type="text"
+              v-if="item.userId.toString() == userId.toString()"
+              @click="ClickDelete(item.messageBoardId)"
+              >删除</el-button
+            >
           </el-card>
         </el-timeline-item>
       </el-timeline>
@@ -35,7 +41,11 @@
   </div>
 </template>
 <script>
-import { getActivityAllMessageBoard, sendMessageBoard } from "@/api/chat";
+import {
+  getActivityAllMessageBoard,
+  sendMessageBoard,
+  deleteMessageBoard,
+} from "@/api/chat";
 
 export default {
   name: "Forum",
@@ -51,23 +61,27 @@ export default {
     };
   },
   mounted() {
-    // 获取当前活动ID
-    this.activityId = this.$route.query.id;
-    getActivityAllMessageBoard(this.activityId)
-      .then((res) => {
-        this.all_message_boards = res.data;
-        console.log("留言板中的所有信息为:", this.all_message_boards);
-        this.all_message_boards.forEach((element) => {
-          // 将Date格式化
-          element.createTime = this.formatDate(element.createTime);
-          console.log(element.createTime);
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    this.GetActivityAllMessageBoard();
   },
   methods: {
+    async GetActivityAllMessageBoard() {
+      // 获取当前活动ID
+      this.activityId = this.$route.query.id;
+      await getActivityAllMessageBoard(this.activityId)
+        .then((res) => {
+          this.all_message_boards = res.data;
+          console.log("留言板中的所有信息为:", this.all_message_boards);
+          this.all_message_boards.forEach((element) => {
+            // 将Date格式化
+            element.createTime = this.formatDate(element.createTime);
+            console.log(element.createTime);
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
     // 格式化Date方法
     formatDate(time, format = "YY-MM-DD hh:mm:ss") {
       var date = new Date(time);
@@ -102,19 +116,66 @@ export default {
         .then((res) => {
           console.log(res);
           // 重新获取数据
-          getActivityAllMessageBoard(this.activityId)
-          .then((res) => {
+          getActivityAllMessageBoard(this.activityId).then((res) => {
             this.all_message_boards = res.data;
             console.log("留言板中的所有信息为:", this.all_message_boards);
             this.all_message_boards.forEach((element) => {
               element.createTime = this.formatDate(element.createTime);
               console.log(element.createTime);
             });
-          })
+          });
         })
         .catch((err) => {
           console.log(err);
         });
+    },
+    //删除留言
+    async ClickDelete(message_id) {
+      // 弹窗确认
+      const h = this.$createElement;
+      this.$msgbox({
+        title: "确定删除留言？",
+
+        dangerouslyUseHTMLString: true,
+        showCancelButton: true,
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        beforeClose: async (action, instance, done) => {
+          // 点击了 确认
+          if (action === "confirm") {
+            instance.confirmButtonLoading = true;
+            instance.confirmButtonText = "执行中...";
+            // 向后端接口请求
+
+            await deleteMessageBoard(message_id)
+              .then((res) => {
+                console.log("deleteMessageBoard:res:", res);
+                this.$message({
+                  type: "success",
+                  message: "留言成功删除",
+                });
+                this.$nextTick(() => {
+                  this.GetActivityAllMessageBoard();
+                });
+              })
+              .catch((err) => {
+                console.log("deleteMessageBoard:err:", err);
+              })
+              .finally(() => {
+                instance.confirmButtonLoading = false;
+
+                done();
+              });
+          } else {
+            done();
+          }
+        },
+      }).then((action) => {
+        // this.$message({
+        //   type: "info",
+        //   message: "action: " + action,
+        // });
+      });
     },
   },
   computed: {
@@ -144,5 +205,4 @@ export default {
 ::-webkit-scrollbar-thumb {
   background: grey;
 }
-
 </style>

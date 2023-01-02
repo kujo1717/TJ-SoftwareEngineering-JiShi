@@ -32,6 +32,7 @@
                 >
               </el-col>
             </el-row>
+
             <el-row>
               <el-col :span="8" class="date-item">
                 {{ info.createTime }}
@@ -41,6 +42,15 @@
           <div class="content-item">
             {{ info.content }}
           </div>
+
+          <el-row>
+            <el-button
+              type="text"
+              style="float: right"
+              @click="ClickDeleteUserNotice(user_id, info.noticeId)"
+              >删除消息</el-button
+            >
+          </el-row>
         </el-card>
       </el-tab-pane>
       <el-tab-pane label="活动通知" name="act">
@@ -83,6 +93,15 @@
           <div class="content-item">
             {{ info.content }}
           </div>
+
+          <el-row>
+            <el-button
+              type="text"
+              style="float: right"
+              @click="ClickDeleteUserNotice(user_id, info.noticeId)"
+              >删除消息</el-button
+            >
+          </el-row>
         </el-card>
       </el-tab-pane>
       <el-tab-pane label="事项通知" name="item">
@@ -121,6 +140,14 @@
           <div class="content-item">
             {{ info.content }}
           </div>
+          <el-row>
+            <el-button
+              type="text"
+              style="float: right"
+              @click="ClickDeleteItemNotice(info.itemNoticeId)"
+              >删除消息</el-button
+            >
+          </el-row>
         </el-card>
       </el-tab-pane>
       <!--好友 by135-->
@@ -215,6 +242,16 @@
           <el-col v-else :span="8" style="margin-left: 80%">
             该申请已处理
           </el-col>
+          <el-row>
+            <el-button
+              type="text"
+              style="float: right"
+              @click="
+                ClickDeleteFriendRequest(info.friendRequest.friendRequestId)
+              "
+              >删除消息</el-button
+            >
+          </el-row>
         </el-card>
       </el-tab-pane>
       <!--好友结束-->
@@ -243,6 +280,9 @@ import {
   getFriendRequest,
   rejectFriendRequest,
   acceptFriendRequest,
+  deleteUserNotice,
+  deleteItemrNotice,
+  deleteFriendRequest,
 } from "@/api/message";
 import { handleFriendActInvite } from "@/api/activity";
 export default {
@@ -265,7 +305,239 @@ export default {
       dialogVisible: false,
     };
   },
+  computed: {
+    /**
+     * 用户个人信息
+     */
+    user_id: {
+      get: function () {
+        return this.$store.getters.id;
+      },
+    },
+    user_name: {
+      get: function () {
+        return this.$store.getters.name;
+      },
+    },
+  },
   methods: {
+    //delete user notice
+    async ClickDeleteUserNotice(user_id, notice_id) {
+      // 弹窗确认
+      const h = this.$createElement;
+      this.$msgbox({
+        title: "确定删除消息？",
+
+        dangerouslyUseHTMLString: true,
+        showCancelButton: true,
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        beforeClose: async (action, instance, done) => {
+          // 点击了 确认
+          if (action === "confirm") {
+            instance.confirmButtonLoading = true;
+            instance.confirmButtonText = "执行中...";
+            // 向后端接口请求
+
+            await deleteUserNotice(user_id, notice_id)
+              .then((res) => {
+                console.log("deleteUserNotice:res:", res);
+                this.$message({
+                  type: "success",
+                  message: "消息成功删除",
+                });
+                this.$nextTick(() => {});
+              })
+              .catch((err) => {
+                console.log("deleteUserNotice:err:", err);
+              })
+              .finally(async () => {
+                instance.confirmButtonLoading = false;
+                await getSystemInfo(this.user_id)
+                  .then((res) => {
+                    console.log("getSystemInfo:res", res);
+                    this.system_infos = res.data;
+                    this.sys_unread_num = 0;
+
+                    this.system_infos.forEach((value, index) => {
+                      // 添加index
+                      value.index = index;
+                      // 计算未读通知数
+
+                      if (value.status == 0) {
+                        this.sys_unread_num++;
+                      }
+                    });
+                    console.log("添加index后", this.system_infos);
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  });
+                await getActivityInfo(this.user_id)
+                  .then((res) => {
+                    console.log("getActivityInfo:res", res);
+
+                    this.activity_infos = res.data;
+                    this.act_unread_num = 0;
+                    this.activity_infos.forEach((value, index) => {
+                      // 添加index
+                      value.index = index;
+                      // 计算未读通知数
+
+                      if (value.status == 0) {
+                        this.act_unread_num++;
+                      }
+                    });
+                    console.log("添加index后", this.activity_infos);
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  });
+                done();
+              });
+          } else {
+            done();
+          }
+        },
+      }).then((action) => {
+        // this.$message({
+        //   type: "info",
+        //   message: "action: " + action,
+        // });
+      });
+    },
+
+    //delete item notice
+    async ClickDeleteItemNotice(itemNoticeId) {
+      // 弹窗确认
+      const h = this.$createElement;
+      this.$msgbox({
+        title: "确定删除消息？",
+
+        dangerouslyUseHTMLString: true,
+        showCancelButton: true,
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        beforeClose: async (action, instance, done) => {
+          // 点击了 确认
+          if (action === "confirm") {
+            instance.confirmButtonLoading = true;
+            instance.confirmButtonText = "执行中...";
+            // 向后端接口请求
+
+            await deleteItemrNotice(itemNoticeId)
+              .then((res) => {
+                console.log("deleteUserNotice:res:", res);
+                this.$message({
+                  type: "success",
+                  message: "消息成功删除",
+                });
+                this.$nextTick(() => {});
+              })
+              .catch((err) => {
+                console.log("deleteUserNotice:err:", err);
+              })
+              .finally(async () => {
+                instance.confirmButtonLoading = false;
+                await getItemInfo(this.user_id)
+                  .then((res) => {
+                    console.log("getItemInfo:res", res);
+
+                    this.item_infos = res.data;
+                    this.item_unread_num = 0;
+
+                    this.item_infos.forEach((value, index) => {
+                      // 添加index
+                      value.index = index;
+                      // 计算未读通知数
+                      if (value.status == 0) {
+                        this.item_unread_num++;
+                      }
+                    });
+                    console.log("添加index后", this.item_infos);
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  });
+                done();
+              });
+          } else {
+            done();
+          }
+        },
+      }).then((action) => {
+        // this.$message({
+        //   type: "info",
+        //   message: "action: " + action,
+        // });
+      });
+    },
+    //delete friend request
+    async ClickDeleteFriendRequest(friend_request_id) {
+      // 弹窗确认
+      const h = this.$createElement;
+      this.$msgbox({
+        title: "确定删除消息？",
+
+        dangerouslyUseHTMLString: true,
+        showCancelButton: true,
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        beforeClose: async (action, instance, done) => {
+          // 点击了 确认
+          if (action === "confirm") {
+            instance.confirmButtonLoading = true;
+            instance.confirmButtonText = "执行中...";
+            // 向后端接口请求
+
+            await deleteFriendRequest(friend_request_id)
+              .then((res) => {
+                console.log("deleteFriendRequest:res:", res);
+                this.$message({
+                  type: "success",
+                  message: "消息成功删除",
+                });
+                this.$nextTick(() => {});
+              })
+              .catch((err) => {
+                console.log("deleteFriendRequest:err:", err);
+              })
+              .finally(async () => {
+                instance.confirmButtonLoading = false;
+                //好友通知
+                await getFriendRequest(this.user_id)
+                  .then((res) => {
+                    console.log("getFriendRequest:res", res);
+
+                    this.firend_infos = res.data;
+                    this.item_unread_num = 0;
+
+                    this.firend_infos.forEach((value, index) => {
+                      // 添加index
+                      value.index = index;
+                      // 计算未读通知数
+                      if (value.status == 0) {
+                        this.item_unread_num++;
+                      }
+                    });
+                    console.log("添加index后", this.item_infos);
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  });
+                done();
+              });
+          } else {
+            done();
+          }
+        },
+      }).then((action) => {
+        // this.$message({
+        //   type: "info",
+        //   message: "action: " + action,
+        // });
+      });
+    },
     ShowDetails(index) {
       console.log(index);
       if (this.tab_name == "sys") {
@@ -338,12 +610,15 @@ export default {
   async mounted() {
     await getSystemInfo(this.user_id)
       .then((res) => {
-        console.log(res);
+        console.log("getSystemInfo:res", res);
         this.system_infos = res.data;
+        this.sys_unread_num = 0;
+
         this.system_infos.forEach((value, index) => {
           // 添加index
           value.index = index;
           // 计算未读通知数
+
           if (value.status == 0) {
             this.sys_unread_num++;
           }
@@ -355,12 +630,15 @@ export default {
       });
     await getActivityInfo(this.user_id)
       .then((res) => {
-        console.log(res);
+        console.log("getActivityInfo:res", res);
+
         this.activity_infos = res.data;
+        this.act_unread_num = 0;
         this.activity_infos.forEach((value, index) => {
           // 添加index
           value.index = index;
           // 计算未读通知数
+
           if (value.status == 0) {
             this.act_unread_num++;
           }
@@ -372,8 +650,11 @@ export default {
       });
     await getItemInfo(this.user_id)
       .then((res) => {
-        console.log(res);
+        console.log("getItemInfo:res", res);
+
         this.item_infos = res.data;
+        this.item_unread_num = 0;
+
         this.item_infos.forEach((value, index) => {
           // 添加index
           value.index = index;
@@ -390,8 +671,11 @@ export default {
     //好友通知
     await getFriendRequest(this.user_id)
       .then((res) => {
-        console.log(res);
+        console.log("getFriendRequest:res", res);
+
         this.firend_infos = res.data;
+        this.item_unread_num = 0;
+
         this.firend_infos.forEach((value, index) => {
           // 添加index
           value.index = index;
