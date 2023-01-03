@@ -321,7 +321,7 @@ export default {
         .then(
           this.$message({
             type: "success",
-            message: "添加成功!",
+            message: "好友申请发送成功!",
           })
         )
         .catch(() => {
