@@ -3,6 +3,7 @@ package com.example.backend.service.impl;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.backend.Tools.SystemNoticeUtil;
 import com.example.backend.dto.ActivityUserRole;
 import com.example.backend.dto.FriendRequestDto;
 import com.example.backend.entity.Activity;
@@ -37,6 +38,9 @@ public class FriendRequestImpl implements FriendRequestService {
 
     @Autowired
     ActivityParticipateService activityParticipateService;
+
+    @Autowired
+    SystemNoticeUtil systemNoticeUtil;
 
     @Override
     public List<FriendRequestDto> findFriendRequest(Long userid) {
@@ -122,10 +126,22 @@ public class FriendRequestImpl implements FriendRequestService {
     @Override
     public boolean handleActivityInvite(Long user_id, Long friend_id, Long activity_id, Integer handle_code) {
         boolean flag=false;
+        User friend=userMapper.selectById(user_id);
+        Activity activity=activityMapper.selectById(activity_id);
         if (handle_code.equals(0)){
+            /**handle code 0 拒绝邀请*/
+
+            /**通知发送者 */
+            String title=friend.getName()+" 拒绝了您的活动邀请";
+
+            String content="您的好友 "+friend.getName()
+                    +"拒绝您发送的活动参与邀请，拒绝参与活动 "+activity.getTitle_name()+" ";
+            systemNoticeUtil.SendSystemNotice(friend_id,title,content);
             flag=true;
         } else if (handle_code.equals(1)) {
             /**handle code 1 接受邀请*/
+
+
 
             /**判断user是不是活动的报名者*/
             ActivityUserRole RoleApplicant=activityApplyService.isApplicant(user_id,activity_id);
@@ -142,6 +158,12 @@ public class FriendRequestImpl implements FriendRequestService {
                 activityParticipateService.AddParticipant(activityParticipate);
             }
 
+            /**通知发送者 */
+            String title=friend.getName()+" 同意了您的活动邀请";
+
+            String content="您的好友 "+friend.getName()
+                    +"同意您发送的活动参与邀请，已参与活动 "+activity.getTitle_name()+" ";
+            systemNoticeUtil.SendSystemNotice(friend_id,title,content);
             flag=true;
         }
         //更新消息状态
