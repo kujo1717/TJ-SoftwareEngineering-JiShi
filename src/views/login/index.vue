@@ -177,12 +177,10 @@ export default {
               console.log("path_s:", path_s);
 
               window.location.reload();
-              // setTimeout(() => {
-              //   this.$router.push({ path: this.redirect || path_s });
-              // }, 3000);
 
-              this.$router.push({ path: this.redirect || path_s });
-              // this.$router.push({ name: name_s });
+
+              // this.$router.push({ path: this.redirect || path_s });
+              this.$router.push({ name: name_s });
 
               console.log("跳转");
               this.loading = false;

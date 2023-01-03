@@ -52,16 +52,20 @@ export default {
     },
   },
   mounted() {
-    const roles = this.$store.getters.roles;
-    console.log("login:roles:", roles);
-    let name_s = "";
+    let nowPath = this.$route.path;
+    console.log("this.$route.path:", nowPath);
+    if (nowPath == "/") {
+      const roles = this.$store.getters.roles;
+      console.log("login:roles:", roles);
+      let name_s = "";
 
-    if (roles.includes("admin")) {
-      name_s = "AdminConsole";
-    } else if (roles.includes("client")) {
-      name_s = "Dashboard";
+      if (roles.includes("admin")) {
+        name_s = "AdminConsole";
+      } else if (roles.includes("client")) {
+        name_s = "Dashboard";
+      }
+      this.$router.push({ name: name_s });
     }
-    this.$router.push({ name: name_s });
   },
 };
 </script>

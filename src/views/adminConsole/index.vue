@@ -28,32 +28,23 @@
         </el-card>
         <br />
 
-        <!-- <el-card class="box-card font-size2">
-          <div style="margin-bottom: 20px">信息管理栏</div>
-          <div
-            style="margin-left: 30px; margin-bottom: 15px"
-            @click="toSearch()"
-          >
-            信息管理
-            <el-button type="primary" icon="el-icon-edit"></el-button>
-          </div>
-        </el-card> -->
+
 
         <br />
         <el-card class="box-card font-size2">
           <div style="margin-bottom: 30px">工作台</div>
-          <!--护工资质审核-->
+
           <div style="margin-bottom: 20px">
             用户举报单审核<br />
-            <el-button style="margin-left: 90px" @click="toCarerQualify" round
+            <el-button style="margin-left: 90px" @click="toExamineUser" round
               >待审核：{{ auditLog.userReportTodoNum }}</el-button
             >
           </div>
 
-          <!--举报单审核-->
+  
           <div style="margin-bottom: 20px">
             活动举报单审核<br />
-            <el-button style="margin-left: 90px" @click="toReportScan" round
+            <el-button style="margin-left: 90px" @click="toExamineAct" round
               >待审核：{{ auditLog.activityReportTodoNum }}</el-button
             >
           </div>
@@ -120,30 +111,18 @@ export default {
     },
   },
   methods: {
-    toCarerQualify() {
-      this.dialogVisible = false;
+    toExamineUser() {
       this.$router.push({
-        name: "CarerQualify",
+        name: "AdminExmaineUser",
       });
     },
-    toReportScan() {
-      this.dialogVisible = false;
+    toExamineAct() {
       this.$router.push({
-        name: "ReportScan",
+        name: "AdminExamineActivity",
       });
     },
-    toSearch() {
-      this.dialogVisible = false;
-      this.$router.push({
-        name: "Search",
-      });
-    },
-    toOrg() {
-      this.dialogVisible = false;
-      this.$router.push({
-        name: "OrgQualify",
-      });
-    },
+
+
     button_close(data) {
       this.flag = data;
     },

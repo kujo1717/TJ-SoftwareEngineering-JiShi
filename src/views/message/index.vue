@@ -516,7 +516,7 @@ export default {
                       // 添加index
                       value.index = index;
                       // 计算未读通知数
-                      if (value.status != 0) {
+                      if (value.friendRequest.status == 1||value.friendRequest.status == 4) {
                         this.friend_unread_num++;
                       }
                     });
@@ -611,7 +611,7 @@ export default {
                 // 添加index
                 value.index = index;
                 // 计算未读通知数
-                if (value.status != 5) {
+                if (value.friendRequest.status == 1||value.friendRequest.status == 4) {
                   this.friend_unread_num++;
                 }
               });
@@ -702,7 +702,7 @@ export default {
           // 添加index
           value.index = index;
           // 计算未读通知数
-          if (value.status != 5) {
+          if (value.friendRequest.status == 1||value.friendRequest.status == 4) {
             this.friend_unread_num++;
           }
         });
