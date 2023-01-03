@@ -1,13 +1,12 @@
 package com.example.backend.controller;
 
+import com.example.backend.Tools.SystemNoticeUtil;
 import com.example.backend.dto.ActivityNotice;
 import com.example.backend.dto.FriendRequestDto;
 import com.example.backend.dto.SystemNotice;
 import com.example.backend.common.Result;
-import com.example.backend.entity.ItemNotice;
-import com.example.backend.entity.Notice;
-import com.example.backend.entity.UserNotice;
-import com.example.backend.entity.friendRequest;
+import com.example.backend.entity.*;
+import com.example.backend.mapper.UserMapper;
 import com.example.backend.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,6 +42,12 @@ public class NoticeController {
     FriendRequestService friendRequestService;
     @Autowired
     FriendService friendService;
+
+    @Autowired
+    SystemNoticeUtil systemNoticeUtil;
+
+    @Autowired
+    UserMapper userMapper;
     @ApiOperation("获取该用户所有系统通知信息")
     @GetMapping("getSystemNoticeByUserID")
     public Result<List<SystemNotice>> findOneUserSystemNoticeInfo(@ApiParam(name = "userId", value = "要查找的用户名", required = true)
@@ -154,6 +159,12 @@ public class NoticeController {
         try{
             if (friendRequestService.modifyFriendRequestStatus(userid,friendid)){
                 friendRequestService.sendFriendRequestById(friendid,userid,null,2);
+
+                User friend =userMapper.selectById(userid);
+                String title="好友申请被拒绝";
+                String content=friend.getName()+" 拒绝了您的好友申请";
+                systemNoticeUtil.SendSystemNotice(friendid,title,content);
+
                 return Result.success("信息状态更新成功");
             }
             return Result.success("更新失败");
@@ -172,6 +183,12 @@ public class NoticeController {
             if (friendRequestService.modifyFriendRequestStatus(userid,friendid)){
                 friendRequestService.sendFriendRequestById(friendid,userid,null,3);
                 friendService.addFriend(userid,friendid);
+
+                User friend =userMapper.selectById(userid);
+                String title="好友申请通过";
+                String content=friend.getName()+" 同意了您的好友申请";
+                systemNoticeUtil.SendSystemNotice(friendid,title,content);
+
                 return Result.success("信息状态更新成功");
             }
             return Result.success("更新失败");
