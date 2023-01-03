@@ -510,14 +510,14 @@ export default {
                     console.log("getFriendRequest:res", res);
 
                     this.firend_infos = res.data;
-                    this.item_unread_num = 0;
+                    this.friend_unread_num = 0;
 
                     this.firend_infos.forEach((value, index) => {
                       // 添加index
                       value.index = index;
                       // 计算未读通知数
-                      if (value.status == 0) {
-                        this.item_unread_num++;
+                      if (value.status != 0) {
+                        this.friend_unread_num++;
                       }
                     });
                     console.log("添加index后", this.item_infos);
@@ -598,6 +598,28 @@ export default {
         })
         .catch((err) => {
           console.log("handleFriendActInvite:err", err);
+        })
+        .finally(async() => {
+          await getFriendRequest(this.user_id)
+            .then((res) => {
+              console.log("getFriendRequest:res", res);
+
+              this.firend_infos = res.data;
+              this.friend_unread_num = 0;
+
+              this.firend_infos.forEach((value, index) => {
+                // 添加index
+                value.index = index;
+                // 计算未读通知数
+                if (value.status != 5) {
+                  this.friend_unread_num++;
+                }
+              });
+              console.log("添加index后", this.item_infos);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         });
     },
     activityInvite_reject(index) {
@@ -674,14 +696,14 @@ export default {
         console.log("getFriendRequest:res", res);
 
         this.firend_infos = res.data;
-        this.item_unread_num = 0;
+        this.friend_unread_num = 0;
 
         this.firend_infos.forEach((value, index) => {
           // 添加index
           value.index = index;
           // 计算未读通知数
-          if (value.status == 0) {
-            this.item_unread_num++;
+          if (value.status != 5) {
+            this.friend_unread_num++;
           }
         });
         console.log("添加index后", this.item_infos);
