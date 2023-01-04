@@ -32,4 +32,10 @@ public class ItemNoticeServiceImpl implements ItemNoticeService {
     public int modifyItemNoticeStatus(Long itemNoticeId) {
         return itemNoticeMapper.modifyItemNoticeStatus(itemNoticeId);
     }
+
+    @Override
+    public Integer deleteItemNotice(Long item_notice_id) {
+
+        return itemNoticeMapper.deleteById(item_notice_id);
+    }
 }

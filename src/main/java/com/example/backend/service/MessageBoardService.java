@@ -16,4 +16,6 @@ public interface MessageBoardService {
 
     int addMessageBoard(MessageBoard messageBoard);
 
+    Integer deleteMessageBoard(Long message_board_id);
+
 }

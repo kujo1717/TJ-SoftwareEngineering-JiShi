@@ -1,5 +1,6 @@
 package com.example.backend.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.backend.entity.MessageBoard;
 import org.apache.ibatis.annotations.*;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * @JDKVersion 17.0.4
  */
 @Mapper
-public interface MessageBoardMapper {
+public interface MessageBoardMapper extends BaseMapper<MessageBoard> {
     @Select("SELECT * FROM message_board WHERE activity_id=${activityId}")
     List<MessageBoard> selectActivityAllMessageBoard(@Param("activityId") Long activityId);
 

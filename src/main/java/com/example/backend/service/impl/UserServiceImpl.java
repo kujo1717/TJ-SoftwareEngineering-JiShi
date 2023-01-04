@@ -63,11 +63,12 @@ public class UserServiceImpl implements UserService {
     }
     public Result<String> confirmUser(String email, String password){
         User user=userMapper.selectByEmail(email);
-        Long user_id=user.getId();
+
         if (user==null){
             return Result.fail(10001,"用户不存在");
         }
-        else if (!user.getPassword().equals(DigestUtils.md5DigestAsHex(password.getBytes()))){
+        Long user_id=user.getId();
+        if (!user.getPassword().equals(DigestUtils.md5DigestAsHex(password.getBytes()))){
             return Result.fail(10001,"密码错误");
         }
         if (user.getBannedTime()!=null&&user.getBannedTime().after(new Date())){

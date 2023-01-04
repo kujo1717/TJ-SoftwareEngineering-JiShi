@@ -183,17 +183,21 @@ public class ReportServiceImpl implements ReportService {
             User user=userMapper.selectById(user_id);
             Date nowTime=user.getBannedTime();
 
+            if (nowTime==null||nowTime.before(new Date())){
+                nowTime=new Date();
+            }
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(nowTime);
             calendar.add(Calendar.DATE,banndeDay);
             Date targetDate = calendar.getTime();
 
-
+            User user1=userMapper.selectById(user_id);
 
             userMapper.update(null,Wrappers.<User>lambdaUpdate()
                     .eq(User::getId,user_id)
-                    .set(User::getBannedTime,targetDate));
+                    .set(User::getBannedTime,targetDate)
+                    .set(User::getCredit,user1.getCredit()-1));
 
         }
 

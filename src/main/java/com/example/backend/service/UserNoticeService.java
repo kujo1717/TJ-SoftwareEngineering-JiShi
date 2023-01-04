@@ -17,4 +17,7 @@ public interface UserNoticeService {
     int modifyNoticeStatus(Long userId, Long noticeId);
 
     int addUserNotice(UserNotice userNotice);
+
+    Integer deleteUserNotice(Long user_id,Long notice_id);
+
 }

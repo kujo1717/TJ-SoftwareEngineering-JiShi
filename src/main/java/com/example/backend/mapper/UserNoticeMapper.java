@@ -1,5 +1,6 @@
 package com.example.backend.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.backend.entity.UserNotice;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -14,7 +15,7 @@ import java.util.List;
  * @JDKVersion 17.0.4
  */
 @Mapper
-public interface UserNoticeMapper {
+public interface UserNoticeMapper extends BaseMapper<UserNotice> {
     @Select("SELECT * FROM user_notice WHERE user_id=${userId}")
     List<UserNotice> selectOneUserAllNotice(@Param("userId") Long userId);
 

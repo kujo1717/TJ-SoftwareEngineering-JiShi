@@ -27,4 +27,11 @@ public class MessageBoardServiceImpl implements MessageBoardService {
     public int addMessageBoard(MessageBoard messageBoard) {
         return messageBoardMapper.insertMessageBoard(messageBoard);
     }
+
+    @Override
+    public Integer deleteMessageBoard(Long message_board_id) {
+        Integer i=messageBoardMapper.deleteById(message_board_id);
+
+        return i;
+    }
 }

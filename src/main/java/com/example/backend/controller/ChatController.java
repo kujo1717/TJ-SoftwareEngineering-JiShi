@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @Author 2051196 刘一飞
@@ -177,6 +174,26 @@ public class ChatController {
             MessageBoard messageBoard = new MessageBoard(activityId, userId, content, date);
             messageBoardService.addMessageBoard(messageBoard);
             return Result.success("yes");
+        } catch (Exception e) {
+            return Result.fail(500, e.getMessage());
+        }
+
+    }
+
+
+    @ApiOperation("删除留言板消息")
+    @DeleteMapping("deleteMessageBoard")
+    public Result<Map<String, Object>> DeleteMessageBoard(
+            @ApiParam(name = "message_board_id", value = "留言板信息ID", required = true)
+            @RequestParam() Long message_board_id
+    ) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("message_board_id",message_board_id);
+        try {
+            Integer i=messageBoardService.deleteMessageBoard(message_board_id);
+            map.put("i",i);
+
+            return Result.success(map);
         } catch (Exception e) {
             return Result.fail(500, e.getMessage());
         }

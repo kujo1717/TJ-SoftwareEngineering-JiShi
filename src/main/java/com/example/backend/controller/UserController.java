@@ -69,7 +69,7 @@ public class UserController {
     @PostMapping("login")
     public Result<String> login(@RequestBody User user) {
         User user_whole=userService.getUserByEmail(user.getEmail());
-
+        systemNoticeUtil.SendSystemNotice(user_whole.getId(),"自动记录","用户"+user_whole.getName()+"成功登录");
 
         return userService.confirmUser(user.getEmail(), user.getPassword());
     }

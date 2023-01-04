@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 30/12/2022 10:40:44
+ Date: 02/01/2023 20:16:52
 */
 
 SET NAMES utf8mb4;
@@ -49,7 +49,7 @@ CREATE TABLE `activity`  (
 -- ----------------------------
 -- Records of activity
 -- ----------------------------
-INSERT INTO `activity` VALUES (1605191090871222273, '测试好友邀请', NULL, '测试好友邀请', '2022-11-17 00:00:00', NULL, '2022-12-20 21:19:13', 117, 1, 2, 1148, 0, NULL, '测试好友邀请', NULL, NULL, NULL, '', 0);
+INSERT INTO `activity` VALUES (1605191090871222273, '测试好友邀请', NULL, '测试好友邀请', '2022-11-17 00:00:00', NULL, '2022-12-20 21:19:13', 148, 1, 2, 1148, 0, NULL, '测试好友邀请', NULL, NULL, NULL, '', 0);
 
 -- ----------------------------
 -- Table structure for activity_apply
@@ -142,6 +142,7 @@ CREATE TABLE `classification`  (
 -- ----------------------------
 -- Records of classification
 -- ----------------------------
+INSERT INTO `classification` VALUES ('默认分组', 1147, '2023-01-02 18:09:26');
 
 -- ----------------------------
 -- Table structure for friend
@@ -176,7 +177,7 @@ CREATE TABLE `friend_group`  (
   PRIMARY KEY (`belongid`, `groupid`) USING BTREE,
   INDEX `groupid`(`groupid`) USING BTREE,
   CONSTRAINT `friend_group_ibfk_1` FOREIGN KEY (`belongid`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of friend_group
@@ -195,8 +196,14 @@ CREATE TABLE `friend_request`  (
   `create_time` datetime(0) NULL DEFAULT NULL,
   `activity_id` bigint(0) NULL DEFAULT NULL,
   `friend_request_id` bigint(0) NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`friend_request_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`friend_request_id`) USING BTREE,
+  INDEX `userid`(`userid`) USING BTREE,
+  INDEX `friendid`(`friendid`) USING BTREE,
+  INDEX `activity_id`(`activity_id`) USING BTREE,
+  CONSTRAINT `friend_request_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `friend_request_ibfk_2` FOREIGN KEY (`friendid`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `friend_request_ibfk_3` FOREIGN KEY (`activity_id`) REFERENCES `activity` (`activity_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of friend_request
@@ -219,11 +226,17 @@ CREATE TABLE `item_notice`  (
   INDEX `item_notice_item_id`(`item_id`) USING BTREE,
   CONSTRAINT `item_notice_item_id` FOREIGN KEY (`item_id`) REFERENCES `task` (`task_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `item_notice_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of item_notice
 -- ----------------------------
+INSERT INTO `item_notice` VALUES (6, 1147, '数据库课设事项开始提醒', '该事项还有十分钟就要开始了，请注意及时参加哦', '2023-01-02 18:49:00', 1609854570966626305, 0);
+INSERT INTO `item_notice` VALUES (7, 1147, '计算机网络实验一事项开始提醒', '该事项还有十分钟就要开始了，请注意及时参加哦', '2023-01-02 18:49:00', 1609854656492679169, 0);
+INSERT INTO `item_notice` VALUES (8, 1147, '设计模式小组会议事项开始提醒', '该事项还有十分钟就要开始了，请注意及时参加哦', '2023-01-02 18:49:00', 1609854734779363329, 0);
+INSERT INTO `item_notice` VALUES (9, 1147, '数据库课设事项开始提醒', '该事项还有十分钟就要开始了，请注意及时参加哦', '2023-01-02 19:49:00', 1609854570966626305, 0);
+INSERT INTO `item_notice` VALUES (10, 1147, '计算机网络实验一事项开始提醒', '该事项还有十分钟就要开始了，请注意及时参加哦', '2023-01-02 19:49:00', 1609854656492679169, 0);
+INSERT INTO `item_notice` VALUES (11, 1147, '设计模式小组会议事项开始提醒', '该事项还有十分钟就要开始了，请注意及时参加哦', '2023-01-02 19:49:00', 1609854734779363329, 0);
 
 -- ----------------------------
 -- Table structure for message
@@ -237,13 +250,12 @@ CREATE TABLE `message`  (
   `type` tinyint(0) NULL DEFAULT NULL COMMENT '消息类型:0为text，1为image，2为file',
   `send_time` bigint(0) NULL DEFAULT NULL COMMENT '消息发送时间，13位毫秒',
   `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '消息内容，如果为image则为URL地址',
-  `file_id` bigint(0) NULL DEFAULT NULL COMMENT '消息对应的文件ID',
   PRIMARY KEY (`message_id`) USING BTREE,
   INDEX `message_activity_id`(`activity_id`) USING BTREE,
   INDEX `message_sender_id`(`sender_id`) USING BTREE,
   CONSTRAINT `message_activity_id` FOREIGN KEY (`activity_id`) REFERENCES `activity` (`activity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `message_sender_id` FOREIGN KEY (`sender_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 55 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of message
@@ -264,11 +276,13 @@ CREATE TABLE `message_board`  (
   INDEX `message_board_user_id`(`user_id`) USING BTREE,
   CONSTRAINT `message_board_activity_id` FOREIGN KEY (`activity_id`) REFERENCES `activity` (`activity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `message_board_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 22 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of message_board
 -- ----------------------------
+INSERT INTO `message_board` VALUES (18, 1605191090871222273, 1148, '2', '2023-01-01 21:37:16');
+INSERT INTO `message_board` VALUES (21, 1605191090871222273, 1147, '123', '2023-01-01 22:02:57');
 
 -- ----------------------------
 -- Table structure for notice
@@ -284,7 +298,7 @@ CREATE TABLE `notice`  (
   PRIMARY KEY (`notice_id`) USING BTREE,
   INDEX `notice_activity_id`(`activity_id`) USING BTREE,
   CONSTRAINT `notice_activity_id` FOREIGN KEY (`activity_id`) REFERENCES `activity` (`activity_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of notice
@@ -296,6 +310,7 @@ INSERT INTO `notice` VALUES (10, NULL, '2022年12月20日:管理员删除活动'
 INSERT INTO `notice` VALUES (11, NULL, '2022年12月20日:管理员删除活动', '管理员222', '2022-12-20 10:16:22', 1);
 INSERT INTO `notice` VALUES (12, NULL, '2022年12月20日:您的活动受到举报，现经审核已删除', '管理员<222>经审核后删除了您的违规活动<2222>', '2022-12-20 13:02:58', 1);
 INSERT INTO `notice` VALUES (13, NULL, '2022年12月20日:您的活动受到举报，现经审核已删除', '管理员<222>经审核后删除了您的违规活动<2222>', '2022-12-20 19:09:32', 1);
+INSERT INTO `notice` VALUES (14, NULL, 'a1', '1231231231', '2023-01-01 22:06:52', 2);
 
 -- ----------------------------
 -- Table structure for poll
@@ -315,6 +330,7 @@ CREATE TABLE `poll`  (
 -- ----------------------------
 -- Records of poll
 -- ----------------------------
+INSERT INTO `poll` VALUES (1609873298840170498, 1605191090871222273, '\"晚餐去哪家店？\"', '2023-01-05 00:00:00', 0);
 
 -- ----------------------------
 -- Table structure for relativetask
@@ -351,20 +367,22 @@ CREATE TABLE `report`  (
   `handle_time` datetime(0) NULL DEFAULT NULL,
   `admin_id` bigint(0) NULL DEFAULT NULL,
   `handle_operation` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  PRIMARY KEY (`report_id`) USING BTREE
+  PRIMARY KEY (`report_id`) USING BTREE,
+  INDEX `report_activity_id`(`activity_id`) USING BTREE,
+  INDEX `report_informer_id`(`informer_id`) USING BTREE,
+  INDEX `report_admin_id`(`admin_id`) USING BTREE,
+  CONSTRAINT `report_activity_id` FOREIGN KEY (`activity_id`) REFERENCES `activity` (`activity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `report_admin_id` FOREIGN KEY (`admin_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `report_informer_id` FOREIGN KEY (`informer_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of report
 -- ----------------------------
-INSERT INTO `report` VALUES (1605065010592096258, '聚众赌博', '11111111', 1605063550315810818, NULL, 1, '1', 'string', '0', '2022-12-20 12:58:14', '2022-12-20 12:58:27', 2, '0');
-INSERT INTO `report` VALUES (1605065112694038529, '聚众赌博', '11111111', 1605063550315810818, NULL, 1, '1', 'string', '0', '2022-12-20 12:58:38', '2022-12-20 12:58:52', 2, '1');
-INSERT INTO `report` VALUES (1605066164600426498, '邪教传播', '111111111', 1605066134728593410, NULL, 1, '1', 'string', '0', '2022-12-20 13:02:49', '2022-12-20 13:02:58', 2, '1');
-INSERT INTO `report` VALUES (1605067502637928449, '非法组织', '2222', 1605066135315795969, NULL, 1, '1', 'string', '0', '2022-12-20 13:08:08', '2022-12-20 19:09:32', 2, '1');
-INSERT INTO `report` VALUES (1606672425737572354, '恶意骚扰', '1147', NULL, 1147, 1147, '1', 'string', '1', '2022-12-24 23:25:31', '2022-12-24 23:25:48', 1149, '90');
-INSERT INTO `report` VALUES (1606673373331484673, '恶意骚扰', '1147', NULL, 1147, 1147, '1', 'string', '1', '2022-12-24 23:29:17', '2022-12-24 23:29:28', 1149, '90');
-INSERT INTO `report` VALUES (1606673912031113218, '恶意骚扰', '1147', NULL, 1147, 1147, '1', 'string', '1', '2022-12-24 23:31:26', '2022-12-24 23:31:45', 1149, '7');
-INSERT INTO `report` VALUES (1606675010875838466, '恶意骚扰', '1147', NULL, 1147, 1147, '0', ':/report/illus/1607395288530554881-404.a57b6f31.png', '1', '2022-12-24 23:35:48', '2022-12-24 23:36:07', 1149, '1');
+INSERT INTO `report` VALUES (1609863372369637377, '涉嫌诈骗', '涉嫌诈骗', NULL, 1148, 1147, '1', 'string', '1', '2023-01-02 18:45:12', '2023-01-02 20:04:30', 1149, '1');
+INSERT INTO `report` VALUES (1609877947974496258, '恶意骚扰', '该用户涉嫌恶意骚扰', NULL, 1148, 1147, '1', ':/report/illus/1609877947974496258-xianxiayuedu.png', '1', '2023-01-02 19:43:08', '2023-01-02 20:06:29', 1149, '3');
+INSERT INTO `report` VALUES (1609883926090780674, '恶意骚扰', '该用户涉嫌恶意骚扰', NULL, 1148, 1147, '1', 'string', '1', '2023-01-02 20:06:53', '2023-01-02 20:07:07', 1149, '3');
+INSERT INTO `report` VALUES (1609884074766274562, '恶意骚扰', '该用户涉嫌恶意骚扰', NULL, 1148, 1147, '1', 'string', '1', '2023-01-02 20:07:28', '2023-01-02 20:07:40', 1149, '7');
 
 -- ----------------------------
 -- Table structure for tag
@@ -422,6 +440,9 @@ CREATE TABLE `task`  (
 -- ----------------------------
 -- Records of task
 -- ----------------------------
+INSERT INTO `task` VALUES (1609854570966626305, '数据库课设', '数据库课设', '1', '默认分组', 0, '2023-01-10 00:00:00', '2023-01-11 00:00:00', 1, '0', 1147, '2023-01-02 19:33:11', '无', '2023-01-02 18:10:14', 2);
+INSERT INTO `task` VALUES (1609854656492679169, '计算机网络实验一', '计算机网络实验一', '0', '默认分组', 0, '2023-01-10 00:00:00', '2023-01-11 00:00:00', 1, '0', 1147, NULL, '无', '2023-01-02 18:10:34', 2);
+INSERT INTO `task` VALUES (1609854734779363329, '设计模式小组会议', '设计模式小组会议', '1', '默认分组', 0, '2023-01-11 00:00:00', '2023-01-12 00:00:00', 1, '0', 1147, '2023-01-02 19:33:12', '无', '2023-01-02 18:10:53', 2);
 
 -- ----------------------------
 -- Table structure for user
@@ -441,13 +462,13 @@ CREATE TABLE `user`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `email`(`email`) USING BTREE,
   INDEX `name`(`name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1149 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1150 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
 INSERT INTO `user` VALUES (1147, 'yy', 'e178ce6a0ba65721a4327d44e326ea6a', '657826973@qq.com', NULL, NULL, 'http://42.192.45.95:8081/api/user/avatar.jpg', '0', NULL, 100);
-INSERT INTO `user` VALUES (1148, 'Johnny', 'e178ce6a0ba65721a4327d44e326ea6a', '1558124206@qq.com', NULL, NULL, 'http://42.192.45.95:8081/api/user/avatar.jpg', '0', NULL, 100);
+INSERT INTO `user` VALUES (1148, 'Johnny', 'e178ce6a0ba65721a4327d44e326ea6a', '1558124206@qq.com', NULL, NULL, 'http://42.192.45.95:8081/api/user/avatar.jpg', '0', '2023-01-09 20:07:40', 98);
 INSERT INTO `user` VALUES (1149, 'admin', 'e178ce6a0ba65721a4327d44e326ea6a', '123456@qq.com', NULL, NULL, 'http://42.192.45.95:8081/api/user/avatar.jpg', '1', NULL, 100);
 
 -- ----------------------------
@@ -517,5 +538,7 @@ CREATE TABLE `vote_option`  (
 -- ----------------------------
 -- Records of vote_option
 -- ----------------------------
+INSERT INTO `vote_option` VALUES (1609873298840170499, '麦当劳', 1609873298840170498, 0);
+INSERT INTO `vote_option` VALUES (1609873298907279362, '塔可星', 1609873298840170498, 0);
 
 SET FOREIGN_KEY_CHECKS = 1;
