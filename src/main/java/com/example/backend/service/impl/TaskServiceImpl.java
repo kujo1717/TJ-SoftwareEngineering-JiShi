@@ -166,11 +166,14 @@ public class TaskServiceImpl implements TaskService {
                 //完成所有孩子（递归）
                 for (Task sonTask : task.getRelativeTask()) {
                     //如果及时完成
-                    if (DateTimeUtil.getCurrentTimestamp().before(sonTask.getEndTime()))
+                    if (DateTimeUtil.getCurrentTimestamp().before(sonTask.getEndTime())) {
                         sonTask.setTaskState((short) 1);
-                        //如果没有及时完成
+                        sonTask.setRealFinishTime(DateTimeUtil.getCurrentTimestamp());
+                    }
+                    //如果没有及时完成
                     else {
                         sonTask.setTaskState((short) 2);
+                        sonTask.setRealFinishTime(DateTimeUtil.getCurrentTimestamp());
                     }
 
                     //递归更新子事项
@@ -212,7 +215,10 @@ public class TaskServiceImpl implements TaskService {
         //保证一位数的日期也是dd格式
         String dayStr = day < 10 ? "0" + Integer.toString(day) : Integer.toString(day);
 
-        List<Task> taskList = taskMapper.selectOneDayFinishedTaskList(userId, year, month, dayStr);
+        //保证一位数的月份也是mm格式
+        String monthStr = month < 10 ? "0" + Integer.toString(month) : Integer.toString(month);
+
+        List<Task> taskList = taskMapper.selectOneDayFinishedTaskList(userId, year, monthStr, dayStr);
         return taskList;
     }
 
@@ -231,7 +237,10 @@ public class TaskServiceImpl implements TaskService {
         //保证一位数的日期也是dd格式
         String dayStr = day < 10 ? "0" + Integer.toString(day) : Integer.toString(day);
 
-        List<Task> taskList = taskMapper.selectOneDayCreatedTaskList(userId, year, month, dayStr);
+        //保证一位数的月份也是mm格式
+        String monthStr = month < 10 ? "0" + Integer.toString(month) : Integer.toString(month);
+
+        List<Task> taskList = taskMapper.selectOneDayCreatedTaskList(userId, year, monthStr, dayStr);
         return taskList;
     }
 
